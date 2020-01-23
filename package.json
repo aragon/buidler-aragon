@@ -1,0 +1,58 @@
+{
+  "name": "@aragon/buidler-aragon",
+  "version": "0.0.1",
+  "description": "Aragon Buidler plugin",
+  "main": "index.js",
+  "author": "Aragon Association <legal@aragon.org>",
+  "license": "GPL-3.0-or-later",
+  "keywords": [
+    "aragon",
+    "buidler",
+    "plugin",
+    "ethereum"
+  ],
+  "scripts": {
+    "build-project": "cd test/buidler-project && npm install && cd ../..",
+    "prepare": "npm run compile && npm run generate && npm run build-project",
+    "compile": "buidler compile --force",
+    "generate": "typechain --target truffle --outDir typechain 'artifacts/*.json'",
+    "lint": "eslint 'src/**/*.{js,ts}'",
+    "prettier": "prettier --write '**/*.{ts,js,css,html}'",
+    "test": "mocha --exit",
+    "build": "tsc --build ."
+  },
+  "dependencies": {
+    "@aragon/os": "4.0.1",
+    "@aragon/toolkit": "^0.0.3",
+    "@nomiclabs/buidler": "^1.0.2",
+    "@nomiclabs/buidler-truffle5": "^1.0.2",
+    "@nomiclabs/buidler-web3": "^1.0.2",
+    "@types/chai": "^4.2.5",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^13.1.4",
+    "@types/web3": "^1.2.2",
+    "chalk": "^3.0.0",
+    "chokidar": "^3.3.1",
+    "dotenv": "^8.2.0",
+    "eth-ens-namehash": "^2.0.8",
+    "ethjs-ens": "^2.0.1",
+    "execa": "^4.0.0",
+    "fs-extra": "^8.1.0",
+    "open": "^7.0.0",
+    "truffle-typings": "1.0.4",
+    "ts-node": "^8.5.4",
+    "tsconfig-paths": "^3.9.0",
+    "typechain": "^1.0.3",
+    "typechain-target-truffle": "^1.0.2",
+    "typescript": "^3.7.4",
+    "web3": "^1.2.4"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "prettier": "^1.19.1"
+  }
+}
