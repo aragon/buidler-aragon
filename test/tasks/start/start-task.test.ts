@@ -3,7 +3,7 @@ import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { TASK_START } from '~/src/tasks/task-names'
 import { execaPipe } from '~/src/tasks/start/utils/execa'
 
-describe('start-task.ts', function() {
+describe.only('start-task.ts', function() {
   const RUN_TIME = 20000
   let errorThrown
 
@@ -14,7 +14,11 @@ describe('start-task.ts', function() {
       // closes open ended tasks.
       // NOTE #2: Notice how no 'await' is used because we don't want
       // to trigger the process just yet.
-      const startTaskProcess = execaPipe('npx', ['buidler', TASK_START], {})
+      const startTaskProcess = execaPipe(
+        'npx',
+        ['buidler', TASK_START, '--open-browser', 'false'],
+        {}
+      )
 
       // This will kill the process after it starts.
       setTimeout(() => {

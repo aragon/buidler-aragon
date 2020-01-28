@@ -1,5 +1,5 @@
 import chokidar from 'chokidar'
-import { task } from '@nomiclabs/buidler/config'
+import { task, types } from '@nomiclabs/buidler/config'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { TASK_START, TASK_COMPILE } from '../task-names'
 import { createDao } from './utils/backend/dao'
@@ -23,8 +23,14 @@ import { getAppName, getAppEnsName } from './utils/arapp'
  * Main, composite, task. Calls startBackend, then startFrontend,
  * and then returns an unresolving promise to keep the task open.
  */
-task(TASK_START, 'Starts Aragon app development').setAction(
-  async (params, bre: BuidlerRuntimeEnvironment) => {
+task(TASK_START, 'Starts Aragon app development')
+  .addParam(
+    'openBrowser',
+    'Wether or not to automatically open a browser tab with the client',
+    true,
+    types.boolean
+  )
+  .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
     logMain(`Starting...`)
 
     const appEnsName = await getAppEnsName()
@@ -35,9 +41,8 @@ task(TASK_START, 'Starts Aragon app development').setAction(
     logMain(`App id: ${appId}`)
 
     const { daoAddress, appAddress } = await startBackend(bre, appName, appId)
-    await startFrontend(bre, daoAddress, appAddress)
-  }
-)
+    await startFrontend(bre, daoAddress, appAddress, params.openBrowser)
+  })
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -138,22 +143,27 @@ async function startBackend(
 async function startFrontend(
   bre: BuidlerRuntimeEnvironment,
   daoAddress: string,
-  appAddress: string
+  appAddress: string,
+  openBrowser: boolean
 ): Promise<void> {
   const config: AragonConfig = bre.config.aragon as AragonConfig
 
-  await installAragonClientIfNeeded()
+  if (openBrowser) {
+    await installAragonClientIfNeeded()
+  }
 
   await buildAppArtifacts(config.appBuildOutputPath as string, bre.artifacts)
 
   // Start Aragon client at the deployed address.
-  const url: string = await startAragonClient(
-    config.clientServePort as number,
-    `${daoAddress}/${appAddress}`
-  )
-  logFront(`You can now view the Aragon client in the browser.
- Local:  ${url}
-`)
+  if (openBrowser) {
+    const url: string = await startAragonClient(
+      config.clientServePort as number,
+      `${daoAddress}/${appAddress}`
+    )
+    logFront(`You can now view the Aragon client in the browser.
+   Local:  ${url}
+  `)
+  }
 
   // Watch for changes to rebuild app.
   await watchAppFrontEnd(config.appSrcPath as string)
