@@ -45,9 +45,7 @@ export function getAppName(): string {
 export function getMainContractPath(): string {
   // Read the path from arapp.json.
   if (fs.existsSync(arappPath)) {
-    const arapp: { path: string } = JSON.parse(
-      fs.readFileSync(arappPath, 'utf-8')
-    )
+    const arapp = readArapp()
 
     return arapp.path
   }
