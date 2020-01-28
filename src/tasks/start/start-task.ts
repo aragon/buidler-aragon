@@ -27,7 +27,14 @@ task(TASK_START, 'Starts Aragon app development').setAction(
   async (params, bre: BuidlerRuntimeEnvironment) => {
     logMain(`Starting...`)
 
-    const { daoAddress, appAddress } = await startBackend(bre)
+    const appEnsName = await getAppEnsName()
+    const appName = await getAppName()
+    const appId: string = getAppId(appName)
+    logMain(`App name: ${appName}`)
+    logMain(`App ens name: ${appEnsName}`)
+    logMain(`App id: ${appId}`)
+
+    const { daoAddress, appAddress } = await startBackend(bre, appName, appId)
     await startFrontend(bre, daoAddress, appAddress)
   }
 )
@@ -41,17 +48,11 @@ task(TASK_START, 'Starts Aragon app development').setAction(
  * be used with an Aragon client to view the app.
  */
 async function startBackend(
-  bre: BuidlerRuntimeEnvironment
+  bre: BuidlerRuntimeEnvironment,
+  appName: string,
+  appId: string
 ): Promise<{ daoAddress: string; appAddress: string }> {
-  const appEnsName = await getAppEnsName()
-  const appName = await getAppName()
-  const appId: string = getAppId(appName)
-  console.log(`App name: ${appName}`)
-  console.log(`App ens name: ${appEnsName}`)
-  console.log(`App id: ${appId}`)
-
   const config: AragonConfig = bre.config.aragon as AragonConfig
-  console.log(`config`, config)
 
   await bre.run(TASK_COMPILE)
 
@@ -81,7 +82,9 @@ async function startBackend(
       proxyInitParams = params
     }
   }
-  console.log(`proxyInitParams`, proxyInitParams)
+  if (proxyInitParams && proxyInitParams.length > 0) {
+    logBack(`Proxy init params: ${proxyInitParams}`)
+  }
 
   // Deploy first implementation and set it in the Repo and in a Proxy.
   const implementation: Truffle.ContractInstance = await deployImplementation(

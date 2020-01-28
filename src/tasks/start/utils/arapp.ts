@@ -11,7 +11,6 @@ export function readArapp(): AragonAppJson {
 
 export function getAppEnsName(): string {
   const arapp = readArapp()
-  console.log(`arapp`, arapp)
 
   const defaultEnvironment = arapp.environments.default
   if (!defaultEnvironment) {
