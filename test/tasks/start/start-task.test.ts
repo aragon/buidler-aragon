@@ -1,15 +1,13 @@
 import { assert } from 'chai'
-import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
+import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { TASK_START } from '~/src/tasks/task-names'
 import { execaPipe } from '~/src/tasks/start/utils/execa'
 
 describe('start-task.ts', function() {
-  useDefaultEnvironment()
+  const RUN_TIME = 20000
+  let errorThrown
 
-  describe('when running the start task for a few seconds', function() {
-    const RUN_TIME = 20000
-    let errorThrown
-
+  const itRunsTheStartTask = function() {
     before('run the start task with a kill timeout', async function() {
       // Define the start task process using execa.
       // NOTE #1: Not using this.env.run(TASK_START) because it currently
@@ -36,6 +34,16 @@ describe('start-task.ts', function() {
         `Unexpected error thrown: ${errorThrown}`
       )
     })
+  }
+
+  describe('when running on the counter project', async function() {
+    useEnvironment('../projects/counter')
+    itRunsTheStartTask()
+  })
+
+  describe('when running on the token-wrapper project', async function() {
+    useEnvironment('../projects/token-wrapper')
+    itRunsTheStartTask()
   })
 
   it.skip('more tests needed', async function() {})
