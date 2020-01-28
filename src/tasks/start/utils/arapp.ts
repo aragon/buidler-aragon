@@ -5,10 +5,18 @@ import { AragonAppJson } from '~/src/types'
 const arappPath = 'arapp.json'
 const contractsPath = './contracts'
 
+/**
+ * Reads and parses an arapp.json file.
+ * @return AragonAppJson
+ */
 export function readArapp(): AragonAppJson {
   return JSON.parse(fs.readFileSync(arappPath, 'utf-8'))
 }
 
+/**
+ * Returns app ens name.
+ * @return "voting.open.aragonpm.eth"
+ */
 export function getAppEnsName(): string {
   const arapp = readArapp()
 
@@ -20,6 +28,10 @@ export function getAppEnsName(): string {
   return defaultEnvironment.appName
 }
 
+/**
+ * Returns app name.
+ * @return "voting"
+ */
 export function getAppName(): string {
   const ensName = getAppEnsName()
 
@@ -27,7 +39,7 @@ export function getAppName(): string {
 }
 
 /**
- * Returns main contract path
+ * Returns main contract path.
  * @return "./contracts/Counter.sol"
  */
 export function getMainContractPath(): string {
@@ -57,7 +69,7 @@ export function getMainContractPath(): string {
 }
 
 /**
- * Returns main contract name
+ * Returns main contract name.
  * @return "Counter"
  */
 export function getMainContractName(): string {
