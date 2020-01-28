@@ -3,7 +3,7 @@ import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { TASK_START } from '~/src/tasks/task-names'
 import { execaPipe } from '~/src/tasks/start/utils/execa'
 
-describe.only('start-task.ts', function() {
+describe('start-task.ts', function() {
   const RUN_TIME = 20000
   let errorThrown
 

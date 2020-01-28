@@ -27,7 +27,7 @@ module.exports = {
     clientServePort: 3000,
     appSrcPath: 'app/',
     appBuildOutputPath: 'dist/',
-    // proxyInitializationParams: ['one', 'two', 'three']
+    proxyInitializationParams: ['0xDEADBEAF', 'Wrapped token', 'wORG'],
     proxyInitializationParamsFn: require('./scripts/proxyInitializationParamsFn.js')
   }
 }
