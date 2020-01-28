@@ -4,11 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prepare": "npm run compile && npm run generate && npm run build-app",
+    "postinstall": "npm run compile && npm run generate && npm run build-app",
     "build-app": "cd app && npm install && cd ..",
     "compile": "buidler compile --force",
-    "generate": "typechain --target truffle --outDir typechain 'artifacts/*.json'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "generate": "typechain --target truffle --outDir typechain 'artifacts/*.json'"
   },
   "dependencies": {
     "@aragon/os": "4.0.1",

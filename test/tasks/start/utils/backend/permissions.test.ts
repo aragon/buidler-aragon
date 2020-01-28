@@ -33,7 +33,8 @@ describe('permissions.ts', function() {
       appId,
       dao,
       this.env.web3,
-      this.env.artifacts
+      this.env.artifacts,
+      []
     )
 
     arapp = readArapp()

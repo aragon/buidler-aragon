@@ -4,6 +4,7 @@ import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 
 export const ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
+export const DUMMY_BYTES = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 /**
  * Scans arapp.json, setting all permissions to ANY_ADDRESS.
@@ -22,6 +23,7 @@ export async function setAllPermissionsOpenly(
   const ACL = artifacts.require('ACL')
   const acl = await ACL.at(aclAddress)
 
+  // Sweep all roles found in arapp.json.
   for (const role of arapp.roles) {
     const permission = await app[role.id]()
 
@@ -35,4 +37,8 @@ export async function setAllPermissionsOpenly(
       { from: rootAccount }
     )
   }
+
+  // Additionally, set a placeholder permission, so that the app
+  // shows in the client even if it doesn't specify permissions yet.
+  acl.createPermission(ANY_ADDRESS, app.address, DUMMY_BYTES, rootAccount)
 }

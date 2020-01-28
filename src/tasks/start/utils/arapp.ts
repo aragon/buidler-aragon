@@ -9,6 +9,24 @@ export function readArapp(): AragonAppJson {
   return JSON.parse(fs.readFileSync(arappPath, 'utf-8'))
 }
 
+export function getAppEnsName(): string {
+  const arapp = readArapp()
+  console.log(`arapp`, arapp)
+
+  const defaultEnvironment = arapp.environments.default
+  if (!defaultEnvironment) {
+    throw new Error('Default environemnt not found in arapp.json')
+  }
+
+  return defaultEnvironment.appName
+}
+
+export function getAppName(): string {
+  const ensName = getAppEnsName()
+
+  return ensName.split('.')[0]
+}
+
 /**
  * Returns main contract path
  * @return "./contracts/Counter.sol"

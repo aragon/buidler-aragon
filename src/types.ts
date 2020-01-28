@@ -1,4 +1,4 @@
-import { BuidlerConfig } from '@nomiclabs/buidler/types'
+import { BuidlerConfig, BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 
 export interface BuidlerAragonConfig extends BuidlerConfig {
   aragon: AragonConfig
@@ -9,6 +9,10 @@ export interface AragonConfig {
   clientServePort?: number
   appSrcPath?: string
   appBuildOutputPath?: string
+  proxyInitializationParams?: any[]
+  proxyInitializationParamsFn?: (
+    bre: BuidlerRuntimeEnvironment
+  ) => Promise<any[]> | any[]
 }
 
 /**
@@ -16,7 +20,7 @@ export interface AragonConfig {
  */
 export interface AragonAppJson {
   roles: Role[]
-  environment: AragonEnvironments
+  environments: AragonEnvironments
   path: string
 }
 
