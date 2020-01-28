@@ -8,7 +8,7 @@ import {
 } from '~/src/tasks/start/utils/arapp'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 
-describe.only('arapp.ts', function() {
+describe('arapp.ts', function() {
   useDefaultEnvironment()
 
   it('should read an arapp.json file', async function() {
