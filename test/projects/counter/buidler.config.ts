@@ -6,7 +6,7 @@ usePlugin('@nomiclabs/buidler-web3')
 // Specially load the buidler-aragon plugin for testing here.
 // Normally would use `usePlugin(@aragon/buidler-aragon)`.
 import { loadPluginFile } from '@nomiclabs/buidler/plugins-testing'
-loadPluginFile(__dirname + '/../../src/index')
+loadPluginFile(__dirname + '/../../../src/index')
 
 const config: BuidlerConfig = {
   defaultNetwork: 'localhost',

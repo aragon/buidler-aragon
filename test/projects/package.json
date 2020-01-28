@@ -1,0 +1,13 @@
+{
+  "name": "projects",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build-counter": "cd counter && npm install && cd ..",
+    "build-projects": "npm run build-counter"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

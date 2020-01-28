@@ -12,8 +12,8 @@
     "ethereum"
   ],
   "scripts": {
-    "build-project": "cd test/buidler-project && npm install && cd ../..",
-    "prepare": "npm run compile && npm run generate && npm run build-project",
+    "build-projects": "cd test/projects && npm install && cd ../..",
+    "prepare": "npm run compile && npm run generate && npm run build-projects",
     "compile": "buidler compile --force",
     "generate": "typechain --target truffle --outDir typechain 'artifacts/*.json'",
     "lint": "eslint 'src/**/*.{js,ts}'",

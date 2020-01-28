@@ -9,7 +9,7 @@ declare module 'mocha' {
 }
 
 export function useDefaultEnvironment(): void {
-  useEnvironment(path.join(__dirname, '../buidler-project'))
+  useEnvironment(path.join(__dirname, '../projects/counter'))
 }
 
 export function useEnvironment(

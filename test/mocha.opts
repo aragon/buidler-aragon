@@ -3,5 +3,5 @@
 --require tsconfig-paths/register
 --require source-map-support/register
 --recursive test/**/*.ts
---exclude test/buidler-project/**/*.ts
+--exclude test/projects/**/*.ts
 --timeout 60000
