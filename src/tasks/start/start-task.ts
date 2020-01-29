@@ -1,5 +1,5 @@
 import chokidar from 'chokidar'
-import { task } from '@nomiclabs/buidler/config'
+import { task, types } from '@nomiclabs/buidler/config'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { TASK_START, TASK_COMPILE } from '../task-names'
 import { createDao } from './utils/backend/dao'
@@ -16,20 +16,33 @@ import { KernelInstance, RepoInstance } from '~/typechain'
 import { getAppId } from './utils/id'
 import { logFront, logBack, logMain } from './utils/logger'
 import { readArapp } from './utils/arapp'
-import { AragonConfig } from '~/src/types'
+import { AragonConfig, AragonConfigHooks } from '~/src/types'
+import { getAppName, getAppEnsName } from './utils/arapp'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,
  * and then returns an unresolving promise to keep the task open.
  */
-task(TASK_START, 'Starts Aragon app development').setAction(
-  async (params, env: BuidlerRuntimeEnvironment) => {
+task(TASK_START, 'Starts Aragon app development')
+  .addParam(
+    'openBrowser',
+    'Wether or not to automatically open a browser tab with the client',
+    true,
+    types.boolean
+  )
+  .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
     logMain(`Starting...`)
 
-    const { daoAddress, appAddress } = await startBackend(env)
-    await startFrontend(env, daoAddress, appAddress)
-  }
-)
+    const appEnsName = await getAppEnsName()
+    const appName = await getAppName()
+    const appId: string = getAppId(appName)
+    logMain(`App name: ${appName}`)
+    logMain(`App ens name: ${appEnsName}`)
+    logMain(`App id: ${appId}`)
+
+    const { daoAddress, appAddress } = await startBackend(bre, appName, appId)
+    await startFrontend(bre, daoAddress, appAddress, params.openBrowser)
+  })
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -40,56 +53,82 @@ task(TASK_START, 'Starts Aragon app development').setAction(
  * be used with an Aragon client to view the app.
  */
 async function startBackend(
-  env: BuidlerRuntimeEnvironment
+  bre: BuidlerRuntimeEnvironment,
+  appName: string,
+  appId: string
 ): Promise<{ daoAddress: string; appAddress: string }> {
-  const appName = 'counter'
-  const appId: string = getAppId(appName)
+  const config: AragonConfig = bre.config.aragon as AragonConfig
+  const hooks: AragonConfigHooks = config.hooks as AragonConfigHooks
 
-  const config: AragonConfig = env.config.aragon as AragonConfig
-
-  await env.run(TASK_COMPILE)
+  await bre.run(TASK_COMPILE)
 
   // Read arapp.json
   const arapp = readArapp()
 
   // Prepare a DAO and a Repo to hold the app.
-  const dao: KernelInstance = await createDao(env.web3, env.artifacts)
+  const dao: KernelInstance = await createDao(bre.web3, bre.artifacts)
   const repo: RepoInstance = await createRepo(
     appName,
     appId,
-    env.web3,
-    env.artifacts
+    bre.web3,
+    bre.artifacts
   )
+
+  // Call preInit hook.
+  if (hooks && hooks.preInit) {
+    console.log(`PRE?`)
+    await hooks.preInit(bre)
+  }
+
+  // Call getInitParams hook.
+  let proxyInitParams: any[] = []
+  if (hooks && hooks.getInitParams) {
+    const params = await hooks.getInitParams(bre)
+    proxyInitParams = params ? params : proxyInitParams
+  }
+  if (proxyInitParams && proxyInitParams.length > 0) {
+    logBack(`Proxy init params: ${proxyInitParams}`)
+  }
 
   // Deploy first implementation and set it in the Repo and in a Proxy.
   const implementation: Truffle.ContractInstance = await deployImplementation(
-    env.artifacts
+    bre.artifacts
   )
   const proxy: Truffle.ContractInstance = await createProxy(
     implementation,
     appId,
     dao,
-    env.web3,
-    env.artifacts
+    bre.web3,
+    bre.artifacts,
+    proxyInitParams
   )
   await updateRepo(repo, implementation, config.appServePort as number)
-  await setAllPermissionsOpenly(dao, proxy, arapp, env.web3, env.artifacts)
 
-  // Watch back-end files. Debounce for performance
+  // TODO: What if user wants to set custom permissions?
+  // Use a hook? A way to disable all open permissions?
+  await setAllPermissionsOpenly(dao, proxy, arapp, bre.web3, bre.artifacts)
+
+  // Call postInit hook.
+  if (hooks && hooks.postInit) {
+    console.log(`POST?`)
+    await hooks.postInit(bre)
+  }
+
+  // Watch back-end files.
   chokidar
     .watch('./contracts/', {
       awaitWriteFinish: { stabilityThreshold: 1000 }
     })
     .on('change', async () => {
       logBack(`<<< Triggering backend build >>>`)
-      await env.run(TASK_COMPILE)
+      await bre.run(TASK_COMPILE)
 
       // Update implementation and set it in Repo and Proxy.
       const newImplementation: Truffle.ContractInstance = await deployImplementation(
-        env.artifacts
+        bre.artifacts
       )
       await updateRepo(repo, newImplementation, config.appServePort as number)
-      await updateProxy(newImplementation, appId, dao, env.web3)
+      await updateProxy(newImplementation, appId, dao, bre.web3)
     })
 
   logBack(`
@@ -110,24 +149,29 @@ async function startBackend(
  * If changes are detected, the app's frontend is rebuilt.
  */
 async function startFrontend(
-  env: BuidlerRuntimeEnvironment,
+  bre: BuidlerRuntimeEnvironment,
   daoAddress: string,
-  appAddress: string
+  appAddress: string,
+  openBrowser: boolean
 ): Promise<void> {
-  const config: AragonConfig = env.config.aragon as AragonConfig
+  const config: AragonConfig = bre.config.aragon as AragonConfig
 
-  await installAragonClientIfNeeded()
+  if (openBrowser) {
+    await installAragonClientIfNeeded()
+  }
 
-  await buildAppArtifacts(config.appBuildOutputPath as string, env.artifacts)
+  await buildAppArtifacts(config.appBuildOutputPath as string, bre.artifacts)
 
   // Start Aragon client at the deployed address.
-  const url: string = await startAragonClient(
-    config.clientServePort as number,
-    `${daoAddress}/${appAddress}`
-  )
-  logFront(`You can now view the Aragon client in the browser.
- Local:  ${url}
-`)
+  if (openBrowser) {
+    const url: string = await startAragonClient(
+      config.clientServePort as number,
+      `${daoAddress}/${appAddress}`
+    )
+    logFront(`You can now view the Aragon client in the browser.
+   Local:  ${url}
+  `)
+  }
 
   // Watch for changes to rebuild app.
   await watchAppFrontEnd(config.appSrcPath as string)

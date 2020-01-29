@@ -18,7 +18,7 @@
     }
   },
   "include": ["./src", "./test"],
-  "exclude": ["./test/buidler-project"],
+  "exclude": ["./test/projects"],
   "files": [
     "./src/type-extensions.d.ts",
     "./node_modules/@nomiclabs/buidler-web3/src/type-extensions.d.ts",

@@ -12,7 +12,7 @@ describe('execa.ts', function() {
 
     it('should have printed console output with the expected path', async function() {
       const dir = path.basename(res.stdout)
-      assert.equal(dir, 'buidler-project')
+      assert.equal(dir, 'counter')
     })
 
     it('should have ended with exit code 0', async function() {

@@ -1,14 +1,14 @@
-import { usePlugin, BuidlerConfig } from '@nomiclabs/buidler/config'
+const { usePlugin } = require('@nomiclabs/buidler/config')
 
 usePlugin('@nomiclabs/buidler-truffle5')
 usePlugin('@nomiclabs/buidler-web3')
 
 // Specially load the buidler-aragon plugin for testing here.
 // Normally would use `usePlugin(@aragon/buidler-aragon)`.
-import { loadPluginFile } from '@nomiclabs/buidler/plugins-testing'
-loadPluginFile(__dirname + '/../../src/index')
+const { loadPluginFile } = require('@nomiclabs/buidler/plugins-testing')
+loadPluginFile(__dirname + '/../../../dist/src/index')
 
-const config: BuidlerConfig = {
+module.exports = {
   defaultNetwork: 'localhost',
   networks: {
     localhost: {
@@ -26,8 +26,7 @@ const config: BuidlerConfig = {
     appServePort: 8001,
     clientServePort: 3000,
     appSrcPath: 'app/',
-    appBuildOutputPath: 'dist/'
+    appBuildOutputPath: 'dist/',
+    hooks: require('./scripts/hooks.js')
   }
 }
-
-export default config

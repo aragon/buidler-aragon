@@ -5,20 +5,47 @@ import { AragonAppJson } from '~/src/types'
 const arappPath = 'arapp.json'
 const contractsPath = './contracts'
 
+/**
+ * Reads and parses an arapp.json file.
+ * @return AragonAppJson
+ */
 export function readArapp(): AragonAppJson {
   return JSON.parse(fs.readFileSync(arappPath, 'utf-8'))
 }
 
 /**
- * Returns main contract path
+ * Returns app ens name.
+ * @return "voting.open.aragonpm.eth"
+ */
+export function getAppEnsName(): string {
+  const arapp = readArapp()
+
+  const defaultEnvironment = arapp.environments.default
+  if (!defaultEnvironment) {
+    throw new Error('Default environemnt not found in arapp.json')
+  }
+
+  return defaultEnvironment.appName
+}
+
+/**
+ * Returns app name.
+ * @return "voting"
+ */
+export function getAppName(): string {
+  const ensName = getAppEnsName()
+
+  return ensName.split('.')[0]
+}
+
+/**
+ * Returns main contract path.
  * @return "./contracts/Counter.sol"
  */
 export function getMainContractPath(): string {
   // Read the path from arapp.json.
   if (fs.existsSync(arappPath)) {
-    const arapp: { path: string } = JSON.parse(
-      fs.readFileSync(arappPath, 'utf-8')
-    )
+    const arapp = readArapp()
 
     return arapp.path
   }
@@ -40,7 +67,7 @@ export function getMainContractPath(): string {
 }
 
 /**
- * Returns main contract name
+ * Returns main contract name.
  * @return "Counter"
  */
 export function getMainContractName(): string {

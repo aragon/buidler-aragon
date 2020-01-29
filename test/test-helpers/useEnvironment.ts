@@ -9,13 +9,14 @@ declare module 'mocha' {
 }
 
 export function useDefaultEnvironment(): void {
-  useEnvironment(path.join(__dirname, '../buidler-project'))
+  useEnvironment('counter')
 }
 
 export function useEnvironment(
-  projectPath: string,
+  projectName: string,
   networkName = 'localhost'
 ): void {
+  const projectPath = path.join(__dirname, '../projects', projectName)
   before('loading buidler environment', function() {
     process.chdir(projectPath)
     process.env.BUIDLER_NETWORK = networkName

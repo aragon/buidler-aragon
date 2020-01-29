@@ -1,0 +1,14 @@
+{
+  "name": "projects",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build-token-wrapper": "cd token-wrapper && npm install && cd ..",
+    "build-counter": "cd counter && npm install && cd ..",
+    "build-projects": "npm run build-counter && npm run build-token-wrapper"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

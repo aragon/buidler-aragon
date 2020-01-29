@@ -5,7 +5,7 @@ import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 
 interface InitializableApp extends Truffle.ContractInstance {
-  initialize: () => void
+  initialize: (...args: any[]) => void
 }
 
 const BASE_NAMESPACE =
@@ -21,7 +21,8 @@ export async function createProxy(
   appId: string,
   dao: KernelInstance,
   web3: Web3,
-  artifacts: TruffleEnvironmentArtifacts
+  artifacts: TruffleEnvironmentArtifacts,
+  proxyInitParams: any[]
 ): Promise<Truffle.ContractInstance> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
 
@@ -50,7 +51,7 @@ export async function createProxy(
   const proxy: InitializableApp = await App.at(proxyAddress)
 
   // Initialize the app.
-  await proxy.initialize()
+  await proxy.initialize(...proxyInitParams)
 
   return proxy
 }

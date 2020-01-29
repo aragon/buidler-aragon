@@ -1,0 +1,39 @@
+{
+  "name": "@aragonone/apps-token-wrapper",
+  "version": "1.0.0",
+  "description": "Aragon token wrapper app",
+  "author": "Aragon One <legal@aragon.one>",
+  "license": "(GPL-3.0-or-later OR AGPL-3.0-or-later)",
+  "files": [
+    "/abi",
+    "/arapp.json",
+    "/build",
+    "/contracts",
+    "/test"
+  ],
+  "scripts": {
+    "postinstall": "npm run compile && npm run build-app",
+    "build-app": "cd app && npm install && cd ..",
+    "compile": "buidler compile --force"
+  },
+  "dependencies": {
+    "@aragon/os": "4.3.0",
+    "@aragonone/voting-connectors-contract-utils": "^1.0.0-rc.3"
+  },
+  "devDependencies": {
+    "@aragon/apps-shared-migrations": "^1.0.0",
+    "@aragon/apps-shared-minime": "^1.0.0",
+    "@aragon/apps-voting": "^2.0.0",
+    "@aragon/cli": "^6.4.4",
+    "@aragon/test-helpers": "^2.1.0",
+    "@nomiclabs/buidler": "^1.0.2",
+    "@nomiclabs/buidler-truffle5": "^1.0.2",
+    "@nomiclabs/buidler-web3": "^1.0.2",
+    "ethereumjs-abi": "^0.6.4",
+    "ethereumjs-testrpc-sc": "^6.5.1-sc.1",
+    "ganache-cli": "^6.4.3",
+    "solidity-coverage": "^0.6.7",
+    "solium": "^1.2.3",
+    "web3": "^1.2.4"
+  }
+}
