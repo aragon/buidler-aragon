@@ -76,7 +76,6 @@ async function startBackend(
 
   // Call preInit hook.
   if (hooks && hooks.preInit) {
-    console.log(`PRE?`)
     await hooks.preInit(bre)
   }
 
@@ -110,7 +109,6 @@ async function startBackend(
 
   // Call postInit hook.
   if (hooks && hooks.postInit) {
-    console.log(`POST?`)
     await hooks.postInit(bre)
   }
 

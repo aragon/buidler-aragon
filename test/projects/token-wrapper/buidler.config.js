@@ -1,4 +1,5 @@
 const { usePlugin } = require('@nomiclabs/buidler/config')
+const hooks = require('./scripts/hooks')
 
 usePlugin('@nomiclabs/buidler-truffle5')
 usePlugin('@nomiclabs/buidler-web3')
@@ -27,6 +28,6 @@ module.exports = {
     clientServePort: 3000,
     appSrcPath: 'app/',
     appBuildOutputPath: 'dist/',
-    hooks: require('./scripts/hooks.js')
+    hooks
   }
 }
