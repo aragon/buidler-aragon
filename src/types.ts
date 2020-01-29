@@ -9,10 +9,13 @@ export interface AragonConfig {
   clientServePort?: number
   appSrcPath?: string
   appBuildOutputPath?: string
-  proxyInitializationParams?: any[]
-  proxyInitializationParamsFn?: (
-    bre: BuidlerRuntimeEnvironment
-  ) => Promise<any[]> | any[]
+  hooks?: AragonConfigHooks
+}
+
+export interface AragonConfigHooks {
+  preInit?: (bre: BuidlerRuntimeEnvironment) => Promise<void> | void
+  postInit?: (bre: BuidlerRuntimeEnvironment) => Promise<void> | void
+  getInitParams?: (bre: BuidlerRuntimeEnvironment) => Promise<any[]> | any[]
 }
 
 /**

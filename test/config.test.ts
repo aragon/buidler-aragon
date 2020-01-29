@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
+import { AragonConfig, AragonConfigHooks } from '~/src/types'
 
 describe('config.ts', () => {
   // TODO: Make sure to test values not specified in buidler.config.ts falling back to their defauls
@@ -7,48 +8,45 @@ describe('config.ts', () => {
 
   it.skip('more tests needed')
 
-  describe('proxy init params', async function() {
-    let config
+  describe('hooks', async function() {
+    let hooks
 
-    describe('when not specifying proxy init params', async function() {
+    describe('when in the counter project', async function() {
       useEnvironment('counter')
 
-      before('retrieve config', function() {
-        config = this.env.config.aragon
+      before('retrieve hooks', function() {
+        const config = this.env.config.aragon as AragonConfig
+        hooks = config.hooks as AragonConfigHooks
       })
 
-      it('doesnt have a proxyInitializationParams', async function() {
-        assert(config.proxyInitializationParams == undefined)
-      })
-
-      it('doesnt have a proxyInitializationParamsFn', async function() {
-        assert(config.proxyInitializationParamsFn == undefined)
+      it('doesnt have hooks defined', async function() {
+        assert(hooks == undefined)
       })
     })
 
-    describe('when specifying proxy init params', async function() {
+    describe('when in the token-wrapper project', async function() {
       useEnvironment('token-wrapper')
 
-      before('retrieve config', function() {
-        config = this.env.config.aragon
+      before('retrieve hooks', function() {
+        const config = this.env.config.aragon as AragonConfig
+        hooks = config.hooks as AragonConfigHooks
       })
 
-      it('has proxyInitializationParams', async function() {
+      it('has a getInitParams hook, which returns valid parameters', async function() {
+        const params = await hooks.getInitParams(this.env)
         assert.deepEqual(
-          config.proxyInitializationParams,
-          ['0xDEADBEAF', 'Wrapped token', 'wORG'],
+          [undefined, params[1], params[2]],
+          [undefined, 'Wrapped token', 'wORG'],
           'Mismatching proxy init params'
         )
       })
 
-      it('has proxyInitializationParamsFn', async function() {
-        const params = await config.proxyInitializationParamsFn(this.env)
-        const address = params[0].replace(/^0x[a-fA-F0-9]{40}$/g, '0xDEADBEAF')
-        assert.deepEqual(
-          [address, params[1], params[2]],
-          [address, 'Wrapped token', 'wORG'],
-          'Mismatching proxy init params'
-        )
+      it('has a preInit hook', async function() {
+        assert(hooks.preInit != undefined)
+      })
+
+      it('has a postInit hook', async function() {
+        assert(hooks.postInit != undefined)
       })
     })
   })

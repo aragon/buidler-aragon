@@ -16,7 +16,7 @@ import { KernelInstance, RepoInstance } from '~/typechain'
 import { getAppId } from './utils/id'
 import { logFront, logBack, logMain } from './utils/logger'
 import { readArapp } from './utils/arapp'
-import { AragonConfig } from '~/src/types'
+import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { getAppName, getAppEnsName } from './utils/arapp'
 
 /**
@@ -58,6 +58,7 @@ async function startBackend(
   appId: string
 ): Promise<{ daoAddress: string; appAddress: string }> {
   const config: AragonConfig = bre.config.aragon as AragonConfig
+  const hooks: AragonConfigHooks = config.hooks as AragonConfigHooks
 
   await bre.run(TASK_COMPILE)
 
@@ -73,19 +74,17 @@ async function startBackend(
     bre.artifacts
   )
 
-  // Prepare proxy initialization params.
-  // NOTE: This calls a function specified in the BuidlerConfig.
+  // Call preInit hook.
+  if (hooks && hooks.preInit) {
+    console.log(`PRE?`)
+    await hooks.preInit(bre)
+  }
+
+  // Call getInitParams hook.
   let proxyInitParams: any[] = []
-  if (config.proxyInitializationParamsFn) {
-    const params = await config.proxyInitializationParamsFn(bre)
-    if (params) {
-      proxyInitParams = params
-    }
-  } else if (config.proxyInitializationParams) {
-    const params = config.proxyInitializationParams
-    if (params) {
-      proxyInitParams = params
-    }
+  if (hooks && hooks.getInitParams) {
+    const params = await hooks.getInitParams(bre)
+    proxyInitParams = params ? params : proxyInitParams
   }
   if (proxyInitParams && proxyInitParams.length > 0) {
     logBack(`Proxy init params: ${proxyInitParams}`)
@@ -104,9 +103,18 @@ async function startBackend(
     proxyInitParams
   )
   await updateRepo(repo, implementation, config.appServePort as number)
+
+  // TODO: What if user wants to set custom permissions?
+  // Use a hook? A way to disable all open permissions?
   await setAllPermissionsOpenly(dao, proxy, arapp, bre.web3, bre.artifacts)
 
-  // Watch back-end files. Debounce for performance
+  // Call postInit hook.
+  if (hooks && hooks.postInit) {
+    console.log(`POST?`)
+    await hooks.postInit(bre)
+  }
+
+  // Watch back-end files.
   chokidar
     .watch('./contracts/', {
       awaitWriteFinish: { stabilityThreshold: 1000 }
