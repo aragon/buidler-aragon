@@ -1,6 +1,6 @@
 {
   "name": "@aragon/buidler-aragon",
-  "version": "0.0.1-beta.6",
+  "version": "0.0.1-beta.8",
   "description": "Aragon Buidler plugin",
   "main": "dist/src/index.js",
   "author": "Aragon Association <legal@aragon.org>",
@@ -12,13 +12,13 @@
     "ethereum"
   ],
   "files": [
-    "contracts",
+    "artifacts",
+    "typechain",
     "dist",
-    "src",
-    "buidler.config.js"
+    "src"
   ],
   "scripts": {
-    "postinstall": "npm run compile && npm run generate",
+    "dev": "npm run compile && npm run generate && npm run build-projects",
     "compile": "buidler compile --force",
     "generate": "typechain --target truffle --outDir typechain 'artifacts/*.json'",
     "lint": "eslint 'src/**/*.{js,ts}'",
@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@aragon/os": "4.0.1",
+    "@aragon/toolkit": "^0.0.3",
     "@nomiclabs/buidler": "^1.0.2",
     "@nomiclabs/buidler-truffle5": "^1.0.2",
     "@nomiclabs/buidler-web3": "^1.0.2",
