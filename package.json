@@ -1,8 +1,8 @@
 {
   "name": "@aragon/buidler-aragon",
-  "version": "0.0.1-beta.4",
+  "version": "0.0.1-beta.5",
   "description": "Aragon Buidler plugin",
-  "main": "index.js",
+  "main": "dist/index.ts",
   "author": "Aragon Association <legal@aragon.org>",
   "license": "GPL-3.0-or-later",
   "keywords": [
