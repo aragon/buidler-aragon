@@ -1,6 +1,6 @@
 {
   "name": "@aragon/buidler-aragon",
-  "version": "0.0.1-beta.1",
+  "version": "0.0.1-beta.4",
   "description": "Aragon Buidler plugin",
   "main": "index.js",
   "author": "Aragon Association <legal@aragon.org>",
@@ -12,9 +12,10 @@
     "ethereum"
   ],
   "files": [
-    "artifacts",
-    "typechain",
-    "dist/src"
+    "contracts",
+    "dist",
+    "src",
+    "buidler.config.js"
   ],
   "scripts": {
     "postinstall": "npm run compile && npm run generate",
