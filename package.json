@@ -1,6 +1,6 @@
 {
   "name": "@aragon/buidler-aragon",
-  "version": "0.0.1",
+  "version": "0.0.1-beta.1",
   "description": "Aragon Buidler plugin",
   "main": "index.js",
   "author": "Aragon Association <legal@aragon.org>",
@@ -11,14 +11,20 @@
     "plugin",
     "ethereum"
   ],
+  "files": [
+    "artifacts",
+    "typechain",
+    "dist/src"
+  ],
   "scripts": {
-    "build-projects": "cd test/projects && npm install && cd ../..",
-    "postinstall": "npm run compile && npm run generate && npm run build-projects",
+    "postinstall": "npm run compile && npm run generate",
     "compile": "buidler compile --force",
     "generate": "typechain --target truffle --outDir typechain 'artifacts/*.json'",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "prettier": "prettier --write '**/*.{ts,js,css,html}'",
-    "test": "mocha --exit",
+    "build-projects": "cd test/projects && npm install && cd ../..",
+    "test:mocha": "mocha --exit",
+    "test": "npm run build-projects && npm run test:mocha",
     "build": "tsc --build ."
   },
   "dependencies": {
