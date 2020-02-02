@@ -10,13 +10,39 @@ export const manifestPath = 'manifest.json'
 export const artifactPath = 'artifact.json'
 export const arappPath = 'arapp.json'
 
-const execa = execaLogTo(logFront)
+const execaLogToFrontEnd = execaLogTo(logFront)
 
 /**
- * Watches the front-end with the customizable npm run script of the app
+ * Calls the app's aragon/ui copy-aragon-ui-assets script.
  */
-export async function watchAppFrontEnd(appSrcPath: string): Promise<void> {
-  await execa('npm', ['run', 'watch'], { cwd: appSrcPath })
+export async function prepareAppAssets(appSrcPath: string): Promise<void> {
+  await execaLogToFrontEnd('npm', ['run', 'sync-assets'], { cwd: appSrcPath })
+}
+
+/**
+ * Calls the app's front end build watcher.
+ */
+export async function startAppWatcher(appSrcPath: string): Promise<void> {
+  await execaLogToFrontEnd('npm', ['run', 'watch'], { cwd: appSrcPath })
+}
+
+/**
+ * Starts the app's front end sever.
+ */
+export async function serveAppAndResolveWhenBuilt(
+  appSrcPath: string
+): Promise<void> {
+  return new Promise(async (resolve, reject) => {
+    const logger = (data: string): void => {
+      if (data.includes('Built in')) {
+        resolve()
+      }
+
+      logFront(data)
+    }
+
+    await execaLogTo(logger)('npm', ['run', 'serve'], { cwd: appSrcPath })
+  })
 }
 
 /**

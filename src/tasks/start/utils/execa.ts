@@ -2,7 +2,7 @@ import execa from 'execa'
 
 /**
  * execa wrapper
- * Pipes stdout and stderr to the parent process
+ * Pipes stdout and stderr to the parent process.
  */
 export function execaPipe(
   file: string,
@@ -23,7 +23,7 @@ export function execaPipe(
 
 /**
  * execa wrapper
- * Calls a logger on all stdout and stderr data events
+ * Calls a logger on all stdout and stderr data events.
  */
 export function execaLogTo(logger: (data: string) => void) {
   return (

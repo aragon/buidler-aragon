@@ -7,17 +7,22 @@ import { deployImplementation } from './utils/backend/app'
 import { createProxy, updateProxy } from './utils/backend/proxy'
 import { createRepo, updateRepo } from './utils/backend/repo'
 import { setAllPermissionsOpenly } from './utils/backend/permissions'
-import {
-  installAragonClientIfNeeded,
-  startAragonClient
-} from './utils/frontend/client'
-import { buildAppArtifacts, watchAppFrontEnd } from './utils/frontend/build'
 import { KernelInstance, RepoInstance } from '~/typechain'
 import { getAppId } from './utils/id'
 import { logFront, logBack, logMain } from './utils/logger'
 import { readArapp } from './utils/arapp'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { getAppName, getAppEnsName } from './utils/arapp'
+import {
+  installAragonClientIfNeeded,
+  startAragonClient
+} from './utils/frontend/client'
+import {
+  buildAppArtifacts,
+  serveAppAndResolveWhenBuilt,
+  prepareAppAssets,
+  startAppWatcher
+} from './utils/frontend/build'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,
@@ -158,7 +163,14 @@ async function startFrontend(
     await installAragonClientIfNeeded()
   }
 
-  await buildAppArtifacts(config.appBuildOutputPath as string, bre.artifacts)
+  const appBuildOutputPath = config.appBuildOutputPath as string
+  const appSrcPath = config.appSrcPath as string
+
+  await buildAppArtifacts(appBuildOutputPath, bre.artifacts)
+
+  await prepareAppAssets(appSrcPath)
+
+  await serveAppAndResolveWhenBuilt(appSrcPath)
 
   // Start Aragon client at the deployed address.
   if (openBrowser) {
@@ -171,6 +183,5 @@ async function startFrontend(
   `)
   }
 
-  // Watch for changes to rebuild app.
-  await watchAppFrontEnd(config.appSrcPath as string)
+  await startAppWatcher(appSrcPath)
 }
