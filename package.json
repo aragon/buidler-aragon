@@ -46,6 +46,7 @@
     "fs-extra": "^8.1.0",
     "open": "^7.0.0",
     "static-server": "^2.2.1",
+    "tcp-port-used": "^1.0.1",
     "truffle-typings": "1.0.4",
     "ts-node": "^8.5.4",
     "tsconfig-paths": "^3.9.0",

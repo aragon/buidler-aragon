@@ -6,6 +6,8 @@ import { logMain } from './utils/logger'
 import { getAppName, getAppEnsName } from './utils/arapp'
 import { startBackend } from './utils/backend/backend'
 import { startFrontend } from './utils/frontend/frontend'
+import { AragonConfig } from '~/src/types'
+import tcpPortUsed from 'tcp-port-used'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,
@@ -28,6 +30,21 @@ task(TASK_START, 'Starts Aragon app development')
     logMain(`App ens name: ${appEnsName}`)
     logMain(`App id: ${appId}`)
 
+    const config: AragonConfig = bre.config.aragon as AragonConfig
+    await _checkPorts(config)
+
     const { daoAddress, appAddress } = await startBackend(bre, appName, appId)
     await startFrontend(bre, daoAddress, appAddress, params.openBrowser)
   })
+
+async function _checkPorts(config: AragonConfig): Promise<void> {
+  if (await tcpPortUsed.check(config.clientServePort)) {
+    throw new Error(
+      `Cannot start client. Port ${config.clientServePort} is in use.`
+    )
+  }
+
+  if (await tcpPortUsed.check(config.appServePort)) {
+    throw new Error(`Cannot serve app. Port ${config.appServePort} is in use.`)
+  }
+}
