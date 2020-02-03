@@ -8,6 +8,8 @@ import { startBackend } from './utils/backend/backend'
 import { startFrontend } from './utils/frontend/frontend'
 import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
+import fsExtra from 'fs-extra'
+import path from 'path'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,
@@ -32,6 +34,7 @@ task(TASK_START, 'Starts Aragon app development')
 
     const config: AragonConfig = bre.config.aragon as AragonConfig
     await _checkPorts(config)
+    await _checkScripts(config.appSrcPath as string)
 
     const { daoAddress, appAddress } = await startBackend(bre, appName, appId)
     await startFrontend(bre, daoAddress, appAddress, params.openBrowser)
@@ -46,5 +49,21 @@ async function _checkPorts(config: AragonConfig): Promise<void> {
 
   if (await tcpPortUsed.check(config.appServePort)) {
     throw new Error(`Cannot serve app. Port ${config.appServePort} is in use.`)
+  }
+}
+
+async function _checkScripts(appSrcPath: string): Promise<void> {
+  const appPackageJson = await fsExtra.readJson(
+    path.join(appSrcPath, 'package.json')
+  )
+
+  _checkScript(appPackageJson, 'sync-assets')
+  _checkScript(appPackageJson, 'watch')
+  _checkScript(appPackageJson, 'serve')
+}
+
+function _checkScript(json: any, script: string): void {
+  if (!json.scripts[script]) {
+    throw new Error(`Missing script "${script}" in app/package.json.`)
   }
 }

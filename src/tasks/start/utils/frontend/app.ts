@@ -7,8 +7,6 @@ import { readArapp, getMainContractName, getMainContractPath } from '../arapp'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 
 export const manifestPath = 'manifest.json'
-export const artifactPath = 'artifact.json'
-export const arappPath = 'arapp.json'
 
 const execaLogToFrontEnd = execaLogTo(logFront)
 
