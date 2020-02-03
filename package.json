@@ -28,39 +28,45 @@
     "build": "tsc --build ."
   },
   "dependencies": {
-    "@aragon/os": "4.0.1",
     "@aragon/toolkit": "^0.0.4-beta.1",
-    "@nomiclabs/buidler": "^1.0.2",
-    "@nomiclabs/buidler-truffle5": "^1.0.2",
-    "@nomiclabs/buidler-web3": "^1.0.2",
-    "@types/chai": "^4.2.5",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "12.7.5",
-    "@types/web3": "^1.2.2",
     "chalk": "^3.0.0",
     "chokidar": "^3.3.1",
-    "dotenv": "^8.2.0",
     "eth-ens-namehash": "^2.0.8",
     "ethjs-ens": "^2.0.1",
     "execa": "^4.0.0",
     "fs-extra": "^8.1.0",
     "live-server": "^1.2.1",
     "open": "^7.0.0",
-    "tcp-port-used": "^1.0.1",
-    "truffle-typings": "1.0.4",
+    "tcp-port-used": "^1.0.1"
+  },
+  "devDependencies": {
+    "@aragon/os": "4.0.1",
+    "@nomiclabs/buidler": "^1.0.2",
+    "@nomiclabs/buidler-truffle5": "^1.0.2",
+    "@nomiclabs/buidler-web3": "^1.0.2",
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
+    "@types/chai": "^4.2.5",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "12.7.5",
+    "@types/web3": "^1.2.2",
+    "dotenv": "^8.2.0",
     "ts-node": "^8.5.4",
+    "typescript": "^3.7.4",
     "tsconfig-paths": "^3.9.0",
     "typechain": "^1.0.3",
     "typechain-target-truffle": "^1.0.2",
-    "typescript": "^3.7.4",
-    "web3": "^1.2.4"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.16.0",
-    "@typescript-eslint/parser": "^2.16.0",
+    "truffle-typings": "1.0.4",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.9.0",
     "eslint-plugin-prettier": "^3.1.2",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "web3": "^1.2.4"
+  },
+  "peerDependencies": {
+    "@nomiclabs/buidler": "^1.0.2",
+    "@nomiclabs/buidler-truffle5": "^1.0.2",
+    "@nomiclabs/buidler-web3": "^1.0.2",
+    "web3": "^1.2.4"
   }
 }
