@@ -2,7 +2,8 @@ import path from 'path'
 import fsExtra from 'fs-extra'
 import { execaLogTo } from '../execa'
 import { logFront } from '../logger'
-import * as toolkit from '@aragon/toolkit/dist/helpers/generateArtifact.js'
+/* import * as toolkit from '@aragon/toolkit/dist/helpers/generateArtifact.js' */
+import { generateApplicationArtifact } from '@aragon/toolkit'
 import { readArapp, getMainContractName, getMainContractPath } from '../arapp'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 
@@ -80,11 +81,7 @@ async function _generateUriArtifacts(
   const arapp = readArapp()
 
   // Generate artifacts file.
-  const appArtifacts = await toolkit.generateApplicationArtifact(
-    arapp,
-    abi,
-    source
-  )
+  const appArtifacts = await generateApplicationArtifact(arapp, abi, source)
 
   // Write artifacts to file.
   await fsExtra.writeJSON(
