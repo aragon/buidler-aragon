@@ -32,6 +32,11 @@ export async function startBackend(
   // Read arapp.json
   const arapp = readArapp()
 
+  // Call preDao hook.
+  if (hooks && hooks.preDao) {
+    await hooks.preDao(bre)
+  }
+
   // Prepare a DAO and a Repo to hold the app.
   const dao: KernelInstance = await createDao(bre.web3, bre.artifacts)
   const repo: RepoInstance = await createRepo(
@@ -40,6 +45,11 @@ export async function startBackend(
     bre.web3,
     bre.artifacts
   )
+
+  // Call postDao hook.
+  if (hooks && hooks.postDao) {
+    await hooks.postDao(dao, bre)
+  }
 
   // Call preInit hook.
   if (hooks && hooks.preInit) {
@@ -76,7 +86,7 @@ export async function startBackend(
 
   // Call postInit hook.
   if (hooks && hooks.postInit) {
-    await hooks.postInit(bre)
+    await hooks.postInit(proxy, bre)
   }
 
   // Watch back-end files.

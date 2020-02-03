@@ -1,6 +1,14 @@
 let token
 let accounts
 
+async function preDao(dao, bre) {
+  console.log(`preDao hook`)
+}
+
+async function postDao(dao, bre) {
+  console.log(`postDao hook`, dao)
+}
+
 async function preInit(bre) {
   // Retrieve accounts.
   accounts = await bre.web3.eth.getAccounts()
@@ -21,13 +29,16 @@ async function getInitParams(bre) {
   return [tokenAddress, 'Wrapped token', 'wORG']
 }
 
-async function postInit(bre) {
+async function postInit(proxy, bre) {
   console.log(`ERC20 token:`, token.address)
+  console.log(`Proxy:`, proxy.address)
   console.log(`Account 1 token balance`, (await token.balanceOf(accounts[0])).toString())
   console.log(`Account 2 token balance`, (await token.balanceOf(accounts[1])).toString())
 }
 
 module.exports = {
+  preDao,
+  postDao,
   preInit,
   postInit,
   getInitParams

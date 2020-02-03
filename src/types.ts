@@ -1,4 +1,8 @@
-import { BuidlerConfig, BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
+import {
+  BuidlerConfig,
+  BuidlerRuntimeEnvironment
+} from '@nomiclabs/buidler/types'
+import { KernelInstance } from '~/typechain'
 
 export interface BuidlerAragonConfig extends BuidlerConfig {
   aragon: AragonConfig
@@ -13,8 +17,16 @@ export interface AragonConfig {
 }
 
 export interface AragonConfigHooks {
+  preDao?: (bre: BuidlerRuntimeEnvironment) => Promise<void> | void
+  postDao?: (
+    dao: KernelInstance,
+    bre: BuidlerRuntimeEnvironment
+  ) => Promise<void> | void
   preInit?: (bre: BuidlerRuntimeEnvironment) => Promise<void> | void
-  postInit?: (bre: BuidlerRuntimeEnvironment) => Promise<void> | void
+  postInit?: (
+    proxy: Truffle.ContractInstance,
+    bre: BuidlerRuntimeEnvironment
+  ) => Promise<void> | void
   getInitParams?: (bre: BuidlerRuntimeEnvironment) => Promise<any[]> | any[]
 }
 
