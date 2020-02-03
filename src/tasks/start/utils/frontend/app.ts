@@ -15,7 +15,7 @@ const execaLogToFrontEnd = execaLogTo(logFront)
 /**
  * Calls the app's aragon/ui copy-aragon-ui-assets script.
  */
-export async function prepareAppAssets(appSrcPath: string): Promise<void> {
+export async function copyAppUiAssets(appSrcPath: string): Promise<void> {
   await execaLogToFrontEnd('npm', ['run', 'sync-assets'], { cwd: appSrcPath })
 }
 
@@ -46,11 +46,11 @@ export async function serveAppAndResolveWhenBuilt(
 }
 
 /**
- * Generates the artifacts necessary for an Aragon App
+ * Generates the artifacts necessary for an Aragon App.
  * - manifest.json
  * - artifact.json
  */
-export async function buildAppArtifacts(
+export async function generateAppArtifacts(
   appBuildOutputPath: string,
   artifacts: TruffleEnvironmentArtifacts
 ): Promise<void> {
