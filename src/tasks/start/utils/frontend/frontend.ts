@@ -1,4 +1,9 @@
-import { installAragonClientIfNeeded, startAragonClient } from './client'
+import chokidar from 'chokidar'
+import {
+  installAragonClientIfNeeded,
+  startAragonClient,
+  refreshClient
+} from './client'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { logFront } from '../logger'
 import { AragonConfig } from '~/src/types'
@@ -44,6 +49,17 @@ export async function startFrontend(
    Local:  ${url}
   `)
   }
+
+  // Watch changes to app/src/script.js.
+  chokidar
+    .watch('./app/src/script.js', {
+      awaitWriteFinish: { stabilityThreshold: 1000 }
+    })
+    .on('change', async () => {
+      logFront(`script.js changed`)
+
+      await refreshClient()
+    })
 
   await startAppWatcher(appSrcPath)
 }

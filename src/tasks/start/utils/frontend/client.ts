@@ -2,10 +2,10 @@ import path from 'path'
 import fs from 'fs'
 import fsExtra from 'fs-extra'
 import os from 'os'
-import open from 'open'
 import { execaLogTo } from '../execa'
 import { logFront } from '../logger'
-import StaticServer from 'static-server'
+import liveServer from 'live-server'
+import open from 'open'
 
 const defaultRepo = 'https://github.com/aragon/aragon'
 const defaultVersion = '775edd606333a111eb2693df53900039722a95dc'
@@ -61,6 +61,26 @@ export async function startAragonClient(
   return url
 }
 
+/**
+ * Triggers a complete client refresh (not just the iFrame) by making a dummy
+ * change to the client files being served.
+ * Works in tandem with live-server, which is watching for changes
+ * in the client files and is in charge of triggering the actual
+ * page reload.
+ */
+export async function refreshClient(
+  version: string = defaultVersion
+): Promise<void> {
+  const clientPath = _getClientPath(version)
+
+  const filename = 'bump.json'
+  const filepath = path.join(clientPath, 'build', filename)
+
+  await fsExtra.writeJson(filepath, {
+    time: new Date().getTime()
+  })
+}
+
 function _getClientPath(version: string): string {
   return path.join(aragonBaseDir, `client-${version}`)
 }
@@ -71,19 +91,11 @@ function _getClientPath(version: string): string {
  * @param port 3000
  * @param rootPath Dir to serve files from
  */
-export function _createStaticWebserver(
-  port: number,
-  rootPath = '.'
-): Promise<void> {
-  return new Promise(resolve => {
-    const server = new StaticServer({
-      rootPath, // required, the root of the server file tree
-      port, // required, the port to listen
-      cors: '*' // optional, defaults to undefined
-    })
-
-    server.start(() => {
-      resolve()
-    })
+export function _createStaticWebserver(port: number, root = '.'): void {
+  liveServer.start({
+    open: false,
+    root,
+    port,
+    cors: '*'
   })
 }
