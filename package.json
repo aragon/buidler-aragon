@@ -40,7 +40,7 @@
     "tcp-port-used": "^1.0.1"
   },
   "devDependencies": {
-    "@aragon/os": "4.0.1",
+    "@aragon/os": "^4.3.0",
     "@nomiclabs/buidler": "^1.0.2",
     "@nomiclabs/buidler-truffle5": "^1.0.2",
     "@nomiclabs/buidler-web3": "^1.0.2",
