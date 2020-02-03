@@ -104,6 +104,11 @@ export async function startBackend(
       )
       await updateRepo(repo, newImplementation, config.appServePort as number)
       await updateProxy(newImplementation, appId, dao, bre.web3)
+
+      // Call postUpdate hook.
+      if (hooks && hooks.postUpdate) {
+        await hooks.postUpdate(proxy, bre)
+      }
     })
 
   logBack(`

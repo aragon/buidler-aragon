@@ -28,6 +28,10 @@ export interface AragonConfigHooks {
     bre: BuidlerRuntimeEnvironment
   ) => Promise<void> | void
   getInitParams?: (bre: BuidlerRuntimeEnvironment) => Promise<any[]> | any[]
+  postUpdate?: (
+    proxy: Truffle.ContractInstance,
+    bre: BuidlerRuntimeEnvironment
+  ) => Promise<void> | void
 }
 
 /**

@@ -36,10 +36,15 @@ async function postInit(proxy, bre) {
   console.log(`Account 2 token balance`, (await token.balanceOf(accounts[1])).toString())
 }
 
+async function postUpdate(proxy, bre) {
+  console.log(`postUpdate hook`)
+}
+
 module.exports = {
   preDao,
   postDao,
   preInit,
   postInit,
-  getInitParams
+  getInitParams,
+  postUpdate
 }
