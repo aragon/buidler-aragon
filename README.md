@@ -1,21 +1,46 @@
-# buidler-aragon
+## buidler-aragon
 
 _WIP - Experimental!_
 
 Buidler plugin for developing Aragon apps with full front end and back end hot reloading.
 
-## Usage
+### Required plugins
 
-To use this plugin, please use [**create-aragon-app**](https://www.npmjs.com/package/create-aragon-app) with the buidler boilerplate option. For instructions on how to use this boilerplate, please refer to [**aragon-buidler-boilerplate**](https://github.com/aragon/aragon-buidler-boilerplate).
+This plugin currently requires:
+* [**buidler-truffle5**](https://github.com/nomiclabs/buidler/tree/master/packages/buidler-truffle5)
+* [**buidler-web3**](https://github.com/nomiclabs/buidler/tree/master/packages/buidler-web3)
 
-If you don't want to use a create-aragon-app or a boilerplate, you can follow the structure of the boilerplate linked above. In essence, the regular structure of a Buidler project should do. Please refer to the [**Buidler docs**](https://buidler.dev/). Make sure that you are requireing the plugin in your Buidler configuration file:
+### Installation
+
+```
+npm install --save-dev @aragon/buidler-aragon @nomiclabs/buidler-truffle5 @nomiclabs/buidler-web3 web3
+```
+
+And add the following statement to your buidler.config.js:
 
 ```
 usePlugin('@aragon/buidler-aragon')
 ```
 
 ### Tasks
-# TODO
+
+#### Start task
+
+This plugin provides the "start" task, which allows you to develop an application while visualizing it in the browser.
+
+**Task options:**
+* openBrowser: Wether or not to automatically open a browser tab with the client when running this task.
+* Please use buidler.config.js for additional options.
+
+### Environment extensions
+
+This plugin does not extend the environment.
+
+### Usage
+
+To use this plugin, please use [**create-aragon-app**](https://www.npmjs.com/package/create-aragon-app) with the buidler boilerplate option. For instructions on how to use this boilerplate, please refer to [**aragon-buidler-boilerplate**](https://github.com/aragon/aragon-buidler-boilerplate).
+
+If you don't want to use a create-aragon-app or a boilerplate, you can follow the structure of the boilerplate linked above. In essence, the regular structure of a Buidler project should do. Please refer to the [**Buidler docs**](https://buidler.dev/).
 
 ### Configuration
 
@@ -57,8 +82,12 @@ export interface AragonConfigHooks {
 
 For an example on how to use these hooks, please see the [**token-wrapper tests**](https://github.com/aragon/buidler-aragon/blob/master/test/projects/token-wrapper/scripts/hooks.js) within the plugin's test projects.
 
-## Development
+### Development
 
 Please refer to the [**Buidler docs**](https://buidler.dev/advanced/building-plugins.html) for plugin development.
 
 After cloning this repository, make sure you run `npm run dev` so that all required contract artifacts are available.
+
+### Typescript support
+
+You need to add this to your tsconfig.json's files array: "node_modules/@aragon/buidler-aragon/src/type-extensions.d.ts"
