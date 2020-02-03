@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { AragonAppJson } from '~/src/types'
+import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 
 const arappPath = 'arapp.json'
 const contractsPath = './contracts'
@@ -22,7 +23,7 @@ export function getAppEnsName(): string {
 
   const defaultEnvironment = arapp.environments.default
   if (!defaultEnvironment) {
-    throw new Error('Default environemnt not found in arapp.json')
+    throw new BuidlerPluginError('Default environemnt not found in arapp.json')
   }
 
   return defaultEnvironment.appName

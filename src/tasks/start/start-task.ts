@@ -1,4 +1,5 @@
 import { task, types } from '@nomiclabs/buidler/config'
+import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { TASK_START } from '../task-names'
 import { getAppId } from './utils/id'
@@ -42,13 +43,15 @@ task(TASK_START, 'Starts Aragon app development')
 
 async function _checkPorts(config: AragonConfig): Promise<void> {
   if (await tcpPortUsed.check(config.clientServePort)) {
-    throw new Error(
+    throw new BuidlerPluginError(
       `Cannot start client. Port ${config.clientServePort} is in use.`
     )
   }
 
   if (await tcpPortUsed.check(config.appServePort)) {
-    throw new Error(`Cannot serve app. Port ${config.appServePort} is in use.`)
+    throw new BuidlerPluginError(
+      `Cannot serve app. Port ${config.appServePort} is in use.`
+    )
   }
 }
 
@@ -64,6 +67,8 @@ async function _checkScripts(appSrcPath: string): Promise<void> {
 
 function _checkScript(json: any, script: string): void {
   if (!json.scripts[script]) {
-    throw new Error(`Missing script "${script}" in app/package.json.`)
+    throw new BuidlerPluginError(
+      `Missing script "${script}" in app/package.json.`
+    )
   }
 }

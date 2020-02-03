@@ -8,6 +8,7 @@ import {
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import { logBack } from '../logger'
+import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 
 const ENS_REGISTRY_ADDRESS = '0x5f6f7e8cc7346a11ca2def8f827b7a0b612c56a1'
 const APM_REGISTRY_ADDRESS = '0x32296d9f8fed89658668875dc73cacf87e8888b2'
@@ -92,7 +93,9 @@ async function _createRepo(
     l => l.event === 'NewRepo'
   )
   if (!log) {
-    throw new Error('Error creating Repo. Unable to find NewRepo log.')
+    throw new BuidlerPluginError(
+      'Error creating Repo. Unable to find NewRepo log.'
+    )
   }
   const repoAddress = (log as Truffle.TransactionLog).args.repo
 
@@ -124,7 +127,7 @@ async function _ensResolve(appId: string, web3: Web3): Promise<string> {
   const address: string | null = await ens.resolveAddressForNode(appId)
 
   if (!address) {
-    throw new Error('Unable to resolve ENS addres.')
+    throw new BuidlerPluginError('Unable to resolve ENS addres.')
   }
 
   return address as string

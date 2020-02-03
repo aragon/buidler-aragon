@@ -10,6 +10,7 @@ import {
 } from '~/typechain'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import Web3 from 'web3'
+import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 
 /**
  * Deploys a new DAO with direct/pure interaction with aragonOS.
@@ -52,7 +53,9 @@ export async function createDao(
     l => l.event === 'DeployDAO'
   )
   if (!log) {
-    throw new Error('Error deploying new DAO. Unable to find DeployDAO log.')
+    throw new BuidlerPluginError(
+      'Error deploying new DAO. Unable to find DeployDAO log.'
+    )
   }
   const daoAddress: string = (log as Truffle.TransactionLog).args.dao
 

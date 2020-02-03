@@ -3,6 +3,7 @@ import { KernelInstance } from '~/typechain'
 import { logBack } from '../logger'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
+import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 
 interface InitializableApp extends Truffle.ContractInstance {
   initialize: (...args: any[]) => void
@@ -43,7 +44,7 @@ export async function createProxy(
     l => l.event === 'NewAppProxy'
   )
   if (!log) {
-    throw new Error(
+    throw new BuidlerPluginError(
       'Cannot find proxy address. Unable to find NewAppProxy log.'
     )
   }

@@ -30,7 +30,7 @@ export async function startAppWatcher(appSrcPath: string): Promise<void> {
 export async function serveAppAndResolveWhenBuilt(
   appSrcPath: string
 ): Promise<void> {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async resolve => {
     const logger = (data: string): void => {
       if (data.includes('Built in')) {
         resolve()

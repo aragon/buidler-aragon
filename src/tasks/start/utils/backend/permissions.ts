@@ -4,7 +4,8 @@ import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 
 export const ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
-export const DUMMY_BYTES = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+export const DUMMY_BYTES =
+  '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 /**
  * Scans arapp.json, setting all permissions to ANY_ADDRESS.
