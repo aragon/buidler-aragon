@@ -11,3 +11,4 @@ before_script:
   - npm run dev
 script:
   - npm test
+  - npm run lint
