@@ -18,29 +18,33 @@ import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
  */
 export async function createDao(
   web3: Web3,
-  artifacts: TruffleEnvironmentArtifacts
+  artifacts: TruffleEnvironmentArtifacts,
+  daoFactory: DAOFactoryInstance
 ): Promise<KernelInstance> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
 
   // Retrieve contract artifacts.
   const Kernel: KernelContract = artifacts.require('Kernel')
   const ACL: ACLContract = artifacts.require('ACL')
-  const DAOFactory: DAOFactoryContract = artifacts.require('DAOFactory')
-  const EVMScriptRegistryFactory: EVMScriptRegistryFactoryContract = artifacts.require(
-    'EVMScriptRegistryFactory'
-  )
 
-  // Deploy a DAOFactory.
-  const kernelBase: KernelInstance = await Kernel.new(
-    true /*petrifyImmediately*/
-  )
-  const aclBase: ACLInstance = await ACL.new()
-  const registryFactory: EVMScriptRegistryFactoryInstance = await EVMScriptRegistryFactory.new()
-  const daoFactory: DAOFactoryInstance = await DAOFactory.new(
-    kernelBase.address,
-    aclBase.address,
-    registryFactory.address
-  )
+  if (!daoFactory) {
+    const DAOFactory: DAOFactoryContract = artifacts.require('DAOFactory')
+    const EVMScriptRegistryFactory: EVMScriptRegistryFactoryContract = artifacts.require(
+      'EVMScriptRegistryFactory'
+    )
+
+    // Deploy a DAOFactory.
+    const kernelBase: KernelInstance = await Kernel.new(
+      true /*petrifyImmediately*/
+    )
+    const aclBase: ACLInstance = await ACL.new()
+    const registryFactory: EVMScriptRegistryFactoryInstance = await EVMScriptRegistryFactory.new()
+    daoFactory = await DAOFactory.new(
+      kernelBase.address,
+      aclBase.address,
+      registryFactory.address
+    )
+  }
 
   // Create a DAO instance using the factory.
   const txResponse: Truffle.TransactionResponse = await daoFactory.newDAO(

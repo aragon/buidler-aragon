@@ -10,9 +10,6 @@ import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/art
 import { logBack } from '../logger'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 
-const ENS_REGISTRY_ADDRESS = '0x5f6f7e8cc7346a11ca2def8f827b7a0b612c56a1'
-const APM_REGISTRY_ADDRESS = '0x32296d9f8fed89658668875dc73cacf87e8888b2'
-
 /**
  * Attempts to retrieve an APM repository for the app, and if it can't
  * find one, creates a new repository for the app.
@@ -22,14 +19,16 @@ export async function createRepo(
   appName: string,
   appId: string,
   web3: Web3,
-  artifacts: TruffleEnvironmentArtifacts
+  artifacts: TruffleEnvironmentArtifacts,
+  ens: ENS,
+  apmRegistry: APMRegistryInstance
 ): Promise<RepoInstance> {
   // Retrieve the Repo address from ens, or create the Repo if nothing is retrieved.
-  let repoAddress: string | null = await _ensResolve(appId, web3).catch(
+  let repoAddress: string | null = await _ensResolve(appId, ens, web3).catch(
     () => null
   )
   if (!repoAddress) {
-    repoAddress = await _createRepo(appName, web3, artifacts)
+    repoAddress = await _createRepo(appName, web3, artifacts, apmRegistry)
   }
 
   // Wrap Repo address with abi.
@@ -71,15 +70,14 @@ export async function updateRepo(
 async function _createRepo(
   appName: string,
   web3: Web3,
-  artifacts: TruffleEnvironmentArtifacts
+  artifacts: TruffleEnvironmentArtifacts,
+  apmRegistry: APMRegistryInstance
 ): Promise<string> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
 
-  // Retrieve APMRegistry.
-  const APMRegistry: APMRegistryContract = artifacts.require('APMRegistry')
-  const apmRegistry: APMRegistryInstance = await APMRegistry.at(
-    APM_REGISTRY_ADDRESS
-  )
+  // // Retrieve APMRegistry.
+  // const APMRegistry: APMRegistryContract = artifacts.require('APMRegistry')
+  // const apmRegistry: APMRegistryInstance = await APMRegistry.at(APM_DAO_ADDRESS)
 
   // Create new repo.
   const txResponse: Truffle.TransactionResponse = await apmRegistry.newRepo(
@@ -107,23 +105,23 @@ async function _createRepo(
  * @returns Promise<string> The resolved contract address. Will throw if
  * no address is resolved.
  */
-async function _ensResolve(appId: string, web3: Web3): Promise<string> {
+async function _ensResolve(appId: string, web3: Web3, ens): Promise<string> {
   // Define options used by ENS.
-  const opts: {
-    provider: any
-    registryAddress: string
-  } = {
-    provider: web3.currentProvider,
-    registryAddress: ENS_REGISTRY_ADDRESS
-  }
+  // const opts: {
+  //   provider: any
+  //   registryAddress: string
+  // } = {
+  //   provider: web3.currentProvider,
+  //   registryAddress: ENS_REGISTRY_ADDRESS
+  // }
 
-  // Avoids a bug on ENS.
-  if (!opts.provider.sendAsync) {
-    opts.provider.sendAsync = opts.provider.send
-  }
+  // // Avoids a bug on ENS.
+  // if (!opts.provider.sendAsync) {
+  //   opts.provider.sendAsync = opts.provider.send
+  // }
 
-  // Set up ENS and resolve address.
-  const ens: ENS = new ENS(opts)
+  // // Set up ENS and resolve address.
+  // const ens: ENS = new ENS(opts)
   const address: string | null = await ens.resolveAddressForNode(appId)
 
   if (!address) {

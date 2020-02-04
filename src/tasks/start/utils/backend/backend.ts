@@ -10,6 +10,7 @@ import { logBack } from '../logger'
 import { readArapp } from '../arapp'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { TASK_COMPILE } from '../../../task-names'
+import deployBases from '@aragon/aragen/scripts/deploy/apm'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -29,6 +30,15 @@ export async function startBackend(
 
   await bre.run(TASK_COMPILE)
 
+  // Deploy bases
+  const owner: string = (await bre.web3.eth.getAccounts())[0]
+  const { daoFactory, ens, apm } = await deployBases(null, {
+    artifacts: bre.artifacts,
+    web3: bre.web3,
+    owner,
+    verbose: true
+  })
+
   // Read arapp.json
   const arapp = readArapp()
 
@@ -38,12 +48,18 @@ export async function startBackend(
   }
 
   // Prepare a DAO and a Repo to hold the app.
-  const dao: KernelInstance = await createDao(bre.web3, bre.artifacts)
+  const dao: KernelInstance = await createDao(
+    bre.web3,
+    bre.artifacts,
+    daoFactory
+  )
   const repo: RepoInstance = await createRepo(
     appName,
     appId,
     bre.web3,
-    bre.artifacts
+    bre.artifacts,
+    ens,
+    apm
   )
 
   // Call postDao hook.
