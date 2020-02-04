@@ -28,7 +28,7 @@ task(TASK_START, 'Starts Aragon app development')
 
     const appEnsName = await getAppEnsName()
     const appName = await getAppName()
-    const appId: string = getAppId(appName)
+    const appId: string = getAppId(appEnsName)
     logMain(`App name: ${appName}`)
     logMain(`App ens name: ${appEnsName}`)
     logMain(`App id: ${appId}`)
