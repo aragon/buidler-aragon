@@ -1,0 +1,25 @@
+name: CI
+on: push
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 11
+    - name: npm install
+      run: npm install
+    - name: npm lint and build
+      run: |
+        npm run lint
+        npm run dev
+    - name: Run devchain
+      run: |
+        npm install -g @aragon/cli
+        aragon devchain start &
+    - name: Test
+      run: npm run test
+    env:
+      CI: true
