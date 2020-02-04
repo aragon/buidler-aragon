@@ -10,7 +10,7 @@ import { logBack } from '../logger'
 import { readArapp } from '../arapp'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { TASK_COMPILE } from '../../../task-names'
-import deployBases from '@aragon/aragen/scripts/deploy/apm'
+import deployBases from '../../../../../scripts/apm'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
