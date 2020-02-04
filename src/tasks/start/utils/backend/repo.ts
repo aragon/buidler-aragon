@@ -127,7 +127,7 @@ async function _ensResolve(appId: string, web3: Web3): Promise<string> {
   const address: string | null = await ens.resolveAddressForNode(appId)
 
   if (!address) {
-    throw new BuidlerPluginError('Unable to resolve ENS addres.')
+    throw new BuidlerPluginError('Unable to resolve ENS address.')
   }
 
   return address as string
