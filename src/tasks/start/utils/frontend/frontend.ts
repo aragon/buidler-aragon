@@ -61,5 +61,16 @@ export async function startFrontend(
       await refreshClient()
     })
 
+  // Watch changes to artifact files.
+  chokidar
+    .watch(['./arapp.json', './manifest.json'], {
+      awaitWriteFinish: { stabilityThreshold: 1000 }
+    })
+    .on('change', path => {
+      logFront(
+        `Warning: Changes detected on ${path}. Hot reloading is not supported on this file. Please re-run the "start" task to load these changes.`
+      )
+    })
+
   await startAppWatcher(appSrcPath)
 }
