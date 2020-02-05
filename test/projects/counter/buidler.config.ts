@@ -22,13 +22,8 @@ const config: BuidlerAragonConfig = {
   },
   solc: {
     version: '0.4.24'
-  },
-  aragon: {
-    appServePort: 8001,
-    clientServePort: 3000,
-    appSrcPath: 'app/',
-    appBuildOutputPath: 'dist/'
   }
+  // Note: Intentionally not specifying aragon: AragonConfig.
 }
 
 export default config

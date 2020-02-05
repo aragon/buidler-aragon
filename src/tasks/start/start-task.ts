@@ -27,7 +27,13 @@ task(TASK_START, 'Starts Aragon app development')
     true,
     types.boolean
   )
+  .addParam('silent', 'Silences all console output', false, types.boolean)
   .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
+    if (params.silent) {
+      // eslint-disable-next-line
+      console.log = () => {}
+    }
+
     logMain(`Starting...`)
 
     const appEnsName = await getAppEnsName()
