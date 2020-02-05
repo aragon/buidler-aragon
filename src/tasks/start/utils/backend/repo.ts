@@ -1,14 +1,17 @@
-import ENS from 'ethjs-ens'
 import {
   RepoContract,
   RepoInstance,
-  APMRegistryContract,
-  APMRegistryInstance
+  APMRegistryInstance,
+  ENSInstance,
+  PublicResolverContract,
+  PublicResolverInstance
 } from '~/typechain'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import { logBack } from '../logger'
-import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
+import { getLog } from './helpers'
+
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 
 /**
  * Attempts to retrieve an APM repository for the app, and if it can't
@@ -20,15 +23,18 @@ export async function createRepo(
   appId: string,
   web3: Web3,
   artifacts: TruffleEnvironmentArtifacts,
-  ens: ENS,
+  ens: ENSInstance,
   apmRegistry: APMRegistryInstance
 ): Promise<RepoInstance> {
-  // Retrieve the Repo address from ens, or create the Repo if nothing is retrieved.
-  let repoAddress: string | null = await _ensResolve(appId, ens, web3).catch(
-    () => null
+  // Try resolving the Repo address from ENS with the PublicResolver, or create the Repo if ZERO_ADDR is retrieved.
+  const PublicResolver: PublicResolverContract = artifacts.require(
+    'PublicResolver'
   )
-  if (!repoAddress) {
-    repoAddress = await _createRepo(appName, web3, artifacts, apmRegistry)
+  const resolver: PublicResolverInstance = await PublicResolver.new(ens.address)
+  let repoAddress: string = await resolver.addr(appId)
+
+  if (repoAddress === ZERO_ADDR) {
+    repoAddress = await _createRepo(appName, web3, apmRegistry)
   }
 
   // Wrap Repo address with abi.
@@ -39,9 +45,9 @@ export async function createRepo(
 }
 
 /**
- * Updates an APM repository with a new version.
+ * Bump APM repository with a new version.
  */
-export async function updateRepo(
+export async function majorBumpRepo(
   repo: RepoInstance,
   implementation: Truffle.ContractInstance,
   appServePort: number
@@ -70,14 +76,9 @@ export async function updateRepo(
 async function _createRepo(
   appName: string,
   web3: Web3,
-  artifacts: TruffleEnvironmentArtifacts,
   apmRegistry: APMRegistryInstance
 ): Promise<string> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
-
-  // // Retrieve APMRegistry.
-  // const APMRegistry: APMRegistryContract = artifacts.require('APMRegistry')
-  // const apmRegistry: APMRegistryInstance = await APMRegistry.at(APM_DAO_ADDRESS)
 
   // Create new repo.
   const txResponse: Truffle.TransactionResponse = await apmRegistry.newRepo(
@@ -86,47 +87,7 @@ async function _createRepo(
   )
 
   // Retrieve repo address from creation tx logs.
-  const logs: Truffle.TransactionLog[] = txResponse.logs
-  const log: Truffle.TransactionLog | undefined = logs.find(
-    l => l.event === 'NewRepo'
-  )
-  if (!log) {
-    throw new BuidlerPluginError(
-      'Error creating Repo. Unable to find NewRepo log.'
-    )
-  }
-  const repoAddress = (log as Truffle.TransactionLog).args.repo
+  const repoAddress: string = getLog(txResponse, 'NewRepo', 'repo')
 
   return repoAddress
-}
-
-/**
- * Resolves an ENS appId in hex form, to a contract address.
- * @returns Promise<string> The resolved contract address. Will throw if
- * no address is resolved.
- */
-async function _ensResolve(appId: string, web3: Web3, ens): Promise<string> {
-  // Define options used by ENS.
-  // const opts: {
-  //   provider: any
-  //   registryAddress: string
-  // } = {
-  //   provider: web3.currentProvider,
-  //   registryAddress: ENS_REGISTRY_ADDRESS
-  // }
-
-  // // Avoids a bug on ENS.
-  // if (!opts.provider.sendAsync) {
-  //   opts.provider.sendAsync = opts.provider.send
-  // }
-
-  // // Set up ENS and resolve address.
-  // const ens: ENS = new ENS(opts)
-  const address: string | null = await ens.resolveAddressForNode(appId)
-
-  if (!address) {
-    throw new BuidlerPluginError('Unable to resolve ENS addres.')
-  }
-
-  return address as string
 }

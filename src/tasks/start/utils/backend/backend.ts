@@ -3,14 +3,16 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { createDao } from './dao'
 import { deployImplementation } from './app'
 import { createProxy, updateProxy } from './proxy'
-import { createRepo, updateRepo } from './repo'
+import { createRepo, majorBumpRepo } from './repo'
 import { setAllPermissionsOpenly } from './permissions'
 import { KernelInstance, RepoInstance } from '~/typechain'
 import { logBack } from '../logger'
 import { readArapp } from '../arapp'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { TASK_COMPILE } from '../../../task-names'
-import deployBases from '../../../../../scripts/apm'
+import { createDaoFactory } from './bases/daoFactory'
+import { createEns } from './bases/ens'
+import { createApm } from './bases/apm'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -31,13 +33,9 @@ export async function startBackend(
   await bre.run(TASK_COMPILE)
 
   // Deploy bases
-  const owner: string = (await bre.web3.eth.getAccounts())[0]
-  const { daoFactory, ens, apm } = await deployBases(null, {
-    artifacts: bre.artifacts,
-    web3: bre.web3,
-    owner,
-    verbose: true
-  })
+  const ens = await createEns(bre.web3, bre.artifacts)
+  const daoFactory = await createDaoFactory(bre.artifacts)
+  const apm = await createApm(bre.web3, bre.artifacts, ens, daoFactory)
 
   // Read arapp.json
   const arapp = readArapp()
@@ -86,6 +84,9 @@ export async function startBackend(
   const implementation: Truffle.ContractInstance = await deployImplementation(
     bre.artifacts
   )
+
+  await majorBumpRepo(repo, implementation, config.appServePort as number)
+
   const proxy: Truffle.ContractInstance = await createProxy(
     implementation,
     appId,
@@ -94,7 +95,6 @@ export async function startBackend(
     bre.artifacts,
     proxyInitParams
   )
-  await updateRepo(repo, implementation, config.appServePort as number)
 
   // TODO: What if user wants to set custom permissions?
   // Use a hook? A way to disable all open permissions?
@@ -118,7 +118,11 @@ export async function startBackend(
       const newImplementation: Truffle.ContractInstance = await deployImplementation(
         bre.artifacts
       )
-      await updateRepo(repo, newImplementation, config.appServePort as number)
+      await majorBumpRepo(
+        repo,
+        newImplementation,
+        config.appServePort as number
+      )
       await updateProxy(newImplementation, appId, dao, bre.web3)
 
       // Call postUpdate hook.

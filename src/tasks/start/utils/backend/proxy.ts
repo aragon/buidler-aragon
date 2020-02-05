@@ -1,16 +1,13 @@
 import { getMainContractName } from '../arapp'
 import { KernelInstance } from '~/typechain'
 import { logBack } from '../logger'
+import { getLog } from './helpers'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
-import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 
 interface InitializableApp extends Truffle.ContractInstance {
   initialize: (...args: any[]) => void
 }
-
-const BASE_NAMESPACE =
-  '0xf1f3eb40f5bc1ad1344716ced8b8a0431d840b5783aea1fd01786bc26f35ac0f'
 
 /**
  * Creates a new app proxy using a Dao, and set's the specified implementation.
@@ -37,18 +34,11 @@ export async function createProxy(
   )
 
   // Retrieve proxy address and wrap around abi.
+  const proxyAddress: string = getLog(txResponse, 'NewAppProxy', 'proxy')
+
   const mainContractName: string = getMainContractName()
   const App: Truffle.Contract<any> = artifacts.require(mainContractName)
-  const logs: Truffle.TransactionLog[] = txResponse.logs
-  const log: Truffle.TransactionLog | undefined = logs.find(
-    l => l.event === 'NewAppProxy'
-  )
-  if (!log) {
-    throw new BuidlerPluginError(
-      'Cannot find proxy address. Unable to find NewAppProxy log.'
-    )
-  }
-  const proxyAddress: string = (log as Truffle.TransactionLog).args.proxy
+
   const proxy: InitializableApp = await App.at(proxyAddress)
 
   // Initialize the app.
@@ -71,7 +61,12 @@ export async function updateProxy(
   logBack(`Updating proxy implementation to: ${implementation.address}`)
 
   // Set the new implementation in the Kernel.
-  await dao.setApp(BASE_NAMESPACE, appId, implementation.address, {
-    from: rootAccount
-  })
+  await dao.setApp(
+    await dao.APP_BASES_NAMESPACE(),
+    appId,
+    implementation.address,
+    {
+      from: rootAccount
+    }
+  )
 }
