@@ -1,7 +1,10 @@
 import { assert } from 'chai'
-import { createDao } from '~/src/tasks/start/utils/backend/dao'
+import {
+  createDao,
+  createDaoFactory
+} from '~/src/tasks/start/utils/backend/dao'
 import { isAddress } from '~/test/test-helpers/isAddress'
-import { KernelInstance } from '~/typechain'
+import { KernelInstance, DAOFactoryInstance } from '~/typechain'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 
 describe('dao.ts', function() {
@@ -11,7 +14,10 @@ describe('dao.ts', function() {
     let dao: KernelInstance
 
     before('create a dao', async function() {
-      dao = await createDao(this.env.web3, this.env.artifacts)
+      const daoFactory: DAOFactoryInstance = await createDaoFactory(
+        this.env.artifacts
+      )
+      dao = await createDao(this.env.web3, this.env.artifacts, daoFactory)
     })
 
     it('deploys a dao with a valid address', function() {

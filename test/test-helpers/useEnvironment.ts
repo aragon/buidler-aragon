@@ -14,7 +14,7 @@ export function useDefaultEnvironment(): void {
 
 export function useEnvironment(
   projectName: string,
-  networkName = 'localhost'
+  networkName = 'buidlerevm'
 ): void {
   const projectPath = path.join(__dirname, '../projects', projectName)
   before('loading buidler environment', function() {

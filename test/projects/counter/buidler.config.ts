@@ -1,4 +1,4 @@
-import { usePlugin, BuidlerConfig } from '@nomiclabs/buidler/config'
+import { usePlugin } from '@nomiclabs/buidler/config'
 
 usePlugin('@nomiclabs/buidler-truffle5')
 usePlugin('@nomiclabs/buidler-web3')
@@ -7,8 +7,9 @@ usePlugin('@nomiclabs/buidler-web3')
 // Normally would use `usePlugin(@aragon/buidler-aragon)`.
 import { loadPluginFile } from '@nomiclabs/buidler/plugins-testing'
 loadPluginFile(__dirname + '/../../../src/index')
+import { BuidlerAragonConfig }from '../../../src/types'
 
-const config: BuidlerConfig = {
+const config: BuidlerAragonConfig = {
   defaultNetwork: 'buidlerevm',
   networks: {
     buidlerevm: {
