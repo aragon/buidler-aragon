@@ -1,6 +1,8 @@
 import chokidar from 'chokidar'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { createDao } from './dao'
+import { createEns } from './ens'
+import { createApm } from './apm'
+import { createDao, createDaoFactory } from './dao'
 import { deployImplementation } from './app'
 import { createProxy, updateProxy } from './proxy'
 import { createRepo, majorBumpRepo } from './repo'
@@ -10,9 +12,6 @@ import { logBack } from '../logger'
 import { readArapp } from '../arapp'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { TASK_COMPILE } from '../../../task-names'
-import { createDaoFactory } from './bases/daoFactory'
-import { createEns } from './bases/ens'
-import { createApm } from './bases/apm'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -135,8 +134,12 @@ export async function startBackend(
   App name: ${appName}
   App id: ${appId}
   DAO: ${dao.address}
-  APMRegistry: ${repo.address}
+  Repo: ${repo.address}
   App proxy: ${proxy.address}
+
+  ENS: ${ens.address}
+  APM: ${apm.address}
+  DAOFactory: ${daoFactory.address}
 `)
 
   return { daoAddress: dao.address, appAddress: proxy.address }

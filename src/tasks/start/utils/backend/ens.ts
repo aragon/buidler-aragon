@@ -1,7 +1,7 @@
 import { ENSContract, ENSFactoryContract, ENSInstance } from '~/typechain'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import Web3 from 'web3'
-import { getLog } from '../helpers'
+import { getLog } from './logs'
 
 /**
  * Deploys a new ENS instance using a ENSFactory.

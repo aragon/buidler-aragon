@@ -3,11 +3,14 @@ import {
   KernelInstance,
   ACLContract,
   ACLInstance,
-  DAOFactoryInstance
+  DAOFactoryContract,
+  DAOFactoryInstance,
+  EVMScriptRegistryFactoryContract,
+  EVMScriptRegistryFactoryInstance
 } from '~/typechain'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import Web3 from 'web3'
-import { getLog } from './helpers'
+import { getLog } from './logs'
 
 /**
  * Deploys a new DAO with direct/pure interaction with aragonOS.
@@ -45,4 +48,34 @@ export async function createDao(
   )
 
   return dao
+}
+
+/**
+ * Deploys a new DAOFactory with direct/pure interaction with aragonOS.
+ * @returns DAOFactory's instance.
+ */
+export async function createDaoFactory(
+  artifacts: TruffleEnvironmentArtifacts
+): Promise<DAOFactoryInstance> {
+  // Retrieve contract artifacts.
+  const Kernel: KernelContract = artifacts.require('Kernel')
+  const ACL: ACLContract = artifacts.require('ACL')
+  const EVMScriptRegistryFactory: EVMScriptRegistryFactoryContract = artifacts.require(
+    'EVMScriptRegistryFactory'
+  )
+  const DAOFactory: DAOFactoryContract = artifacts.require('DAOFactory')
+
+  // Deploy a DAOFactory.
+  const kernelBase: KernelInstance = await Kernel.new(
+    true /*petrifyImmediately*/
+  )
+  const aclBase: ACLInstance = await ACL.new()
+  const registryFactory: EVMScriptRegistryFactoryInstance = await EVMScriptRegistryFactory.new()
+  const daoFactory: DAOFactoryInstance = await DAOFactory.new(
+    kernelBase.address,
+    aclBase.address,
+    registryFactory.address
+  )
+
+  return daoFactory
 }
