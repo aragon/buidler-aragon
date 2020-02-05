@@ -1,0 +1,14 @@
+language: node_js
+notifications:
+  email: false
+node_js:
+  - '11'
+install:
+  - npm install -g @aragon/cli
+  - npm install
+before_script:
+  - aragon devchain start &
+  - npm run dev
+script:
+  - npm test
+  - npm run lint
