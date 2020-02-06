@@ -7,7 +7,7 @@ import {
   aragenGasLimit,
   aragenMnemonic,
   testnetPort
-} from '../../../../aragon-params'
+} from '~/src/aragon-params'
 
 // There's an issue with how web3 exports its typings that conflicts with
 // ganache-core imports of those typings. Follow https://github.com/trufflesuite/ganache-core/issues/465
