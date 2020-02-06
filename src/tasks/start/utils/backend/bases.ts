@@ -4,7 +4,7 @@ import { createEns } from './ens'
 import { createApm } from './apm'
 import { createDaoFactory } from './dao'
 import { logBack } from '../logger'
-import { defaultLocalAragonBases } from '~/src/aragon-params'
+import { defaultLocalAragonBases } from '~/src/params'
 
 interface AragonBases {
   ensAddress: string

@@ -10,7 +10,7 @@ import { logBack } from '../logger'
 import { readArapp } from '../arapp'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { TASK_COMPILE } from '../../../task-names'
-import deployAragonBases from './deployAragonBases'
+import deployAragonBases from './bases'
 import { startGanache } from './ganache'
 
 /**
