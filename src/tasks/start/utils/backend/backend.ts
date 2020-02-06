@@ -3,13 +3,15 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { createDao } from './dao'
 import { deployImplementation } from './app'
 import { createProxy, updateProxy } from './proxy'
-import { createRepo, updateRepo } from './repo'
+import { createRepo, majorBumpRepo } from './repo'
 import { setAllPermissionsOpenly } from './permissions'
 import { KernelInstance, RepoInstance } from '~/typechain'
 import { logBack } from '../logger'
 import { readArapp } from '../arapp'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { TASK_COMPILE } from '../../../task-names'
+import deployAragonBases from './bases'
+import { startGanache } from './ganache'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -29,7 +31,18 @@ export async function startBackend(
 
   await bre.run(TASK_COMPILE)
 
-  // Read arapp.json
+  /**
+   * Until BuidlerEVM JSON RPC is ready, a ganache server will be started
+   * on the appropiate conditions.
+   */
+  await startGanache(bre)
+
+  // Deploy bases.
+  const { ensAddress, daoFactoryAddress, apmAddress } = await deployAragonBases(
+    bre
+  )
+
+  // Read arapp.json.
   const arapp = readArapp()
 
   // Call preDao hook.
@@ -38,12 +51,18 @@ export async function startBackend(
   }
 
   // Prepare a DAO and a Repo to hold the app.
-  const dao: KernelInstance = await createDao(bre.web3, bre.artifacts)
+  const dao: KernelInstance = await createDao(
+    bre.web3,
+    bre.artifacts,
+    daoFactoryAddress
+  )
   const repo: RepoInstance = await createRepo(
     appName,
     appId,
     bre.web3,
-    bre.artifacts
+    bre.artifacts,
+    ensAddress,
+    apmAddress
   )
 
   // Call postDao hook.
@@ -70,6 +89,9 @@ export async function startBackend(
   const implementation: Truffle.ContractInstance = await deployImplementation(
     bre.artifacts
   )
+
+  await majorBumpRepo(repo, implementation, config.appServePort as number)
+
   const proxy: Truffle.ContractInstance = await createProxy(
     implementation,
     appId,
@@ -78,7 +100,6 @@ export async function startBackend(
     bre.artifacts,
     proxyInitParams
   )
-  await updateRepo(repo, implementation, config.appServePort as number)
 
   // TODO: What if user wants to set custom permissions?
   // Use a hook? A way to disable all open permissions?
@@ -102,7 +123,11 @@ export async function startBackend(
       const newImplementation: Truffle.ContractInstance = await deployImplementation(
         bre.artifacts
       )
-      await updateRepo(repo, newImplementation, config.appServePort as number)
+      await majorBumpRepo(
+        repo,
+        newImplementation,
+        config.appServePort as number
+      )
       await updateProxy(newImplementation, appId, dao, bre.web3)
 
       // Call postUpdate hook.
@@ -115,7 +140,7 @@ export async function startBackend(
   App name: ${appName}
   App id: ${appId}
   DAO: ${dao.address}
-  APMRegistry: ${repo.address}
+  Repo: ${repo.address}
   App proxy: ${proxy.address}
 `)
 

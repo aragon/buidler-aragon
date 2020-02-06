@@ -6,7 +6,7 @@ async function preDao(dao, bre) {
 }
 
 async function postDao(dao, bre) {
-  console.log(`postDao hook`, dao)
+  console.log(`postDao hook`, dao.address)
 }
 
 async function preInit(bre) {

@@ -1,17 +1,17 @@
-import ENS from 'ethjs-ens'
 import {
   RepoContract,
   RepoInstance,
   APMRegistryContract,
-  APMRegistryInstance
+  APMRegistryInstance,
+  PublicResolverContract,
+  PublicResolverInstance
 } from '~/typechain'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import { logBack } from '../logger'
-import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
+import { getLog } from './logs'
 
-const ENS_REGISTRY_ADDRESS = '0x5f6f7e8cc7346a11ca2def8f827b7a0b612c56a1'
-const APM_REGISTRY_ADDRESS = '0x32296d9f8fed89658668875dc73cacf87e8888b2'
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 
 /**
  * Attempts to retrieve an APM repository for the app, and if it can't
@@ -22,14 +22,19 @@ export async function createRepo(
   appName: string,
   appId: string,
   web3: Web3,
-  artifacts: TruffleEnvironmentArtifacts
+  artifacts: TruffleEnvironmentArtifacts,
+  ensAddress: string,
+  apmAddress: string
 ): Promise<RepoInstance> {
-  // Retrieve the Repo address from ens, or create the Repo if nothing is retrieved.
-  let repoAddress: string | null = await _ensResolve(appId, web3).catch(
-    () => null
+  // Try resolving the Repo address from ENS with the PublicResolver, or create the Repo if ZERO_ADDR is retrieved.
+  const PublicResolver: PublicResolverContract = artifacts.require(
+    'PublicResolver'
   )
-  if (!repoAddress) {
-    repoAddress = await _createRepo(appName, web3, artifacts)
+  const resolver: PublicResolverInstance = await PublicResolver.new(ensAddress)
+  let repoAddress: string = await resolver.addr(appId)
+
+  if (repoAddress === ZERO_ADDR) {
+    repoAddress = await _createRepo(appName, web3, apmAddress)
   }
 
   // Wrap Repo address with abi.
@@ -40,9 +45,9 @@ export async function createRepo(
 }
 
 /**
- * Updates an APM repository with a new version.
+ * Bump APM repository with a new version.
  */
-export async function updateRepo(
+export async function majorBumpRepo(
   repo: RepoInstance,
   implementation: Truffle.ContractInstance,
   appServePort: number
@@ -71,64 +76,20 @@ export async function updateRepo(
 async function _createRepo(
   appName: string,
   web3: Web3,
-  artifacts: TruffleEnvironmentArtifacts
+  apmAddress: string
 ): Promise<string> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
 
-  // Retrieve APMRegistry.
-  const APMRegistry: APMRegistryContract = artifacts.require('APMRegistry')
-  const apmRegistry: APMRegistryInstance = await APMRegistry.at(
-    APM_REGISTRY_ADDRESS
-  )
-
   // Create new repo.
+  const APMRegistry: APMRegistryContract = artifacts.require('APMRegistry')
+  const apmRegistry: APMRegistryInstance = await APMRegistry.at(apmAddress)
   const txResponse: Truffle.TransactionResponse = await apmRegistry.newRepo(
     appName,
     rootAccount
   )
 
   // Retrieve repo address from creation tx logs.
-  const logs: Truffle.TransactionLog[] = txResponse.logs
-  const log: Truffle.TransactionLog | undefined = logs.find(
-    l => l.event === 'NewRepo'
-  )
-  if (!log) {
-    throw new BuidlerPluginError(
-      'Error creating Repo. Unable to find NewRepo log.'
-    )
-  }
-  const repoAddress = (log as Truffle.TransactionLog).args.repo
+  const repoAddress: string = getLog(txResponse, 'NewRepo', 'repo')
 
   return repoAddress
-}
-
-/**
- * Resolves an ENS appId in hex form, to a contract address.
- * @returns Promise<string> The resolved contract address. Will throw if
- * no address is resolved.
- */
-async function _ensResolve(appId: string, web3: Web3): Promise<string> {
-  // Define options used by ENS.
-  const opts: {
-    provider: any
-    registryAddress: string
-  } = {
-    provider: web3.currentProvider,
-    registryAddress: ENS_REGISTRY_ADDRESS
-  }
-
-  // Avoids a bug on ENS.
-  if (!opts.provider.sendAsync) {
-    opts.provider.sendAsync = opts.provider.send
-  }
-
-  // Set up ENS and resolve address.
-  const ens: ENS = new ENS(opts)
-  const address: string | null = await ens.resolveAddressForNode(appId)
-
-  if (!address) {
-    throw new BuidlerPluginError('Unable to resolve ENS address.')
-  }
-
-  return address as string
 }

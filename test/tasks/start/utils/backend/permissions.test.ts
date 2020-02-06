@@ -1,5 +1,8 @@
 import { assert } from 'chai'
-import { createDao } from '~/src/tasks/start/utils/backend/dao'
+import {
+  createDao,
+  createDaoFactory
+} from '~/src/tasks/start/utils/backend/dao'
 import { readArapp } from '~/src/tasks/start/utils/arapp'
 import { deployImplementation } from '~/src/tasks/start/utils/backend/app'
 import { createProxy } from '~/src/tasks/start/utils/backend/proxy'
@@ -8,7 +11,12 @@ import {
   setAllPermissionsOpenly,
   ANY_ADDRESS
 } from '~/src/tasks/start/utils/backend/permissions'
-import { KernelInstance, ACLContract, ACLInstance } from '~/typechain'
+import {
+  KernelInstance,
+  ACLContract,
+  ACLInstance,
+  DAOFactoryInstance
+} from '~/typechain'
 import { getAppId } from '~/src/tasks/start/utils/id'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 
@@ -21,7 +29,10 @@ describe('permissions.ts', function() {
   let app: any
 
   before('set up dao with app', async function() {
-    dao = await createDao(this.env.web3, this.env.artifacts)
+    const daoFactory: DAOFactoryInstance = await createDaoFactory(
+      this.env.artifacts
+    )
+    dao = await createDao(this.env.web3, this.env.artifacts, daoFactory.address)
 
     const ACL: ACLContract = this.env.artifacts.require('ACL')
     acl = await ACL.at(await dao.acl())

@@ -1,7 +1,7 @@
 {
   "environments": {
     "default": {
-      "appName": "token-wrapper.open.aragonpm.eth",
+      "appName": "token-wrapper.aragonpm.eth",
       "network": "rpc"
     },
     "mainnet": {
