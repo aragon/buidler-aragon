@@ -7,7 +7,7 @@ import { aragenGasLimit, aragenMnemonic, testnetPort } from '../../../../params'
 
 // There's an issue with how web3 exports its typings that conflicts with
 // ganache-core imports of those typings. Follow https://github.com/trufflesuite/ganache-core/issues/465
-// for upcoming solutions, meanwhile require is used to ignore the types
+// for upcoming solutions, meanwhile require is used to ignore the types.
 /* eslint-disable @typescript-eslint/no-var-requires */
 const ganache = require('ganache-core')
 

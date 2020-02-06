@@ -13,14 +13,15 @@ interface AragonBases {
 }
 
 /**
- * Deploys the basic Aragon arquitecture bases if necessary
+ * Deploys the basic Aragon arquitecture bases if necessary.
  * @param bre
  * @return Object of Aragon base addresses
  */
 export default async function deployAragonBases(
   bre: BuidlerRuntimeEnvironment
 ): Promise<AragonBases> {
-  // First aggregate which bases are deployed and which not
+  // First, aggregate which bases are deployed and which not
+  // by checking if code can be found at the expected addresses.
   const isBaseDeployed: { [baseName: string]: boolean } = {}
   for (const [name, address] of Object.entries(defaultLocalAragonBases)) {
     const baseContractCode = await bre.web3.eth.getCode(address)
@@ -28,11 +29,14 @@ export default async function deployAragonBases(
     isBaseDeployed[name] = Boolean(parseInt(baseContractCode))
   }
 
-  // Throw if only some bases are deployed
+  // Check if all, none, or some bases are deployed.
   const basesDeployed = Object.values(isBaseDeployed)
   const allBasesAreDeployed = basesDeployed.every(isDeployed => isDeployed)
   const noBasesAreDeployed = basesDeployed.every(isDeployed => !isDeployed)
 
+  // If *all*  bases deployed => do nothing,
+  //    *no*   bases deployed => deploy them,
+  //    *some* bases deployed => throw an error.
   if (allBasesAreDeployed) {
     logBack(`Aragon bases already deployed`)
   } else if (noBasesAreDeployed) {

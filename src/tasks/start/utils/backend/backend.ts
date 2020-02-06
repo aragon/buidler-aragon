@@ -33,16 +33,16 @@ export async function startBackend(
 
   /**
    * Until BuidlerEVM JSON RPC is ready, a ganache server will be started
-   * on the appropiate conditions
+   * on the appropiate conditions.
    */
   await startGanache(bre)
 
-  // Deploy bases
+  // Deploy bases.
   const { ensAddress, daoFactoryAddress, apmAddress } = await deployAragonBases(
     bre
   )
 
-  // Read arapp.json
+  // Read arapp.json.
   const arapp = readArapp()
 
   // Call preDao hook.
