@@ -17,7 +17,11 @@ describe('dao.ts', function() {
       const daoFactory: DAOFactoryInstance = await createDaoFactory(
         this.env.artifacts
       )
-      dao = await createDao(this.env.web3, this.env.artifacts, daoFactory)
+      dao = await createDao(
+        this.env.web3,
+        this.env.artifacts,
+        daoFactory.address
+      )
     })
 
     it('deploys a dao with a valid address', function() {

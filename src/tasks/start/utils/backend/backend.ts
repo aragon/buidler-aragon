@@ -1,8 +1,8 @@
+import { promisify } from 'util'
 import chokidar from 'chokidar'
+import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { createEns } from './ens'
-import { createApm } from './apm'
-import { createDao, createDaoFactory } from './dao'
+import { createDao } from './dao'
 import { deployImplementation } from './app'
 import { createProxy, updateProxy } from './proxy'
 import { createRepo, majorBumpRepo } from './repo'
@@ -12,6 +12,20 @@ import { logBack } from '../logger'
 import { readArapp } from '../arapp'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { TASK_COMPILE } from '../../../task-names'
+import tcpPortUsed from 'tcp-port-used'
+import deployAragonBases from './deployAragonBases'
+import {
+  aragenGasLimit,
+  aragenMnemonic,
+  testnetPort
+} from '../../../../aragon-params'
+// There's an issue with how web3 exports its typings that conflicts with
+// ganache-core imports of those typings. Follow https://github.com/trufflesuite/ganache-core/issues/465
+// for upcoming solutions, meanwhile require is used to ignore the types
+/* eslint-disable @typescript-eslint/no-var-requires */
+const ganache = require('ganache-core')
+
+const buidlerevmNetworkName = 'buidlerevm'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -31,10 +45,34 @@ export async function startBackend(
 
   await bre.run(TASK_COMPILE)
 
+  /**
+   * Until BuidlerEVM JSON RPC is ready a ganache server will be started
+   * on the appropiate conditions
+   */
+  if (bre.network.name === buidlerevmNetworkName) {
+    throw new BuidlerPluginError(
+      `Cannot use ${buidlerevmNetworkName} network for this task until a JSON RPC is exposed`
+    )
+  } else if (bre.network.name === 'localhost') {
+    if (await tcpPortUsed.check(testnetPort)) {
+      logBack(`Connecting to existing local blockchain instance`)
+    } else {
+      logBack(`Starting a new Ganache testnet instance`)
+      const server = ganache.server({
+        gasLimit: aragenGasLimit,
+        mnemonic: aragenMnemonic
+      })
+      const blockchain = await promisify(server.listen)(testnetPort)
+      logBack(
+        `New Ganache instance ready, id: ${blockchain.options.network_id}`
+      )
+    }
+  }
+
   // Deploy bases
-  const ens = await createEns(bre.web3, bre.artifacts)
-  const daoFactory = await createDaoFactory(bre.artifacts)
-  const apm = await createApm(bre.web3, bre.artifacts, ens, daoFactory)
+  const { ensAddress, daoFactoryAddress, apmAddress } = await deployAragonBases(
+    bre
+  )
 
   // Read arapp.json
   const arapp = readArapp()
@@ -48,15 +86,15 @@ export async function startBackend(
   const dao: KernelInstance = await createDao(
     bre.web3,
     bre.artifacts,
-    daoFactory
+    daoFactoryAddress
   )
   const repo: RepoInstance = await createRepo(
     appName,
     appId,
     bre.web3,
     bre.artifacts,
-    ens,
-    apm
+    ensAddress,
+    apmAddress
   )
 
   // Call postDao hook.
@@ -136,10 +174,6 @@ export async function startBackend(
   DAO: ${dao.address}
   Repo: ${repo.address}
   App proxy: ${proxy.address}
-
-  ENS: ${ens.address}
-  APM: ${apm.address}
-  DAOFactory: ${daoFactory.address}
 `)
 
   return { daoAddress: dao.address, appAddress: proxy.address }

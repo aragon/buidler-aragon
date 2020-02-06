@@ -16,7 +16,14 @@ describe('start-task.ts', function() {
       // to trigger the process just yet.
       const startTaskProcess = execaPipe(
         'npx',
-        ['buidler', TASK_START, '--open-browser', 'false'],
+        [
+          'buidler',
+          TASK_START,
+          '--open-browser',
+          'false',
+          '--network',
+          'localhost'
+        ],
         {}
       )
 
