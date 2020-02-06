@@ -1,8 +1,8 @@
 import {
   RepoContract,
   RepoInstance,
+  APMRegistryContract,
   APMRegistryInstance,
-  ENSInstance,
   PublicResolverContract,
   PublicResolverInstance
 } from '~/typechain'
@@ -23,18 +23,18 @@ export async function createRepo(
   appId: string,
   web3: Web3,
   artifacts: TruffleEnvironmentArtifacts,
-  ens: ENSInstance,
-  apmRegistry: APMRegistryInstance
+  ensAddress: string,
+  apmAddress: string
 ): Promise<RepoInstance> {
   // Try resolving the Repo address from ENS with the PublicResolver, or create the Repo if ZERO_ADDR is retrieved.
   const PublicResolver: PublicResolverContract = artifacts.require(
     'PublicResolver'
   )
-  const resolver: PublicResolverInstance = await PublicResolver.new(ens.address)
+  const resolver: PublicResolverInstance = await PublicResolver.new(ensAddress)
   let repoAddress: string = await resolver.addr(appId)
 
   if (repoAddress === ZERO_ADDR) {
-    repoAddress = await _createRepo(appName, web3, apmRegistry)
+    repoAddress = await _createRepo(appName, web3, apmAddress)
   }
 
   // Wrap Repo address with abi.
@@ -76,11 +76,13 @@ export async function majorBumpRepo(
 async function _createRepo(
   appName: string,
   web3: Web3,
-  apmRegistry: APMRegistryInstance
+  apmAddress: string
 ): Promise<string> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
 
   // Create new repo.
+  const APMRegistry: APMRegistryContract = artifacts.require('APMRegistry')
+  const apmRegistry: APMRegistryInstance = await APMRegistry.at(apmAddress)
   const txResponse: Truffle.TransactionResponse = await apmRegistry.newRepo(
     appName,
     rootAccount

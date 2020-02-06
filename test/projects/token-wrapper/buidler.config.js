@@ -10,7 +10,7 @@ const { loadPluginFile } = require('@nomiclabs/buidler/plugins-testing')
 loadPluginFile(__dirname + '/../../../dist/src/index')
 
 module.exports = {
-  defaultNetwork: 'buidlerevm',
+  defaultNetwork: 'localhost',
   networks: {
     buidlerevm: {
       accounts: [

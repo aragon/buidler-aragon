@@ -32,7 +32,7 @@ describe('permissions.ts', function() {
     const daoFactory: DAOFactoryInstance = await createDaoFactory(
       this.env.artifacts
     )
-    dao = await createDao(this.env.web3, this.env.artifacts, daoFactory)
+    dao = await createDao(this.env.web3, this.env.artifacts, daoFactory.address)
 
     const ACL: ACLContract = this.env.artifacts.require('ACL')
     acl = await ACL.at(await dao.acl())

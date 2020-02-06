@@ -19,11 +19,13 @@ import { getLog } from './logs'
 export async function createDao(
   web3: Web3,
   artifacts: TruffleEnvironmentArtifacts,
-  daoFactory: DAOFactoryInstance
+  daoFactoryAddress: string
 ): Promise<KernelInstance> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
 
   // Create a DAO instance using the factory.
+  const DAOFactory: DAOFactoryContract = artifacts.require('DAOFactory')
+  const daoFactory: DAOFactoryInstance = await DAOFactory.at(daoFactoryAddress)
   const txResponse: Truffle.TransactionResponse = await daoFactory.newDAO(
     rootAccount
   )
