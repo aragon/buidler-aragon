@@ -4,13 +4,17 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { TASK_START } from '../task-names'
 import { getAppId } from './utils/id'
 import { logMain } from './utils/logger'
-import { getAppName, getAppEnsName } from './utils/arapp'
 import { startBackend } from './utils/backend/backend'
 import { startFrontend } from './utils/frontend/frontend'
 import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
 import fsExtra from 'fs-extra'
 import path from 'path'
+import {
+  getAppName,
+  getAppEnsName,
+  isValidEnsNameForDevelopment
+} from './utils/arapp'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,
@@ -32,6 +36,12 @@ task(TASK_START, 'Starts Aragon app development')
     logMain(`App name: ${appName}`)
     logMain(`App ens name: ${appEnsName}`)
     logMain(`App id: ${appId}`)
+
+    if (!isValidEnsNameForDevelopment(appEnsName)) {
+      throw new BuidlerPluginError(
+        `Invalid ENS name "${appEnsName}" found in arapp.json (environments.default.appName). Only ENS names in the form "<name>.aragonpm.eth" are supported in development. Please change the value in environments.default.appName, in your project's arapp.json file. Note: Non-development environments are ignored in development and don't have this restriction.`
+      )
+    }
 
     const config: AragonConfig = bre.config.aragon as AragonConfig
     await _checkPorts(config)
