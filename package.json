@@ -14,7 +14,7 @@
   "files": [
     "artifacts",
     "typechain",
-    "dist",
+    "dist/src",
     "src"
   ],
   "scripts": {
