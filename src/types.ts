@@ -43,14 +43,14 @@ export interface AragonAppJson {
   path: string
 }
 
-interface Role {
+export interface Role {
   name: string
   id: string
   params: string[]
   bytes: string
 }
 
-interface AragonEnvironments {
+export interface AragonEnvironments {
   [environmentName: string]: AragonEnvironment
 }
 
