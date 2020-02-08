@@ -1,4 +1,5 @@
 import chalk from 'chalk'
+import { Ui } from '../ui'
 
 const mainTag = chalk.gray('main | ')
 const frontTag = chalk.yellow('frontend | ')
@@ -14,14 +15,17 @@ function _prependTag(lines: string, tag: string): string {
 export function logMain(data: string): void {
   // eslint-disable-next-line no-console
   /* console.log(_prependTag(data, mainTag)) */
+  Ui.getInstance().logActivity(data)
 }
 
 export function logFront(data: string): void {
   // eslint-disable-next-line no-console
   /* console.log(_prependTag(data, frontTag)) */
+  Ui.getInstance().logActivity(data)
 }
 
 export function logBack(data: string): void {
   // eslint-disable-next-line no-console
   /* console.log(_prependTag(data, backTag)) */
+  Ui.getInstance().logActivity(data)
 }
