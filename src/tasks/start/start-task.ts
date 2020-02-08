@@ -10,6 +10,7 @@ import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
 import fsExtra from 'fs-extra'
 import path from 'path'
+import * as ui from './ui'
 import {
   getAppName,
   getAppEnsName,
@@ -28,12 +29,8 @@ task(TASK_START, 'Starts Aragon app development')
   )
   .addFlag('silent', 'Silences all console output')
   .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
-    if (params.silent) {
-      // eslint-disable-next-line
-      console.log = () => {}
-    }
-
-    logMain(`Starting...`)
+    ui.startRendering()
+    ui.setInfoAppName('counter')
 
     const appEnsName = await getAppEnsName()
     const appName = await getAppName()

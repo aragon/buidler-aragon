@@ -13,15 +13,15 @@ function _prependTag(lines: string, tag: string): string {
 
 export function logMain(data: string): void {
   // eslint-disable-next-line no-console
-  console.log(_prependTag(data, mainTag))
+  /* console.log(_prependTag(data, mainTag)) */
 }
 
 export function logFront(data: string): void {
   // eslint-disable-next-line no-console
-  console.log(_prependTag(data, frontTag))
+  /* console.log(_prependTag(data, frontTag)) */
 }
 
 export function logBack(data: string): void {
   // eslint-disable-next-line no-console
-  console.log(_prependTag(data, backTag))
+  /* console.log(_prependTag(data, backTag)) */
 }
