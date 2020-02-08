@@ -10,7 +10,7 @@ import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
 import fsExtra from 'fs-extra'
 import path from 'path'
-import { Ui } from './ui'
+import * as Ui from './ui/ui'
 import {
   getAppName,
   getAppEnsName,
@@ -54,7 +54,8 @@ ${accountsStr}
     `)
 =======
     /* logMain(`Starting...`) */
-    Ui.getInstance().logActivity('starting...')
+    Ui.initialize()
+    Ui.logActivity('starting...')
 
     const appEns = await getAppEnsName()
     const appName = await getAppName()
@@ -64,7 +65,7 @@ ${accountsStr}
     /* logMain(`App id: ${appId}`) */
 >>>>>>> Starting to show app info
 
-    Ui.getInstance().setInfoBoxData({ appName, appId, appEns })
+    Ui.setInfo({ appName, appId, appEns })
 
     if (!isValidEnsNameForDevelopment(appEns)) {
       throw new BuidlerPluginError(
@@ -86,7 +87,7 @@ ${accountsStr}
     await startFrontend(bre, daoAddress, appAddress, !params.noBrowser)
 =======
     const { daoAddress, appAddress } = await startBackend(bre, appName, appId)
-    Ui.getInstance().setInfoBoxData({ appAddress, daoAddress })
+    Ui.setInfo({ appAddress, daoAddress })
 
     await startFrontend(bre, daoAddress, appAddress, params.openBrowser)
 >>>>>>> Starting to show app info
