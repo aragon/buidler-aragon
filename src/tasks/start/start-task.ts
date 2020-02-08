@@ -29,6 +29,7 @@ task(TASK_START, 'Starts Aragon app development')
   )
   .addFlag('silent', 'Silences all console output')
   .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
+<<<<<<< HEAD
     ui.startRendering()
     ui.setInfoAppName('counter')
 
@@ -51,10 +52,23 @@ App id: ${appId}
 Accounts mnemonic "${aragenMnemonic}"
 ${accountsStr}
     `)
+=======
+    /* logMain(`Starting...`) */
 
-    if (!isValidEnsNameForDevelopment(appEnsName)) {
+    const appEns = await getAppEnsName()
+    const appName = await getAppName()
+    const appId: string = getAppId(appEns)
+    /* logMain(`App name: ${appName}`) */
+    /* logMain(`App ens name: ${appEns}`) */
+    /* logMain(`App id: ${appId}`) */
+>>>>>>> Starting to show app info
+
+    ui.startRendering()
+    ui.setInfoBoxData({ appName, appId, appEns })
+
+    if (!isValidEnsNameForDevelopment(appEns)) {
       throw new BuidlerPluginError(
-        `Invalid ENS name "${appEnsName}" found in arapp.json (environments.default.appName). Only ENS names in the form "<name>.aragonpm.eth" are supported in development. Please change the value in environments.default.appName, in your project's arapp.json file. Note: Non-development environments are ignored in development and don't have this restriction.`
+        `Invalid ENS name "${appEns}" found in arapp.json (environments.default.appName). Only ENS names in the form "<name>.aragonpm.eth" are supported in development. Please change the value in environments.default.appName, in your project's arapp.json file. Note: Non-development environments are ignored in development and don't have this restriction.`
       )
     }
 
@@ -62,6 +76,7 @@ ${accountsStr}
     await _checkPorts(config)
     await _checkScripts(config.appSrcPath as string)
 
+<<<<<<< HEAD
     const { daoAddress, appAddress } = await startBackend(
       bre,
       appName,
@@ -69,6 +84,12 @@ ${accountsStr}
       params.silent
     )
     await startFrontend(bre, daoAddress, appAddress, !params.noBrowser)
+=======
+    const { daoAddress, appAddress } = await startBackend(bre, appName, appId)
+    ui.setInfoBoxData({ appAddress, daoAddress })
+
+    await startFrontend(bre, daoAddress, appAddress, params.openBrowser)
+>>>>>>> Starting to show app info
   })
 
 async function _checkPorts(config: AragonConfig): Promise<void> {
