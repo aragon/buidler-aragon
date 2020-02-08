@@ -1,8 +1,7 @@
 import namehash from 'eth-ens-namehash'
 import web3EthAbi, { AbiCoder } from 'web3-eth-abi'
-import { AbiItem } from 'web3-utils'
 import { extractContractInfo } from './solidityExtractor'
-import { AragonAppJson, Role, AragonEnvironments } from '../types'
+import { AragonAppJson, Role, AragonEnvironments, AbiItem } from '../types'
 
 // Note: fix necessary to correct wrong 'web3-eth-abi' typings
 const { encodeFunctionSignature }: AbiCoder = web3EthAbi as any
@@ -12,14 +11,14 @@ const SOLIDITY_FILE = 'code.sol'
 interface FunctionInfo {
   sig: string // "functionName(address,unit)"
   roles: string[]
-  notice: string | null // Multiline notice text
+  notice: string // Multiline notice text
 }
 
 interface FunctionInfoWithAbi extends FunctionInfo {
   abi?: AbiItem // Abi of the function, may not be found
 }
 
-interface AragonApplicationArtifact extends AragonAppJson {
+export interface AragonApplicationArtifact extends AragonAppJson {
   flattenedCode: string
   environments: AragonEnvironments
   roles: Role[]

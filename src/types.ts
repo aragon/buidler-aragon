@@ -2,7 +2,10 @@ import {
   BuidlerConfig,
   BuidlerRuntimeEnvironment
 } from '@nomiclabs/buidler/types'
+import { AbiItem as AbiItemFromWeb3 } from 'web3-utils'
 import { KernelInstance } from '~/typechain'
+
+export type AbiItem = AbiItemFromWeb3
 
 export interface BuidlerAragonConfig extends BuidlerConfig {
   aragon: AragonConfig
