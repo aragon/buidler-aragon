@@ -18,6 +18,7 @@ export default class Tab {
       height: '100%',
       border: 'bg',
       content: '',
+      bg: 'black',
       mouse: false,
       label: `~ ${label} ~`
     })

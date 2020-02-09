@@ -11,7 +11,7 @@ export default class LogTab extends Tab {
       parent: this.box,
       top: 'center',
       left: 'center',
-      width: '98%',
+      width: '100%',
       height: '98%',
       border: 'bg',
       tags: true,

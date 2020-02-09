@@ -9,10 +9,20 @@ let screen
 let infoTab, logTab, activityBar
 
 export function initialize(): void {
-  _disableConsole()
-
-  screen = blessed.screen()
+  screen = blessed.screen({
+    smartCSR: true,
+    debug: true
+  })
   screen.title = 'Aragon - start task'
+
+  // Disable console output that could occur from
+  // running sub-processes.
+  // eslint-disable-next-line no-console
+  console = new console.Console(new Writable())
+
+  // Route console logs to the screen debugger.
+  // eslint-disable-next-line no-console
+  console.log = (...args): void => screen.debug(`${args.join(' ')}`)
 
   infoTab = new InfoTab(screen)
   logTab = new LogTab(screen)
@@ -30,11 +40,6 @@ export function initialize(): void {
   })
 
   screen.render()
-}
-
-function _disableConsole(): void {
-  // eslint-disable-next-line no-console
-  console = new console.Console(new Writable())
 }
 
 export function setInfo(data): void {
