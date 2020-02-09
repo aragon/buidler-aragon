@@ -35,8 +35,10 @@
     "execa": "^4.0.0",
     "fs-extra": "^8.1.0",
     "ganache-core": "^2.10.1",
+    "ipfs-http-client": "^42.0.0",
     "live-server": "^1.2.1",
     "open": "^7.0.0",
+    "semver": "^7.1.2",
     "tcp-port-used": "^1.0.1"
   },
   "devDependencies": {

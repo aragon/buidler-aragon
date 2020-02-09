@@ -11,6 +11,7 @@ export default function(): void {
 
   // Task definitions.
   require(path.join(__dirname, '/tasks/start/start-task'))
+  require(path.join(__dirname, '/tasks/publish'))
 
   // Environment extensions.
   // No extensions atm.
