@@ -1,5 +1,4 @@
 import { task, types } from '@nomiclabs/buidler/config'
-import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { TASK_START } from '../task-names'
 import { getAppId } from './utils/id'
@@ -29,13 +28,13 @@ task(TASK_START, 'Starts Aragon app development')
   )
   .addFlag('silent', 'Silences all console output')
   .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
-<<<<<<< HEAD
-    ui.startRendering()
-    ui.setInfoAppName('counter')
+    Ui.initialize()
 
-    const appEnsName = await getAppEnsName()
+    Ui.logActivity('starting...')
+
+    const appEns = await getAppEnsName()
     const appName = await getAppName()
-    const appId: string = getAppId(appEnsName)
+    const appId: string = getAppId(appEns)
     logMain(`
 App name: ${appName}
 App ens name: ${appEnsName}
@@ -52,23 +51,11 @@ App id: ${appId}
 Accounts mnemonic "${aragenMnemonic}"
 ${accountsStr}
     `)
-=======
-    /* logMain(`Starting...`) */
-    Ui.initialize()
-    Ui.logActivity('starting...')
-
-    const appEns = await getAppEnsName()
-    const appName = await getAppName()
-    const appId: string = getAppId(appEns)
-    /* logMain(`App name: ${appName}`) */
-    /* logMain(`App ens name: ${appEns}`) */
-    /* logMain(`App id: ${appId}`) */
->>>>>>> Starting to show app info
 
     Ui.setInfo({ appName, appId, appEns })
 
     if (!isValidEnsNameForDevelopment(appEns)) {
-      throw new BuidlerPluginError(
+      throw new Error(
         `Invalid ENS name "${appEns}" found in arapp.json (environments.default.appName). Only ENS names in the form "<name>.aragonpm.eth" are supported in development. Please change the value in environments.default.appName, in your project's arapp.json file. Note: Non-development environments are ignored in development and don't have this restriction.`
       )
     }
@@ -77,33 +64,26 @@ ${accountsStr}
     await _checkPorts(config)
     await _checkScripts(config.appSrcPath as string)
 
-<<<<<<< HEAD
     const { daoAddress, appAddress } = await startBackend(
       bre,
       appName,
       appId,
       params.silent
     )
-    await startFrontend(bre, daoAddress, appAddress, !params.noBrowser)
-=======
-    const { daoAddress, appAddress } = await startBackend(bre, appName, appId)
     Ui.setInfo({ appAddress, daoAddress })
 
-    await startFrontend(bre, daoAddress, appAddress, params.openBrowser)
->>>>>>> Starting to show app info
+    await startFrontend(bre, daoAddress, appAddress, !params.noBrowser)
   })
 
 async function _checkPorts(config: AragonConfig): Promise<void> {
   if (await tcpPortUsed.check(config.clientServePort)) {
-    throw new BuidlerPluginError(
+    throw new Error(
       `Cannot start client. Port ${config.clientServePort} is in use.`
     )
   }
 
   if (await tcpPortUsed.check(config.appServePort)) {
-    throw new BuidlerPluginError(
-      `Cannot serve app. Port ${config.appServePort} is in use.`
-    )
+    throw new Error(`Cannot serve app. Port ${config.appServePort} is in use.`)
   }
 }
 
@@ -119,8 +99,6 @@ async function _checkScripts(appSrcPath: string): Promise<void> {
 
 function _checkScript(json: any, script: string): void {
   if (!json.scripts[script]) {
-    throw new BuidlerPluginError(
-      `Missing script "${script}" in app/package.json.`
-    )
+    throw new Error(`Missing script "${script}" in app/package.json.`)
   }
 }

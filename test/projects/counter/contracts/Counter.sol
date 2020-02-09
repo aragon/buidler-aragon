@@ -30,6 +30,6 @@ contract Counter is AragonApp {
     }
 
     function getVersion() public pure returns (string) {
-        return "1";
+        return "0";
     }
 }

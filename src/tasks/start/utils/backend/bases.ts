@@ -1,4 +1,3 @@
-import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { createEns } from './ens'
 import { createApm } from './apm'
@@ -42,7 +41,7 @@ export default async function deployAragonBases(
     const apm = await createApm(bre.web3, bre.artifacts, ens, daoFactory)
 
     if (ens.address !== defaultLocalAragonBases.ensAddress)
-      throw new BuidlerPluginError(
+      throw new Error(
         `ENS was deployed at ${ens.address} instead of the expected local address ${defaultLocalAragonBases.ensAddress}`
       )
 
