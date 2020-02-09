@@ -9,8 +9,8 @@ export default class InfoTab extends Tab {
     daoAddress: '?'
   }
 
-  constructor(screen) {
-    super(screen, 'Info')
+  constructor(screen, container) {
+    super(screen, container, 'Info')
 
     this._buildContent()
   }

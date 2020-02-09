@@ -16,13 +16,30 @@ export function initialize(): void {
   /* }) */
 
   screen = blessed.screen({
-    smartCSR: false,
+    smartCSR: true,
     debug: true
   })
   screen.title = 'Aragon - start task'
 
-  infoTab = new InfoTab(screen)
-  logTab = new LogTab(screen)
+  const containerBottom = 6
+  const container = blessed.box({
+    parent: screen,
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: screen.height - containerBottom,
+    content: '',
+    bg: 'red'
+  })
+  screen.append(container)
+
+  screen.on('resize', function() {
+    container.height = screen.height - containerBottom
+    screen.render()
+  })
+
+  infoTab = new InfoTab(screen, container)
+  logTab = new LogTab(screen, container)
 
   const tabs: any[] = []
   tabs.push(infoTab)

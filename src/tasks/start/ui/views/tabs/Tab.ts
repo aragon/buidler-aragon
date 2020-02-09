@@ -6,26 +6,25 @@ export default class Tab {
 
   _label: string
 
-  constructor(screen, label: string) {
+  constructor(screen, container, label: string) {
     this.screen = screen
     this._label = label
 
     this.box = blessed.box({
-      parent: this.screen,
+      parent: container,
       top: 0,
       right: 0,
-      width: '100%',
-      height: '100%',
-      border: 'bg',
+      left: 0,
+      bottom: 0,
+      border: 'line',
       content: '',
-      bg: 'black',
-      mouse: false,
-      label: `~ ${label} ~`
+      label
     })
 
     this.box.hidden = true
 
-    this.screen.append(this.box)
+    /* this.screen.append(this.box) */
+    container.append(this.box)
   }
 
   set hidden(value: boolean) {
