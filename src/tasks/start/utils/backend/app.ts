@@ -1,5 +1,6 @@
 import { getMainContractName } from '../arapp'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
+import * as Ui from '../../ui/ui'
 
 /**
  * Deploys the app's current contract.
@@ -14,6 +15,8 @@ export async function deployImplementation(
   // Deploy the main contract.
   const App: Truffle.Contract<any> = artifacts.require(mainContractName)
   const implementation: Truffle.ContractInstance = await App.new()
+
+  Ui.setInfo({ implementationAddress: implementation.address })
 
   return implementation
 }

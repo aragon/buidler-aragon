@@ -18,6 +18,14 @@ export default class Tab {
       bottom: 0,
       border: 'line',
       content: '',
+      tags: true,
+      scrollable: true,
+      vi: true,
+      alwaysScroll: true,
+      scrollbar: {
+        ch: ' ',
+        inverse: true
+      },
       label
     })
 

@@ -20,12 +20,7 @@ export default class LogTab extends Tab {
       scrollback: 100,
       scrollbar: {
         ch: ' ',
-        track: {
-          bg: 'yellow'
-        },
-        style: {
-          inverse: true
-        }
+        inverse: true
       }
     })
   }

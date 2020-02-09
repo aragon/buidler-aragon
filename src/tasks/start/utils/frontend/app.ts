@@ -5,6 +5,7 @@ import { logFront } from '../logger'
 import { generateApplicationArtifact } from '../../../../utils/generateArtifacts'
 import { readArapp, getMainContractName, getMainContractPath } from '../arapp'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
+import * as Ui from '../../ui/ui'
 
 export const manifestPath = 'manifest.json'
 
@@ -39,6 +40,8 @@ export async function serveAppAndResolveWhenBuilt(
 
       logFront(data)
     }
+
+    Ui.setInfo({ contentUrl: `http://localhost:${appServePort}` })
 
     await execaLogTo(logger)(
       'npm',

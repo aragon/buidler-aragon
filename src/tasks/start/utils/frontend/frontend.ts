@@ -14,6 +14,7 @@ import {
   startAppWatcher
 } from './app'
 import { emitEvent, FRONTEND_STARTED_SERVING } from '../../../../events'
+import * as Ui from '../../ui/ui'
 
 /**
  * Starts the task's frontend sub-tasks. Logic is contained in ./tasks/start/utils/frontend/.
@@ -45,6 +46,9 @@ export async function startFrontend(
     `${daoAddress}/${appAddress}`,
     openBrowser
   )
+
+  Ui.setInfo({ url })
+
   logFront(`You can now view the Aragon client in the browser.
  Local:  ${url}
 `)

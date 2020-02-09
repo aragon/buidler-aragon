@@ -10,6 +10,7 @@ import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import { logBack } from '../logger'
 import { getLog } from '../../../../utils/getLog'
+import * as Ui from '../../ui/ui'
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 
@@ -37,6 +38,8 @@ export async function createRepo(
     repoAddress = await _createRepo(appName, web3, apmAddress)
   }
 
+  Ui.setInfo({ repoAddress })
+
   // Wrap Repo address with abi.
   const Repo: RepoContract = artifacts.require('Repo')
   const repo: RepoInstance = await Repo.at(repoAddress)
@@ -58,7 +61,11 @@ export async function majorBumpRepo(
     0,
     0
   ]
-  logBack(`Repo version: ${semver.join('.')}`)
+
+  const repoVersion = semver.join('.')
+  logBack(`Repo version: ${repoVersion}`)
+
+  Ui.setInfo({ repoVersion })
 
   // URI where this plugin is serving the app's front end.
   const contentUri = `http://localhost:${appServePort}`

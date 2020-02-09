@@ -17,7 +17,8 @@ export function initialize(): void {
 
   screen = blessed.screen({
     smartCSR: true,
-    debug: true
+    debug: true,
+    warnings: true
   })
   screen.title = 'Aragon - start task'
 

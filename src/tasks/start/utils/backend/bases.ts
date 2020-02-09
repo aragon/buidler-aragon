@@ -3,6 +3,7 @@ import { createEns } from './ens'
 import { createApm } from './apm'
 import { createDaoFactory } from './dao'
 import { defaultLocalAragonBases } from '../../../../params'
+import * as Ui from '../../ui/ui'
 
 interface AragonBases {
   ensAddress: string
@@ -39,6 +40,8 @@ export default async function deployAragonBases(
     const ens = await createEns(bre.web3, bre.artifacts)
     const daoFactory = await createDaoFactory(bre.artifacts)
     const apm = await createApm(bre.web3, bre.artifacts, ens, daoFactory)
+
+    Ui.setInfo({ ensAddress: ens.address, apmAddress: apm.address })
 
     if (ens.address !== defaultLocalAragonBases.ensAddress)
       throw new Error(
