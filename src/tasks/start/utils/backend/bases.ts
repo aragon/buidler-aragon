@@ -18,7 +18,7 @@ interface AragonBases {
  */
 export default async function deployAragonBases(
   bre: BuidlerRuntimeEnvironment
-): Promise<AragonBases> {
+): Promise<AragonBases> | never {
   // First, aggregate which bases are deployed and which not
   // by checking if code can be found at the expected addresses.
   const isBaseDeployed: { [baseName: string]: boolean } = {}

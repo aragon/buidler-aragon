@@ -28,7 +28,7 @@ task(TASK_START, 'Starts Aragon app development')
   )
   .addFlag('silent', 'Silences all console output')
   .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
-    Ui.initialize()
+    Ui.initialize(params.interactiveUi)
 
     Ui.logActivity('starting...')
 
