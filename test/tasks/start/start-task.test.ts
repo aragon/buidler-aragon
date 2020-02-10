@@ -4,12 +4,13 @@ import { TASK_START } from '~/src/tasks/task-names'
 import { execaPipe } from '~/src/tasks/start/utils/execa'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
-import sinon from 'sinon'
+import * as fs from 'fs-extra'
+import path from 'path'
 
 const DEBUG_START_TASK_RUNNER = true
 const SHOW_START_TASK_LOGS = true
 
-describe.only('start-task.ts', function() {
+describe('start-task.ts', function() {
   let config
 
   describe('while in the counter project', async function() {
@@ -61,10 +62,12 @@ describe.only('start-task.ts', function() {
   describe.only('while in the token-wrapper project', async function() {
     useEnvironment('../projects/token-wrapper')
 
-    before('retrieve config', function() {
+    before('retrieve config and hooks', function() {
       config = this.env.config.aragon as AragonConfig
+    })
 
-      console.log(`bre`, this.env)
+    before('delete all logs created by hooks', async function() {
+      await config.hooks._deleteLogs()
     })
 
     /*   preDao?: (bre: BuidlerRuntimeEnvironment) => Promise<void> | void */
@@ -83,22 +86,8 @@ describe.only('start-task.ts', function() {
     /*     bre: BuidlerRuntimeEnvironment */
     /*   ) => Promise<void> | void */
 
-    let preDaoSpy
-
-    before('intercept hooks with sinon', async function() {
-      const hooks = config.hooks as AragonConfigHooks
-      console.log(`hooks`, hooks.preDao)
-
-      preDaoSpy = sinon.spy(hooks, 'preDao')
-      console.log(`hooks1`, hooks.preDao, preDaoSpy)
-
-      // prettier-ignore
-      { ((this.env.config.aragon as AragonConfig).hooks as AragonConfigHooks) = hooks }
-    })
-
     describe('when the start task is running', async function() {
       before('run start task for a while, then start tests', async function() {
-        /* await runStartTask(45) */
         await runStartTask(20)
       })
 
@@ -120,13 +109,42 @@ describe.only('start-task.ts', function() {
       })
 
       it('calls the preDao hook with the dao and the bre', async function() {
-        assert(preDaoSpy.calledOnce, 'preDao hook was not called')
+        const json = await _readHookLog('preDao')
 
-        console.log(`bre`, preDaoSpy.getCall(0).args[0])
+        assert(json, 'preDao hook log not found')
+        assert(json.aragon, 'preDao hook log contains invalid data')
       })
     })
   })
 })
+
+// -----------------------------------------------------
+// Utils for reading logs created by hooks.
+// -----------------------------------------------------
+
+async function _readHookLog(filename): Promise<any | void> {
+  const filepath = path.join(
+    __dirname,
+    '../..//projects/token-wrapper/logs',
+    filename
+  )
+
+  return new Promise((resolve, reject) => {
+    fs.readJSON(filepath, (err, res) => {
+      if (err) {
+        // eslint-disable-next-line no-console
+        console.log(`Error reading file: ${err.message}`)
+        reject()
+      }
+
+      resolve(res)
+    })
+  })
+}
+
+// -----------------------------------------------------
+// Utils for calling the start task.
+// -----------------------------------------------------
 
 let startTaskProcess
 
