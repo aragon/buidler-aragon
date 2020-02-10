@@ -1,7 +1,7 @@
 let token
 let accounts
 
-async function preDao(dao, bre) {
+async function preDao(bre) {
   console.log(`preDao hook`)
 }
 

@@ -36,8 +36,9 @@ export async function startFrontend(
   await generateAppArtifacts(appBuildOutputPath, bre.artifacts)
 
   const appSrcPath = config.appSrcPath as string
+  const appServePort = config.appServePort as number
   await copyAppUiAssets(appSrcPath)
-  await serveAppAndResolveWhenBuilt(appSrcPath)
+  await serveAppAndResolveWhenBuilt(appSrcPath, appServePort)
 
   // Start Aragon client at the deployed address.
   if (openBrowser) {
