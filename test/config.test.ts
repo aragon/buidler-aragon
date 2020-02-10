@@ -2,71 +2,12 @@ import { assert } from 'chai'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import defaultAragonConfig from '~/src/config'
-import tcpPortUsed from 'tcp-port-used'
-import { TASK_START } from '~/src/tasks/task-names'
-import { execaPipe } from '~/src/tasks/start/utils/execa'
 
-describe.only('config.ts', () => {
-  describe('config values', async function() {
-    let config, startTaskProcess
-
-    describe('when in the token-wrapper project', async function() {
-      useEnvironment('token-wrapper')
-
-      before('retrieve config', function() {
-        config = this.env.config.aragon as AragonConfig
-      })
-
-      before('run start task and wait a bit', async function() {
-        const WAIT_TIME = 20000
-
-        return new Promise(resolve => {
-          startTaskProcess = execaPipe(
-            'npx',
-            [
-              'buidler',
-              TASK_START,
-              '--open-browser',
-              'false',
-              '--silent',
-              'true'
-            ],
-            {}
-          )
-
-          console.log(`Starting start task and waiting...`)
-          startTaskProcess.then(() => {})
-
-          setTimeout(() => {
-            console.log(`Starting tests...`)
-            resolve()
-          }, WAIT_TIME)
-        })
-      })
-
-      after('stop start task', function() {
-        startTaskProcess.kill('SIGTERM', { forceKillAfterTimeout: 2000 })
-      })
-
-      describe('appServePort', async function() {
-        it.only('serves the app contents at the correct port', async function() {
-          console.log(`checking port`, config.appServePort)
-          const portUsed = await tcpPortUsed.check(config.appServePort)
-
-          console.log(`use port`, portUsed)
-
-          /* assert */
-        })
-
-        /* it.skip('sets the repo contentURI to the correct port', async function() { */
-
-        /* }) */
-      })
-    })
-  })
-
+describe('config.ts', () => {
   describe('default config', async function() {
     let config
+
+    const defaultConfig = defaultAragonConfig
 
     describe('when in the counter project', async function() {
       useEnvironment('counter')
@@ -76,10 +17,27 @@ describe.only('config.ts', () => {
       })
 
       it('resulting config contains default values', function() {
-        assert.deepEqual(
-          config,
-          defaultAragonConfig,
-          'Not using default config.'
+        assert.deepEqual(config, defaultConfig, 'config is different')
+      })
+    })
+
+    describe('when in the token-wrapper project', async function() {
+      useEnvironment('token-wrapper')
+
+      before('retrieve config', function() {
+        config = this.env.config.aragon as AragonConfig
+      })
+
+      it('resulting config does not contain some default values', function() {
+        assert.notEqual(
+          config.appServePort,
+          defaultConfig.appServePort,
+          'appServePort is equal'
+        )
+        assert.notEqual(
+          config.clientServePort,
+          defaultConfig.clientServePort,
+          'clientServePort is equal'
         )
       })
     })

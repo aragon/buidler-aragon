@@ -24,7 +24,7 @@ module.exports = {
     version: '0.4.24'
   },
   aragon: {
-    appServePort: 8001, // Intentionally not using default value (8001).
+    appServePort: 8002, // Intentionally not using default value (8001).
     clientServePort: 3001, // Intentionally not using default value (3000).
     appSrcPath: 'app/',
     appBuildOutputPath: 'dist/',

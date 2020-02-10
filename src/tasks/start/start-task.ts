@@ -53,7 +53,12 @@ task(TASK_START, 'Starts Aragon app development')
     await _checkPorts(config)
     await _checkScripts(config.appSrcPath as string)
 
-    const { daoAddress, appAddress } = await startBackend(bre, appName, appId)
+    const { daoAddress, appAddress } = await startBackend(
+      bre,
+      appName,
+      appId,
+      params.silent
+    )
     await startFrontend(bre, daoAddress, appAddress, params.openBrowser)
   })
 
