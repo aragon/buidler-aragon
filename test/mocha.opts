@@ -4,4 +4,4 @@
 --require source-map-support/register
 --recursive test/**/*.ts
 --exclude test/projects/**/*.ts
---timeout 60000
+--timeout 300000

@@ -8,11 +8,19 @@ async function preDao(bre) {
   console.log(`preDao hook called`)
 
   // Used for testing only.
-  await _writeLog('preDao', JSON.stringify(bre.config, null, 2))
+  const content = bre.config
+  await _writeLog('preDao', JSON.stringify(content, null, 2))
 }
 
 async function postDao(dao, bre) {
   console.log(`postDao hook called`, dao.address)
+
+  // Used for testing only.
+  const content = {
+    ...bre.config,
+    daoAddress: dao.address
+  }
+  await _writeLog('postDao', JSON.stringify(content, null, 2))
 }
 
 async function preInit(bre) {
@@ -30,12 +38,25 @@ async function preInit(bre) {
   // so no need to mint to the first account. All we need to do is transfer from the first
   // account to the second account.
   await token.transfer(accounts[1], '1000000000000000000000')
+
+  // Used for testing only.
+  const content = {
+    ...bre.config,
+    rootAccount: accounts[0],
+    tokenAddress: token.address
+  }
+  await _writeLog('preInit', JSON.stringify(content, null, 2))
 }
 
 async function getInitParams(bre) {
   console.log(`getInitParams hook called`)
 
   const tokenAddress = token ? token.address : undefined
+
+  // Used for testing only.
+  const content = bre.config
+  await _writeLog('getInitParams', JSON.stringify(content, null, 2))
+
   return [tokenAddress, 'Wrapped token', 'wORG']
 }
 
@@ -46,10 +67,24 @@ async function postInit(proxy, bre) {
   console.log(`Proxy:`, proxy.address)
   console.log(`Account 1 token balance`, (await token.balanceOf(accounts[0])).toString())
   console.log(`Account 2 token balance`, (await token.balanceOf(accounts[1])).toString())
+
+  // Used for testing only.
+  const content = {
+    ...bre.config,
+    proxyAddress: proxy.address
+  }
+  await _writeLog('postInit', JSON.stringify(content, null, 2))
 }
 
 async function postUpdate(proxy, bre) {
   console.log(`postUpdate hook called`)
+
+  // Used for testing only.
+  const content = {
+    ...bre.config,
+    proxyAddress: proxy.address
+  }
+  await _writeLog('postUpdate', JSON.stringify(content, null, 2))
 }
 
 // ----------------------------------------------------
@@ -60,11 +95,14 @@ async function postUpdate(proxy, bre) {
 async function _writeLog(filename, content) {
   return new Promise(resolve => {
     const logPath = path.join(__dirname, '../logs', filename)
+    console.log(`writing log: ${logPath}`)
 
     fs.writeFile(logPath, content, err => {
       if (err) {
         console.log(`Error while writing log: ${err.message}`)
       }
+
+      resolve()
     })
   })
 }
