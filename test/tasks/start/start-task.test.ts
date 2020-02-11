@@ -2,11 +2,11 @@ import { assert } from 'chai'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { TASK_START } from '~/src/tasks/task-names'
 import { execaPipe } from '~/src/tasks/start/utils/execa'
-import { AragonConfig, AragonConfigHooks } from '~/src/types'
+import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
 import * as fs from 'fs-extra'
 import path from 'path'
-import { isAddress } from '~/test/test-helpers/isAddress'
+import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 
 const DEBUG_START_TASK_RUNNER = true
 const SHOW_START_TASK_LOGS = true
@@ -78,7 +78,7 @@ describe('start-task.ts', function() {
           'postDao hook log does not contain an aragon property'
         )
         assert(
-          isAddress(json.daoAddress),
+          isNonZeroAddress(json.daoAddress),
           'postDao hook does not contain a valid dao address'
         )
       })
@@ -89,11 +89,11 @@ describe('start-task.ts', function() {
         assert(json, 'preInit hook log not found')
         assert(json.aragon, 'preInit hook does not contain an aragon property')
         assert(
-          isAddress(json.tokenAddress),
+          isNonZeroAddress(json.tokenAddress),
           'preInit hook does not contain a token address'
         )
         assert(
-          isAddress(json.rootAccount),
+          isNonZeroAddress(json.rootAccount),
           'preInit hook does not contain a root account'
         )
       })
@@ -104,7 +104,7 @@ describe('start-task.ts', function() {
         assert(json, 'postInit hook log not found')
         assert(json.aragon, 'postInit hook does not contain an aragon property')
         assert(
-          isAddress(json.proxyAddress),
+          isNonZeroAddress(json.proxyAddress),
           'postInit hook does not contain a proxy address'
         )
       })
@@ -138,7 +138,7 @@ describe('start-task.ts', function() {
             'postUpdate hook does not contain an aragon property'
           )
           assert(
-            isAddress(json.proxyAddress),
+            isNonZeroAddress(json.proxyAddress),
             'postUpdate hook does not contain a proxy address'
           )
         })

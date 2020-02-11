@@ -3,7 +3,7 @@ import {
   createDao,
   createDaoFactory
 } from '~/src/tasks/start/utils/backend/dao'
-import { isAddress } from '~/test/test-helpers/isAddress'
+import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { KernelInstance, DAOFactoryInstance } from '~/typechain'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 
@@ -17,6 +17,7 @@ describe('dao.ts', function() {
       const daoFactory: DAOFactoryInstance = await createDaoFactory(
         this.env.artifacts
       )
+
       dao = await createDao(
         this.env.web3,
         this.env.artifacts,
@@ -25,11 +26,19 @@ describe('dao.ts', function() {
     })
 
     it('deploys a dao with a valid address', function() {
-      assert.equal(isAddress(dao.address), true, 'Invalid contract address.')
+      assert.equal(
+        isNonZeroAddress(dao.address),
+        true,
+        'Invalid contract address.'
+      )
     })
 
     it('has a valid ACL', async function() {
-      assert.equal(isAddress(await dao.acl()), true, 'Invalid acl address.')
+      assert.equal(
+        isNonZeroAddress(await dao.acl()),
+        true,
+        'Invalid acl address.'
+      )
     })
 
     it('has been initialized', async function() {

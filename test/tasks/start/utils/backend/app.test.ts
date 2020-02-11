@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { isAddress } from '~/test/test-helpers/isAddress'
+import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { deployImplementation } from '~/src/tasks/start/utils/backend/app'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 
@@ -15,7 +15,7 @@ describe('app.ts', function() {
 
     it('deploys a contract with a valid address', async function() {
       assert.equal(
-        isAddress(implementation.address),
+        isNonZeroAddress(implementation.address),
         true,
         'Invalid contract address.'
       )
