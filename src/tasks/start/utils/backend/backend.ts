@@ -37,12 +37,17 @@ export async function startBackend(
    * Until BuidlerEVM JSON RPC is ready, a ganache server will be started
    * on the appropiate conditions.
    */
-  await startGanache(bre)
+  const networkId = await startGanache(bre)
+  if (networkId !== 0) {
+    logBack(`Started a ganache testnet instance with id ${networkId}`)
+  }
 
   // Deploy bases.
+  logBack('Deploying Aragon bases (ENS, DAOFactory, and APM)...')
   const { ensAddress, daoFactoryAddress, apmAddress } = await deployAragonBases(
     bre
   )
+  logBack('Aragon bases deployed.')
 
   // Read arapp.json.
   const arapp = readArapp()

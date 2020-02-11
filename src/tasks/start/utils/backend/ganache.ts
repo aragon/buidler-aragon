@@ -2,7 +2,6 @@ import tcpPortUsed from 'tcp-port-used'
 import { promisify } from 'util'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
-import { logBack } from '../logger'
 import { aragenGasLimit, aragenMnemonic, testnetPort } from '../../../../params'
 
 // There's an issue with how web3 exports its typings that conflicts with
@@ -11,28 +10,45 @@ import { aragenGasLimit, aragenMnemonic, testnetPort } from '../../../../params'
 /* eslint-disable @typescript-eslint/no-var-requires */
 const ganache = require('ganache-core')
 
-const buidlerevmNetworkName = 'buidlerevm'
+let server
 
 export async function startGanache(
   bre: BuidlerRuntimeEnvironment
-): Promise<void> {
-  if (bre.network.name === buidlerevmNetworkName) {
+): Promise<number> {
+  if (bre.network.name === 'buidlerevm') {
     throw new BuidlerPluginError(
-      `Cannot use ${buidlerevmNetworkName} network for this task until a JSON RPC is exposed`
+      'Cannot use buidlerevm network for this task until a JSON RPC is exposed'
     )
-  } else if (bre.network.name === 'localhost') {
-    if (await tcpPortUsed.check(testnetPort)) {
-      logBack(`Connecting to existing local blockchain instance`)
-    } else {
-      logBack(`Starting a new Ganache testnet instance`)
-      const server = ganache.server({
-        gasLimit: aragenGasLimit,
-        mnemonic: aragenMnemonic
-      })
-      const blockchain = await promisify(server.listen)(testnetPort)
-      logBack(
-        `New Ganache instance ready, id: ${blockchain.options.network_id}`
-      )
-    }
   }
+
+  if (bre.network.name !== 'localhost') {
+    throw new BuidlerPluginError(
+      'This plugin currently requires that the localhost network is used.'
+    )
+  }
+
+  // If port is in use, assume that a local chain is already running.
+  const portInUse = await tcpPortUsed.check(testnetPort)
+  if (portInUse) {
+    return 0
+  }
+
+  // Start a new ganache server.
+  server = ganache.server({
+    gasLimit: aragenGasLimit,
+    mnemonic: aragenMnemonic
+  })
+  const blockchain = await promisify(server.listen)(testnetPort)
+
+  return blockchain.options.network_id
+}
+
+export function stopGanache(): void {
+  if (!server) {
+    throw new BuidlerPluginError(
+      'Cant stop ganache server because it doesnt seem to be running.'
+    )
+  }
+
+  server.close()
 }
