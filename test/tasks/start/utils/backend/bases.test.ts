@@ -9,7 +9,7 @@ import {
 } from '~/src/tasks/start/utils/backend/ganache'
 import { createEns } from '~/src/tasks/start/utils/backend/ens'
 
-describe.only('bases.ts', function() {
+describe('bases.ts', function() {
   // Note: These particular tests use localhost instead of buidlerevm.
   // This is required for bases to have the expected addresses,
   // And because we want to restart the chain on certain tests.
@@ -63,6 +63,49 @@ describe.only('bases.ts', function() {
         'Non matching apm address'
       )
     })
+
+    describe('when all bases are deployed', async function() {
+      let blockBefore
+
+      describe('when attempting to deploy bases again', async function() {
+        before('deploy bases again', async function() {
+          blockBefore = await this.env.web3.eth.getBlockNumber()
+          ;({
+            ensAddress,
+            daoFactoryAddress,
+            apmAddress
+          } = await deployAragonBases(this.env))
+        })
+
+        it('should not deploy any contracts', async function() {
+          const currentBlock = await this.env.web3.eth.getBlockNumber()
+
+          assert.equal(
+            blockBefore,
+            currentBlock,
+            'deployAragonBases emitted transactions'
+          )
+        })
+
+        it('should return the default addresses', async function() {
+          assert.equal(
+            ensAddress,
+            defaultLocalAragonBases.ensAddress,
+            'Non matching ens address'
+          )
+          assert.equal(
+            apmAddress,
+            defaultLocalAragonBases.apmAddress,
+            'Non matching dao factory address'
+          )
+          assert.equal(
+            daoFactoryAddress,
+            defaultLocalAragonBases.daoFactoryAddress,
+            'Non matching apm address'
+          )
+        })
+      })
+    })
   })
 
   describe('when some bases are deployed', async function() {
@@ -90,8 +133,4 @@ describe.only('bases.ts', function() {
       })
     })
   })
-
-  /* describe('when all bases are deployed', async function() { */
-
-  /* }) */
 })

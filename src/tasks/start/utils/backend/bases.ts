@@ -51,7 +51,7 @@ export default async function deployAragonBases(
       daoFactoryAddress: daoFactory.address,
       apmAddress: apm.address
     }
-  } else {
+  } else if (!allBasesAreDeployed) {
     throw new BuidlerPluginError(
       `Only some Aragon bases are deployed in the current testnet. Restart its state and retry`
     )
