@@ -1,15 +1,19 @@
+import execa from 'execa'
 import { assert } from 'chai'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { TASK_START } from '~/src/tasks/task-names'
-import { execaPipe } from '~/src/tasks/start/utils/execa'
 import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
 import * as fs from 'fs-extra'
 import path from 'path'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
+import {
+  FRONTEND_STARTED_SERVING,
+  BACKEND_PROXY_UPDATED
+} from '../../../src/events'
 
-const DEBUG_START_TASK_RUNNER = true
-const SHOW_START_TASK_LOGS = true
+const EMIT_START_TASK_OUTPUT = false
+const DEBUG_START_TASK_CYCLE = false
 
 describe('start-task.ts', function() {
   let config
@@ -36,17 +40,17 @@ describe('start-task.ts', function() {
       })
     })
 
-    describe('when the start task is running', async function() {
+    describe('when the start task is running (these tests can take aprox 2 minutes)', async function() {
       before('delete all logs created by hooks', async function() {
         await config.hooks._deleteLogs()
       })
 
       before('run start task for a while, then start tests', async function() {
-        await runStartTask(80)
+        await _runStartTask()
       })
 
       after('kill the start task', function() {
-        killStartTask()
+        _killStartTask()
       })
 
       it('uses the target ports', async function() {
@@ -131,7 +135,7 @@ describe('start-task.ts', function() {
       describe('when modifying the contract source', async function() {
         before('modify the contract source', async function() {
           await _modifyContractSource()
-          await wait(30)
+          await _waitForStartTaskEvent(BACKEND_PROXY_UPDATED)
         })
 
         after('restore the contract source', async function() {
@@ -245,13 +249,17 @@ async function _restoreContractSource(): Promise<void> {
 let startTaskProcess
 
 /*
- * Define the start task process using execa.
- * NOTE #1: Not using this.env.run(TASK_START) because Buidler
- * doesn't provide a way to close unending tasks started that way.
+ * Runs the start task using execa.
+ * After starting the task, the function listens for custom
+ * events emitted from the task's process, and resolves only when
+ * the task is ready to begin testing.
+ *
+ * Note: Not using this.env.run(TASK_START) because Buidler
+ * doesnt provide a way to close tasks started in this way.
  */
-async function runStartTask(waitSeconds): Promise<void> {
-  // Define process.
-  startTaskProcess = execaPipe(
+async function _runStartTask(): Promise<void> {
+  // Define sub-process.
+  startTaskProcess = execa(
     'npx',
     [
       'buidler',
@@ -261,61 +269,67 @@ async function runStartTask(waitSeconds): Promise<void> {
       '--network',
       'localhost',
       '--silent',
-      `${!SHOW_START_TASK_LOGS}`
+      'false'
     ],
     {}
   )
 
   // Trigger the process but don't wait for it!
-  if (DEBUG_START_TASK_RUNNER) {
+  if (DEBUG_START_TASK_CYCLE) {
     // eslint-disable-next-line no-console
     console.log(`>>> Running start task...`)
   }
   // prettier-ignore
   {
     (async (): Promise<void> => {
+      // The task will be intentionally terminated by _killStartTask()
+      // so we want to catch that SIGTERM error.
       await startTaskProcess.catch(() => {})
     })()
   }
 
-  // Wait a bit until the task is considered started.
-  if (DEBUG_START_TASK_RUNNER) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `>>> Waiting for start task to run for ${waitSeconds} seconds...`
-    )
-  }
-  await wait(waitSeconds)
-  if (DEBUG_START_TASK_RUNNER) {
-    // eslint-disable-next-line no-console
-    console.log(`>>> Running tests on start task...`)
-  }
+  // Hold execution until an event is detected in
+  // task's process.
+  await _waitForStartTaskEvent(FRONTEND_STARTED_SERVING)
 }
 
-function killStartTask(): void {
-  // eslint-disable-next-line no-console
-  console.log(`>>> Killing start task.`)
+function _killStartTask(): void {
+  if (DEBUG_START_TASK_CYCLE) {
+    // eslint-disable-next-line no-console
+    console.log(`>>> Killing start task.`)
+  }
+
   startTaskProcess.kill('SIGTERM', { forceKillAfterTimeout: 2000 })
 }
 
-async function wait(seconds): Promise<void> {
-  return new Promise(resolve => {
-    // Count ticks.
-    let interval
-    if (DEBUG_START_TASK_RUNNER) {
-      let ticker = 0
-      interval = setInterval(() => {
-        ticker++
+async function _waitForStartTaskEvent(eventName): Promise<void> {
+  if (DEBUG_START_TASK_CYCLE) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `>>> Waiting for event ${eventName} to be emitted from start task...`
+    )
+  }
+  await new Promise(resolve => {
+    startTaskProcess.stdout.on('data', (bytes): void => {
+      const data = Buffer.from(bytes, 'utf-8').toString()
 
+      // Emit start task output.
+      if (EMIT_START_TASK_OUTPUT) {
         // eslint-disable-next-line no-console
-        console.log(`waiting: ${ticker}s`)
-      }, 1000)
-    }
+        console.log(data)
+      }
 
-    // Wait and resolve.
-    setTimeout(() => {
-      clearInterval(interval)
-      resolve()
-    }, seconds * 1000)
+      // Spy on process output looking for the ready event.
+      if (data.includes(eventName)) {
+        startTaskProcess.stdout.removeAllListeners()
+
+        if (DEBUG_START_TASK_CYCLE) {
+          // eslint-disable-next-line no-console
+          console.log(`>>> ${eventName} event emitted, starting tests.`)
+        }
+
+        resolve()
+      }
+    })
   })
 }

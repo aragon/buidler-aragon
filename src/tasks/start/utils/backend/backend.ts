@@ -13,6 +13,11 @@ import { TASK_COMPILE } from '../../../task-names'
 import deployAragonBases from './bases'
 import { startGanache } from './ganache'
 import { Writable } from 'stream'
+import {
+  emitEvent,
+  BACKEND_BUILD_STARTED,
+  BACKEND_PROXY_UPDATED
+} from '../../../../events'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -28,6 +33,8 @@ export async function startBackend(
   appId: string,
   silent: boolean
 ): Promise<{ daoAddress: string; appAddress: string }> {
+  emitEvent(BACKEND_BUILD_STARTED)
+
   const config: AragonConfig = bre.config.aragon as AragonConfig
   const hooks: AragonConfigHooks = config.hooks as AragonConfigHooks
 
@@ -141,6 +148,8 @@ export async function startBackend(
       if (hooks && hooks.postUpdate) {
         await hooks.postUpdate(proxy, bre)
       }
+
+      emitEvent(BACKEND_PROXY_UPDATED)
     })
 
   logBack(`

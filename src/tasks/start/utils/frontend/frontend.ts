@@ -13,6 +13,7 @@ import {
   copyAppUiAssets,
   startAppWatcher
 } from './app'
+import { emitEvent, FRONTEND_STARTED_SERVING } from '../../../../events'
 
 /**
  * Starts the task's frontend sub-tasks. Logic is contained in ./tasks/start/utils/frontend/.
@@ -69,6 +70,8 @@ export async function startFrontend(
         `Warning: Changes detected on ${path}. Hot reloading is not supported on this file. Please re-run the "start" task to load these changes.`
       )
     })
+
+  emitEvent(FRONTEND_STARTED_SERVING, 1000)
 
   await startAppWatcher(appSrcPath)
 }
