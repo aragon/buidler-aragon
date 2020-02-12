@@ -195,7 +195,7 @@ async function _modifyContractSource(): Promise<void> {
     '../../projects/token-wrapper/contracts/TokenWrapper.sol'
   )
 
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     fs.readFile(filepath, (err, res) => {
       if (err) {
         // eslint-disable-next-line no-console
@@ -223,7 +223,7 @@ async function _restoreContractSource(): Promise<void> {
       '../../projects/token-wrapper/contracts/TokenWrapper.sol'
     )
 
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       fs.writeFile(filepath, contractSource, err => {
         if (err) {
           // eslint-disable-next-line no-console

@@ -93,6 +93,11 @@ async function postUpdate(proxy, bre) {
 // ----------------------------------------------------
 
 async function _writeLog(filename, content) {
+  const logsPath = path.join(__dirname, '../logs')
+  if (!fs.existsSync(logsPath)){
+      fs.mkdirSync(logsPath);
+  }
+
   return new Promise(resolve => {
     const logPath = path.join(__dirname, '../logs', filename)
     console.log(`writing log: ${logPath}`)
