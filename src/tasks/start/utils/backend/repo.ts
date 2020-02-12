@@ -9,7 +9,7 @@ import {
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import { logBack } from '../logger'
-import { getLog } from './logs'
+import { getLog } from '../../../../utils/getLog'
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 
@@ -61,12 +61,12 @@ export async function majorBumpRepo(
   logBack(`Repo version: ${semver.join('.')}`)
 
   // URI where this plugin is serving the app's front end.
-  const contentURI = `0x${Buffer.from(
-    `http://localhost:${appServePort}`
-  ).toString('hex')}`
+  const contentUri = `http://localhost:${appServePort}`
+  const contentUriBytes = `0x${Buffer.from(contentUri).toString('hex')}`
+  logBack(`Repo content URI: ${contentUri}`)
 
   // Create a new version in the app's repo, with the new implementation.
-  await repo.newVersion(semver, implementation.address, contentURI)
+  await repo.newVersion(semver, implementation.address, contentUriBytes)
 }
 
 /**

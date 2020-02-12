@@ -28,7 +28,8 @@ export async function startAppWatcher(appSrcPath: string): Promise<void> {
  * Starts the app's front end sever.
  */
 export async function serveAppAndResolveWhenBuilt(
-  appSrcPath: string
+  appSrcPath: string,
+  appServePort: number
 ): Promise<void> {
   return new Promise(async resolve => {
     const logger = (data: string): void => {
@@ -39,7 +40,11 @@ export async function serveAppAndResolveWhenBuilt(
       logFront(data)
     }
 
-    await execaLogTo(logger)('npm', ['run', 'serve'], { cwd: appSrcPath })
+    await execaLogTo(logger)(
+      'npm',
+      ['run', 'serve', '--', '--port', `${appServePort}`],
+      { cwd: appSrcPath }
+    )
   })
 }
 

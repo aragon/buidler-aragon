@@ -12,6 +12,12 @@ import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { TASK_COMPILE } from '../../../task-names'
 import deployAragonBases from './bases'
 import { startGanache } from './ganache'
+import { Writable } from 'stream'
+import {
+  emitEvent,
+  BACKEND_BUILD_STARTED,
+  BACKEND_PROXY_UPDATED
+} from '../../../../events'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -24,23 +30,31 @@ import { startGanache } from './ganache'
 export async function startBackend(
   bre: BuidlerRuntimeEnvironment,
   appName: string,
-  appId: string
+  appId: string,
+  silent: boolean
 ): Promise<{ daoAddress: string; appAddress: string }> {
+  emitEvent(BACKEND_BUILD_STARTED)
+
   const config: AragonConfig = bre.config.aragon as AragonConfig
   const hooks: AragonConfigHooks = config.hooks as AragonConfigHooks
 
-  await bre.run(TASK_COMPILE)
+  await _compileDisablingOutput(bre, silent)
 
   /**
    * Until BuidlerEVM JSON RPC is ready, a ganache server will be started
    * on the appropiate conditions.
    */
-  await startGanache(bre)
+  const networkId = await startGanache(bre)
+  if (networkId !== 0) {
+    logBack(`Started a ganache testnet instance with id ${networkId}`)
+  }
 
   // Deploy bases.
+  logBack('Deploying Aragon bases (ENS, DAOFactory, and APM)...')
   const { ensAddress, daoFactoryAddress, apmAddress } = await deployAragonBases(
     bre
   )
+  logBack('Aragon bases deployed.')
 
   // Read arapp.json.
   const arapp = readArapp()
@@ -117,7 +131,7 @@ export async function startBackend(
     })
     .on('change', async () => {
       logBack(`<<< Triggering backend build >>>`)
-      await bre.run(TASK_COMPILE)
+      await _compileDisablingOutput(bre, silent)
 
       // Update implementation and set it in Repo and Proxy.
       const newImplementation: Truffle.ContractInstance = await deployImplementation(
@@ -134,6 +148,8 @@ export async function startBackend(
       if (hooks && hooks.postUpdate) {
         await hooks.postUpdate(proxy, bre)
       }
+
+      emitEvent(BACKEND_PROXY_UPDATED)
     })
 
   logBack(`
@@ -145,4 +161,28 @@ export async function startBackend(
 `)
 
   return { daoAddress: dao.address, appAddress: proxy.address }
+}
+
+/**
+ * Buidler's compile task currently calls console.logs.
+ * Until they can be disabled as an option, this workaround removes them.
+ */
+async function _compileDisablingOutput(
+  bre: BuidlerRuntimeEnvironment,
+  silent: boolean
+): Promise<void> {
+  logBack('compiling contracts...')
+
+  const consoleCache = console
+
+  if (silent) {
+    // eslint-disable-next-line no-console
+    console = new console.Console(new Writable())
+  }
+
+  await bre.run(TASK_COMPILE)
+
+  console = consoleCache
+
+  logBack('contracts compiled.')
 }

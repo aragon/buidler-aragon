@@ -13,6 +13,7 @@ import {
   copyAppUiAssets,
   startAppWatcher
 } from './app'
+import { emitEvent, FRONTEND_STARTED_SERVING } from '../../../../events'
 
 /**
  * Starts the task's frontend sub-tasks. Logic is contained in ./tasks/start/utils/frontend/.
@@ -28,27 +29,25 @@ export async function startFrontend(
 ): Promise<void> {
   const config: AragonConfig = bre.config.aragon as AragonConfig
 
-  if (openBrowser) {
-    await installAragonClientIfNeeded()
-  }
+  await installAragonClientIfNeeded()
 
   const appBuildOutputPath = config.appBuildOutputPath as string
   await generateAppArtifacts(appBuildOutputPath, bre.artifacts)
 
   const appSrcPath = config.appSrcPath as string
+  const appServePort = config.appServePort as number
   await copyAppUiAssets(appSrcPath)
-  await serveAppAndResolveWhenBuilt(appSrcPath)
+  await serveAppAndResolveWhenBuilt(appSrcPath, appServePort)
 
   // Start Aragon client at the deployed address.
-  if (openBrowser) {
-    const url: string = await startAragonClient(
-      config.clientServePort as number,
-      `${daoAddress}/${appAddress}`
-    )
-    logFront(`You can now view the Aragon client in the browser.
-   Local:  ${url}
-  `)
-  }
+  const url: string = await startAragonClient(
+    config.clientServePort as number,
+    `${daoAddress}/${appAddress}`,
+    openBrowser
+  )
+  logFront(`You can now view the Aragon client in the browser.
+ Local:  ${url}
+`)
 
   // Watch changes to app/src/script.js.
   chokidar
@@ -71,6 +70,8 @@ export async function startFrontend(
         `Warning: Changes detected on ${path}. Hot reloading is not supported on this file. Please re-run the "start" task to load these changes.`
       )
     })
+
+  emitEvent(FRONTEND_STARTED_SERVING, 1000)
 
   await startAppWatcher(appSrcPath)
 }

@@ -27,7 +27,13 @@ task(TASK_START, 'Starts Aragon app development')
     true,
     types.boolean
   )
+  .addParam('silent', 'Silences all console output', false, types.boolean)
   .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
+    if (params.silent) {
+      // eslint-disable-next-line
+      console.log = () => {}
+    }
+
     logMain(`Starting...`)
 
     const appEnsName = await getAppEnsName()
@@ -47,7 +53,12 @@ task(TASK_START, 'Starts Aragon app development')
     await _checkPorts(config)
     await _checkScripts(config.appSrcPath as string)
 
-    const { daoAddress, appAddress } = await startBackend(bre, appName, appId)
+    const { daoAddress, appAddress } = await startBackend(
+      bre,
+      appName,
+      appId,
+      params.silent
+    )
     await startFrontend(bre, daoAddress, appAddress, params.openBrowser)
   })
 

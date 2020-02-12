@@ -22,7 +22,7 @@
     "dev": "npm run generate && npm run build && npm run build-projects",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "prettier": "prettier --write '**/*.{ts,js,css,html}'",
-    "test": "mocha --exit",
+    "test": "npm run build && mocha --exit",
     "build": "tsc --build ."
   },
   "dependencies": {

@@ -5,7 +5,7 @@ import {
 import { KernelInstance } from '~/typechain'
 
 export interface BuidlerAragonConfig extends BuidlerConfig {
-  aragon: AragonConfig
+  aragon?: AragonConfig
 }
 
 export interface AragonConfig {

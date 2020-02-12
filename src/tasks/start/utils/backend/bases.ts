@@ -3,7 +3,6 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { createEns } from './ens'
 import { createApm } from './apm'
 import { createDaoFactory } from './dao'
-import { logBack } from '../logger'
 import { defaultLocalAragonBases } from '../../../../params'
 
 interface AragonBases {
@@ -34,13 +33,10 @@ export default async function deployAragonBases(
   const allBasesAreDeployed = basesDeployed.every(isDeployed => isDeployed)
   const noBasesAreDeployed = basesDeployed.every(isDeployed => !isDeployed)
 
-  // If *all*  bases deployed => do nothing,
-  //    *no*   bases deployed => deploy them,
-  //    *some* bases deployed => throw an error.
-  if (allBasesAreDeployed) {
-    logBack(`Aragon bases already deployed`)
-  } else if (noBasesAreDeployed) {
-    logBack(`Aragon bases not found, deploying...`)
+  // If *all*  bases are deployed => do nothing,
+  //    *no*   bases are deployed => deploy them,
+  //    *some* bases are deployed => throw an error.
+  if (noBasesAreDeployed) {
     const ens = await createEns(bre.web3, bre.artifacts)
     const daoFactory = await createDaoFactory(bre.artifacts)
     const apm = await createApm(bre.web3, bre.artifacts, ens, daoFactory)
@@ -49,14 +45,13 @@ export default async function deployAragonBases(
       throw new BuidlerPluginError(
         `ENS was deployed at ${ens.address} instead of the expected local address ${defaultLocalAragonBases.ensAddress}`
       )
-    logBack(`Deployed Aragon bases`)
 
     return {
       ensAddress: ens.address,
       daoFactoryAddress: daoFactory.address,
       apmAddress: apm.address
     }
-  } else {
+  } else if (!allBasesAreDeployed) {
     throw new BuidlerPluginError(
       `Only some Aragon bases are deployed in the current testnet. Restart its state and retry`
     )
