@@ -299,7 +299,9 @@ function _killStartTask(): void {
     console.log(`>>> Killing start task.`)
   }
 
-  startTaskProcess.kill('SIGTERM', { forceKillAfterTimeout: 2000 })
+  if (startTaskProcess) {
+    startTaskProcess.kill('SIGTERM', { forceKillAfterTimeout: 2000 })
+  }
 }
 
 async function _waitForStartTaskEvent(eventName): Promise<void> {

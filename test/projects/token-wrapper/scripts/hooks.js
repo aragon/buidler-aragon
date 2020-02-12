@@ -116,21 +116,25 @@ async function _deleteLogs() {
   return new Promise(resolve => {
     const logsPath = path.join(__dirname, '../logs')
 
-    fs.readdir(logsPath, (err, files) => {
-      if (err) {
-        throw err
-      }
+    if (fs.existsSync(logsPath)) {
+      fs.readdir(logsPath, (err, files) => {
+        if (err) {
+          throw err
+        }
 
-      for (const file of files) {
-        fs.unlink(path.join(logsPath, file), err => {
-          if (err) {
-            throw err
-          }
-        })
-      }
+        for (const file of files) {
+          fs.unlink(path.join(logsPath, file), err => {
+            if (err) {
+              throw err
+            }
+          })
+        }
 
+        resolve()
+      })
+    } else {
       resolve()
-    })
+    }
   })
 }
 
