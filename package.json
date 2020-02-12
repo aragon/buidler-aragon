@@ -1,6 +1,6 @@
 {
   "name": "@aragon/buidler-aragon",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Aragon Buidler plugin",
   "main": "dist/src/index.js",
   "author": "Aragon Association <legal@aragon.org>",
@@ -12,16 +12,14 @@
     "ethereum"
   ],
   "files": [
-    "artifacts",
     "typechain",
     "dist/src",
     "src"
   ],
   "scripts": {
-    "generate": "typechain --target truffle --outDir typechain 'artifacts/*.json'",
-    "compile": "buidler compile --force",
+    "generate": "typechain --target truffle --outDir typechain './node_modules/@aragon/abis/os/artifacts/*.json'",
     "build-projects": "cd test/projects && npm install && npm run build-projects && cd ../..",
-    "dev": "npm run compile && npm run generate && npm run build && npm run build-projects",
+    "dev": "npm run generate && npm run build && npm run build-projects",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "prettier": "prettier --write '**/*.{ts,js,css,html}'",
     "test": "mocha --exit",
@@ -37,36 +35,39 @@
     "ganache-core": "^2.10.1",
     "live-server": "^1.2.1",
     "open": "^7.0.0",
+    "source-map-support": "^0.5.16",
     "tcp-port-used": "^1.0.1"
   },
   "devDependencies": {
-    "@aragon/os": "^4.3.0",
+    "@aragon/abis": "^1.1.0",
     "@nomiclabs/buidler": "^1.0.2",
     "@nomiclabs/buidler-truffle5": "^1.0.2",
     "@nomiclabs/buidler-web3": "^1.0.2",
-    "@typescript-eslint/eslint-plugin": "^2.16.0",
-    "@typescript-eslint/parser": "^2.16.0",
     "@types/chai": "^4.2.5",
     "@types/mocha": "^5.2.7",
     "@types/node": "12.7.5",
     "@types/web3": "^1.2.2",
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
+    "bignumber.js": "^9.0.0",
     "dotenv": "^8.2.0",
-    "ts-node": "^8.5.4",
-    "typescript": "^3.7.4",
-    "tsconfig-paths": "^3.9.0",
-    "typechain": "^1.0.3",
-    "typechain-target-truffle": "^1.0.2",
-    "truffle-typings": "1.0.4",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.9.0",
     "eslint-plugin-prettier": "^3.1.2",
     "prettier": "^1.19.1",
+    "truffle-typings": "1.0.4",
+    "ts-node": "^8.5.4",
+    "tsconfig-paths": "^3.9.0",
+    "typechain": "^1.0.3",
+    "typechain-target-truffle": "^1.0.2",
+    "typescript": "^3.7.4",
     "web3": "^1.2.4"
   },
   "peerDependencies": {
     "@nomiclabs/buidler": "^1.0.2",
     "@nomiclabs/buidler-truffle5": "^1.0.2",
     "@nomiclabs/buidler-web3": "^1.0.2",
+    "bignumber.js": "^9.0.0",
     "web3": "^1.2.4"
   }
 }

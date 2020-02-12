@@ -10,7 +10,7 @@
     "generate": "typechain --target truffle --outDir typechain 'artifacts/*.json'"
   },
   "dependencies": {
-    "@aragon/os": "4.0.1",
+    "@aragon/abis": "^1.1.0",
     "@nomiclabs/buidler": "^1.0.2",
     "@nomiclabs/buidler-truffle5": "^1.0.2",
     "@nomiclabs/buidler-web3": "^1.0.2",
