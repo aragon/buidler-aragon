@@ -8,7 +8,7 @@ async function preDao(bre) {
   console.log(`preDao hook called`)
 
   // Used for testing only.
-  const content = bre.config
+  const content = bre.config.aragon
   await _writeLog('preDao', JSON.stringify(content, null, 2))
 }
 
@@ -17,7 +17,7 @@ async function postDao(dao, bre) {
 
   // Used for testing only.
   const content = {
-    ...bre.config,
+    ...bre.config.aragon,
     daoAddress: dao.address
   }
   await _writeLog('postDao', JSON.stringify(content, null, 2))
@@ -41,7 +41,7 @@ async function preInit(bre) {
 
   // Used for testing only.
   const content = {
-    ...bre.config,
+    ...bre.config.aragon,
     rootAccount: accounts[0],
     tokenAddress: token.address
   }
@@ -54,7 +54,7 @@ async function getInitParams(bre) {
   const tokenAddress = token ? token.address : undefined
 
   // Used for testing only.
-  const content = bre.config
+  const content = bre.config.aragon
   await _writeLog('getInitParams', JSON.stringify(content, null, 2))
 
   return [tokenAddress, 'Wrapped token', 'wORG']
@@ -70,7 +70,7 @@ async function postInit(proxy, bre) {
 
   // Used for testing only.
   const content = {
-    ...bre.config,
+    ...bre.config.aragon,
     proxyAddress: proxy.address
   }
   await _writeLog('postInit', JSON.stringify(content, null, 2))
@@ -81,7 +81,7 @@ async function postUpdate(proxy, bre) {
 
   // Used for testing only.
   const content = {
-    ...bre.config,
+    ...bre.config.aragon,
     proxyAddress: proxy.address
   }
   await _writeLog('postUpdate', JSON.stringify(content, null, 2))

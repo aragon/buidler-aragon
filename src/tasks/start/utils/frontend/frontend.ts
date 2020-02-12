@@ -28,9 +28,7 @@ export async function startFrontend(
 ): Promise<void> {
   const config: AragonConfig = bre.config.aragon as AragonConfig
 
-  if (openBrowser) {
-    await installAragonClientIfNeeded()
-  }
+  await installAragonClientIfNeeded()
 
   const appBuildOutputPath = config.appBuildOutputPath as string
   await generateAppArtifacts(appBuildOutputPath, bre.artifacts)
@@ -41,15 +39,14 @@ export async function startFrontend(
   await serveAppAndResolveWhenBuilt(appSrcPath, appServePort)
 
   // Start Aragon client at the deployed address.
-  if (openBrowser) {
-    const url: string = await startAragonClient(
-      config.clientServePort as number,
-      `${daoAddress}/${appAddress}`
-    )
-    logFront(`You can now view the Aragon client in the browser.
-   Local:  ${url}
-  `)
-  }
+  const url: string = await startAragonClient(
+    config.clientServePort as number,
+    `${daoAddress}/${appAddress}`,
+    openBrowser
+  )
+  logFront(`You can now view the Aragon client in the browser.
+ Local:  ${url}
+`)
 
   // Watch changes to app/src/script.js.
   chokidar

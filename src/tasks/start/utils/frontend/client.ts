@@ -43,11 +43,10 @@ export async function installAragonClientIfNeeded(
 export async function startAragonClient(
   clientServePort: number,
   subPath?: string,
-  version: string = defaultVersion,
   autoOpen = true
 ): Promise<string> {
   const port: number = clientServePort
-  const clientPath: string = _getClientPath(version)
+  const clientPath: string = _getClientPath(defaultVersion)
 
   logFront(`Starting client server at port ${port}`)
   await _createStaticWebserver(port, path.join(clientPath, 'build'))

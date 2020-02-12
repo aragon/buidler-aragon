@@ -13,7 +13,7 @@ import {
 } from '~/typechain'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
-import { getLog } from './logs'
+import { getLog } from '../../../../utils/getLog'
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 

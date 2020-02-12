@@ -10,7 +10,7 @@ import {
 } from '~/typechain'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import Web3 from 'web3'
-import { getLog } from './logs'
+import { getLog } from '../../../../utils/getLog'
 
 /**
  * Deploys a new DAO with direct/pure interaction with aragonOS.

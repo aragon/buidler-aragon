@@ -66,7 +66,10 @@ describe('start-task.ts', function() {
         const json = await _readHookLog('preDao')
 
         assert(json, 'preDao hook log not found')
-        assert(json.aragon, 'preDao hook does not contain an aragon property')
+        assert(
+          json.appSrcPath,
+          'preDao hook does not contain an aragon property'
+        )
       })
 
       it('calls the postDao hook with the dao and the bre', async function() {
@@ -74,7 +77,7 @@ describe('start-task.ts', function() {
 
         assert(json, 'postDao hook log not found')
         assert(
-          json.aragon,
+          json.appSrcPath,
           'postDao hook log does not contain an aragon property'
         )
         assert(
@@ -87,7 +90,10 @@ describe('start-task.ts', function() {
         const json = await _readHookLog('preInit')
 
         assert(json, 'preInit hook log not found')
-        assert(json.aragon, 'preInit hook does not contain an aragon property')
+        assert(
+          json.appSrcPath,
+          'preInit hook does not contain an aragon property'
+        )
         assert(
           isNonZeroAddress(json.tokenAddress),
           'preInit hook does not contain a token address'
@@ -102,7 +108,10 @@ describe('start-task.ts', function() {
         const json = await _readHookLog('postInit')
 
         assert(json, 'postInit hook log not found')
-        assert(json.aragon, 'postInit hook does not contain an aragon property')
+        assert(
+          json.appSrcPath,
+          'postInit hook does not contain an aragon property'
+        )
         assert(
           isNonZeroAddress(json.proxyAddress),
           'postInit hook does not contain a proxy address'
@@ -114,7 +123,7 @@ describe('start-task.ts', function() {
 
         assert(json, 'getInitParams hook log not found')
         assert(
-          json.aragon,
+          json.appSrcPath,
           'getInitParams hook does not contain an aragon property'
         )
       })
@@ -122,7 +131,7 @@ describe('start-task.ts', function() {
       describe('when modifying the contract source', async function() {
         before('modify the contract source', async function() {
           await _modifyContractSource()
-          await wait(15)
+          await wait(30)
         })
 
         after('restore the contract source', async function() {
@@ -134,7 +143,7 @@ describe('start-task.ts', function() {
 
           assert(json, 'postUpdate hook log not found')
           assert(
-            json.aragon,
+            json.appSrcPath,
             'postUpdate hook does not contain an aragon property'
           )
           assert(
@@ -248,7 +257,7 @@ async function runStartTask(waitSeconds): Promise<void> {
       'buidler',
       TASK_START,
       '--open-browser',
-      'true',
+      'false',
       '--network',
       'localhost',
       '--silent',
@@ -265,7 +274,7 @@ async function runStartTask(waitSeconds): Promise<void> {
   // prettier-ignore
   {
     (async (): Promise<void> => {
-      await startTaskProcess
+      await startTaskProcess.catch(() => {})
     })()
   }
 

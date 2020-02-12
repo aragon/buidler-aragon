@@ -113,6 +113,10 @@ describe('bases.ts', function() {
       await startGanache(this.env)
     })
 
+    after('stop ganache', function() {
+      stopGanache()
+    })
+
     before('deploy an ENS instance', async function() {
       const ens = await createEns(this.env.web3, this.env.artifacts)
 

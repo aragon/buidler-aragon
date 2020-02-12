@@ -89,8 +89,8 @@ describe('ganache.ts', async function() {
       })
 
       describe('when ganache is stopped', async function() {
-        before('stop ganache', async function() {
-          await stopGanache()
+        before('stop ganache', function() {
+          stopGanache()
         })
 
         it('releases the target port', async function() {
