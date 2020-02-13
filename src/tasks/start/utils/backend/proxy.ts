@@ -58,8 +58,6 @@ export async function updateProxy(
 ): Promise<void> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
 
-  logBack(`Updating proxy implementation to: ${implementation.address}`)
-
   // Set the new implementation in the Kernel.
   await dao.setApp(
     await dao.APP_BASES_NAMESPACE(),

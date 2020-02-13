@@ -143,6 +143,7 @@ export async function startBackend(
         config.appServePort as number
       )
       await updateProxy(newImplementation, appId, dao, bre.web3)
+      logBack(`Updated proxy implementation to: ${newImplementation.address}`)
 
       // Call postUpdate hook.
       if (hooks && hooks.postUpdate) {

@@ -11,11 +11,30 @@ import {
   createDaoFactory
 } from '~/src/tasks/start/utils/backend/dao'
 
-describe.only('proxy.ts', function() {
-  let dao, implementation, proxy
+describe('proxy.ts', function() {
+  let dao, implementation, proxy, appId
 
   describe('when in the counter project', async function() {
     useDefaultEnvironment()
+
+    const itBehavesLikeACounterContract = function() {
+      it('allows any address to increment and decrement the counter', async function() {
+        let value
+
+        value = (await proxy.value()).toString()
+        assert.equal(value, 0, 'Incorrect value on proxy')
+
+        await proxy.increment(1)
+
+        value = (await proxy.value()).toString()
+        assert.equal(value, 1, 'Incorrect value on proxy')
+
+        await proxy.decrement(1)
+
+        value = (await proxy.value()).toString()
+        assert.equal(value, 0, 'Incorrect value on proxy')
+      })
+    }
 
     before('create a dao and an app implementation', async function() {
       ;({ dao, implementation } = await _createDaoAndAppImplementation(
@@ -26,7 +45,7 @@ describe.only('proxy.ts', function() {
 
     describe('when creating a counter proxy', async function() {
       before('create a counter proxy and set permissions', async function() {
-        const appId = getAppId(getAppEnsName())
+        appId = getAppId(getAppEnsName())
 
         proxy = await createProxy(
           implementation,
@@ -47,23 +66,61 @@ describe.only('proxy.ts', function() {
         )
       })
 
-      it('allows any address to increment the counter', async function() {
-        let value
-
-        value = (await proxy.value()).toString()
-        assert.equal(value, 0, 'Incorrect init value on proxy')
-
-        await proxy.increment(1)
-
-        value = (await proxy.value()).toString()
-        assert.equal(value, 1, 'Incorrect init value on proxy')
+      it('references the dao that created it', async function() {
+        assert.equal(
+          dao.address,
+          await proxy.kernel(),
+          'Incorrect kernel in proxy'
+        )
       })
 
-      describe.skip('when updating the counter proxy', async function() {})
+      it('the dao references the correct implementation for it', async function() {
+        assert.equal(
+          implementation.address,
+          await dao.getApp(await dao.APP_BASES_NAMESPACE(), appId),
+          'Incorrect implementation in proxy'
+        )
+      })
+
+      it('reports the correct hardcoded version', async function() {
+        const version = (await proxy.getVersion()).toString()
+
+        assert.equal(version, '0', 'Incorrect counter proxy version')
+      })
+
+      itBehavesLikeACounterContract()
+
+      describe('when updating the counter proxy', async function() {
+        let newImplementation
+
+        before('deploy new implementation', async function() {
+          const CounterV1 = this.env.artifacts.require('CounterV1')
+
+          newImplementation = await CounterV1.new()
+        })
+
+        before('update the proxy', async function() {
+          await updateProxy(newImplementation, appId, dao, this.env.web3)
+        })
+
+        it('the dao references the correct implementation for it', async function() {
+          assert.equal(
+            newImplementation.address,
+            await dao.getApp(await dao.APP_BASES_NAMESPACE(), appId),
+            'Incorrect implementation in proxy'
+          )
+        })
+
+        it('reports the correct hardcoded version', async function() {
+          const version = (await proxy.getVersion()).toString()
+
+          assert.equal(version, '1', 'Incorrect counter proxy version')
+        })
+
+        itBehavesLikeACounterContract()
+      })
     })
   })
-
-  describe.skip('when in the token-wrapper project', async function() {})
 })
 
 async function _createDaoAndAppImplementation(
