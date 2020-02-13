@@ -1,19 +1,6 @@
 import blessed from 'blessed'
 
 export default function showPopUpWithTimeout(screen): void {
-  const prompt = blessed.prompt({
-    parent: screen,
-    border: 'line',
-    height: 'shrink',
-    width: 'half',
-    top: 'center',
-    left: 'center',
-    label: ' {blue-fg}Prompt{/blue-fg} ',
-    tags: true,
-    keys: true,
-    vi: true
-  })
-
   const question = blessed.question({
     parent: screen,
     border: 'line',
@@ -56,10 +43,6 @@ export default function showPopUpWithTimeout(screen): void {
   })
 
   setTimeout(() => {
-    /* prompt.input( */
-    /* 'A new version of the Aragon Buidler plugin is available, would you like to update now?', */
-    /* '', */
-    /* function(err, value) { */
     question.ask(
       'A new version of the Aragon Buidler plugin is available, would you like to update now?\n',
       function(err, value) {
@@ -67,18 +50,13 @@ export default function showPopUpWithTimeout(screen): void {
           'OK!! Installing Aragon Buidler plugin v7.8.64',
           3,
           function(err) {
-            /* msg.display('Ok, installing!', -1, function(err) { */
             loader.load('Installation in progress...')
             setTimeout(function() {
               loader.stop()
-              /* screen.destroy() */
             }, 3000)
-            /* }) */
           }
         )
       }
     )
-    /* } */
-    /* ) */
   }, 20000)
 }

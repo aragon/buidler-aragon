@@ -16,12 +16,13 @@ export default class ActivityBar {
       height: 3,
       border: 'line',
       content: 'waiting...',
+      tags: true,
       label: 'Activity'
     })
   }
 
   update(msg: string): void {
-    this.box.setContent(`> ${msg}`)
+    this.box.setContent(`{yellow-fg}{bold}> ${msg}{/yellow-fg}{/bold}`)
 
     this.screen.render()
   }

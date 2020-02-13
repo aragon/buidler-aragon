@@ -2,19 +2,19 @@ import Tab from './Tab'
 
 export default class InfoTab extends Tab {
   _data = {
-    appName: '?',
-    appEns: '?.aragonpm.eth',
-    appId: '?',
-    appAddress: 'not deployed',
-    daoAddress: 'not deployed',
-    url: 'client not started',
-    contentUrl: 'content not served',
-    ensAddress: 'not deployed',
-    apmAddress: 'not deployed',
-    repoVersion: 'not deployed',
-    repoAddress: 'not deployed',
-    implementationAddress: 'not deployed',
-    accountsMnemonic: '?',
+    appName: '',
+    appEns: '',
+    appId: '',
+    appAddress: '',
+    daoAddress: '',
+    url: '',
+    contentUrl: '',
+    ensAddress: '',
+    apmAddress: '',
+    repoVersion: '',
+    repoAddress: '',
+    implementationAddress: '',
+    accountsMnemonic: '',
     accounts: []
   }
 
@@ -37,7 +37,9 @@ export default class InfoTab extends Tab {
     let content = '\n'
 
     function section(name): void {
-      content += `  {blue-fg}{bold}${name}{/blue-fg}{/bold}` + '\n'
+      const sectionColor = 'red'
+      content +=
+        `  {${sectionColor}-fg}{bold}${name}{/${sectionColor}-fg}{/bold}` + '\n'
     }
 
     function closeSection(): void {
@@ -45,7 +47,13 @@ export default class InfoTab extends Tab {
     }
 
     function entry(name, value): void {
-      content += `    {gray-fg}{bold}${name}{/gray-fg}{/bold} ${value}` + '\n'
+      let tagColor = 'gray'
+      if (value.length > 0) {
+        tagColor = 'blue'
+      }
+      content +=
+        `    {${tagColor}-fg}{bold}${name}{/${tagColor}-fg}{/bold} ${value}` +
+        '\n'
     }
 
     // Application.
