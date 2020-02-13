@@ -261,16 +261,7 @@ async function _runStartTask(): Promise<void> {
   // Define sub-process.
   startTaskProcess = execa(
     'npx',
-    [
-      'buidler',
-      TASK_START,
-      '--open-browser',
-      'false',
-      '--network',
-      'localhost',
-      '--silent',
-      'false'
-    ],
+    ['buidler', TASK_START, '--no-browser', '--network', 'localhost'],
     {}
   )
 

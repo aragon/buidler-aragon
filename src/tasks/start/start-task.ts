@@ -21,13 +21,11 @@ import {
  * and then returns an unresolving promise to keep the task open.
  */
 task(TASK_START, 'Starts Aragon app development')
-  .addParam(
-    'openBrowser',
-    'Wether or not to automatically open a browser tab with the client',
-    true,
-    types.boolean
+  .addFlag(
+    'noBrowser',
+    'Prevents opening of a browser tab with the Aragon client once the app is built.'
   )
-  .addParam('silent', 'Silences all console output', false, types.boolean)
+  .addFlag('silent', 'Silences all console output')
   .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
     if (params.silent) {
       // eslint-disable-next-line
@@ -59,7 +57,7 @@ task(TASK_START, 'Starts Aragon app development')
       appId,
       params.silent
     )
-    await startFrontend(bre, daoAddress, appAddress, params.openBrowser)
+    await startFrontend(bre, daoAddress, appAddress, !params.noBrowser)
   })
 
 async function _checkPorts(config: AragonConfig): Promise<void> {
