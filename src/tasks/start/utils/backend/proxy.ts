@@ -1,6 +1,5 @@
 import { getMainContractName } from '../arapp'
 import { KernelInstance } from '~/typechain'
-import { logBack } from '../logger'
 import { getLog } from '../../../../utils/getLog'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
@@ -57,8 +56,6 @@ export async function updateProxy(
   web3: Web3
 ): Promise<void> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
-
-  logBack(`Updating proxy implementation to: ${implementation.address}`)
 
   // Set the new implementation in the Kernel.
   await dao.setApp(
