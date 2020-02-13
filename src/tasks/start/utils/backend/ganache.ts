@@ -1,11 +1,8 @@
 import tcpPortUsed from 'tcp-port-used'
 import { promisify } from 'util'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-<<<<<<< HEAD
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
-=======
 import { logBack } from '../logger'
->>>>>>> Fixed glitches in Blessed ui
 import { aragenGasLimit, aragenMnemonic, testnetPort } from '../../../../params'
 
 // There's an issue with how web3 exports its typings that conflicts with

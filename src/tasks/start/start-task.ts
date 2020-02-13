@@ -27,32 +27,26 @@ task(TASK_START, 'Starts Aragon app development')
     'Prevents opening of a browser tab with the Aragon client once the app is built.'
   )
   .addFlag('silent', 'Silences all console output')
+  .addFlag(
+    'interactive',
+    'Displays an interactive UI instead of flat output to console'
+  )
   .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
-    Ui.initialize(params.interactiveUi)
+    Ui.initialize(params.interactive)
 
     Ui.logActivity('starting...')
 
     const appEns = await getAppEnsName()
     const appName = await getAppName()
     const appId: string = getAppId(appEns)
-    logMain(`
-App name: ${appName}
-App ens name: ${appEnsName}
-App id: ${appId}
-    `)
 
-    let accountsStr = ''
-    for (let i = 0; i < aragenAccounts.length; i++) {
-      const account = aragenAccounts[i]
-      accountsStr += `Account ${i} private key ${account.privateKey}\n`
-      accountsStr += `           public key ${account.publicKey}\n`
-    }
-    logMain(`
-Accounts mnemonic "${aragenMnemonic}"
-${accountsStr}
-    `)
-
-    Ui.setInfo({ appName, appId, appEns })
+    Ui.setInfo({
+      appName,
+      appId,
+      appEns,
+      accountsMnemonic: aragenMnemonic,
+      accounts: aragenAccounts
+    })
 
     if (!isValidEnsNameForDevelopment(appEns)) {
       throw new Error(

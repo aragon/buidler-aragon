@@ -1,4 +1,5 @@
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
+import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { createEns } from './ens'
 import { createApm } from './apm'
 import { createDaoFactory } from './dao'

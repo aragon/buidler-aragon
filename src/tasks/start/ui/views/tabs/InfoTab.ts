@@ -13,7 +13,9 @@ export default class InfoTab extends Tab {
     apmAddress: 'not deployed',
     repoVersion: 'not deployed',
     repoAddress: 'not deployed',
-    implementationAddress: 'not deployed'
+    implementationAddress: 'not deployed',
+    accountsMnemonic: '?',
+    accounts: []
   }
 
   constructor(screen, container) {
@@ -43,7 +45,7 @@ export default class InfoTab extends Tab {
     }
 
     function entry(name, value): void {
-      content += `    {gray-fg}{bold}${name}:{/gray-fg}{/bold} ${value}` + '\n'
+      content += `    {gray-fg}{bold}${name}{/gray-fg}{/bold} ${value}` + '\n'
     }
 
     // Application.
@@ -53,6 +55,18 @@ export default class InfoTab extends Tab {
     entry('app id', this._data.appId)
     entry('proxy address', this._data.appAddress)
     entry('implementation address', this._data.implementationAddress)
+    closeSection()
+
+    // Accounts.
+    section('Accounts')
+    entry('mnemonic', this._data.accountsMnemonic)
+    for (let i = 0; i < this._data.accounts.length; i++) {
+      const account: any = this._data.accounts[i]
+      if (account) {
+        entry(`account ${i}`, account.publicKey)
+        entry('         ', account.privateKey)
+      }
+    }
     closeSection()
 
     // Repository.
