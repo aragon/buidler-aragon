@@ -131,7 +131,17 @@ export async function startBackend(
     })
     .on('change', async () => {
       logBack(`<<< Triggering backend build >>>`)
-      await _compileDisablingOutput(bre, silent)
+      const compilationSucceeded = await _compileDisablingOutput(
+        bre,
+        silent,
+        false
+      )
+
+      // Do nothing if contract compilation fails.
+      if (!compilationSucceeded) {
+        logBack('Unable to update proxy, please check your contracts.')
+        return
+      }
 
       // Update implementation and set it in Repo and Proxy.
       const newImplementation: Truffle.ContractInstance = await deployImplementation(
@@ -169,8 +179,9 @@ export async function startBackend(
  */
 async function _compileDisablingOutput(
   bre: BuidlerRuntimeEnvironment,
-  silent: boolean
-): Promise<void> {
+  silent: boolean,
+  exitOnFailure = true
+): Promise<boolean> {
   logBack('compiling contracts...')
 
   const consoleCache = console
@@ -180,9 +191,22 @@ async function _compileDisablingOutput(
     console = new console.Console(new Writable())
   }
 
-  await bre.run(TASK_COMPILE)
+  let success = true
+  await bre.run(TASK_COMPILE).catch(err => {
+    logBack(err.message)
+
+    success = false
+
+    if (exitOnFailure) {
+      process.exit(1)
+    }
+  })
 
   console = consoleCache
 
-  logBack('contracts compiled.')
+  if (success) {
+    logBack('contracts compiled.')
+  }
+
+  return success
 }
