@@ -1,11 +1,12 @@
 import blessed from 'blessed'
 import InfoTab from './views/tabs/InfoTab'
 import LogTab from './views/tabs/LogTab'
+import StatusTab from './views/tabs/StatusTab'
 import TabBar from './views/TabBar'
 import ActivityBar from './views/ActivityBar'
 
 let screen
-let infoTab, logTab, activityBar
+let infoTab, logTab, statusTab, activityBar
 let enabled
 
 export function initialize(showUi): void {
@@ -40,9 +41,11 @@ export function initialize(showUi): void {
 
   infoTab = new InfoTab(screen, container)
   logTab = new LogTab(screen, container)
+  statusTab = new StatusTab(screen, container)
 
   const tabs: any[] = []
   tabs.push(infoTab)
+  tabs.push(statusTab)
   tabs.push(logTab)
 
   new TabBar(screen, tabs)
