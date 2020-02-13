@@ -2,11 +2,14 @@ import blessed from 'blessed'
 import InfoTab from './views/tabs/InfoTab'
 import LogTab from './views/tabs/LogTab'
 import StatusTab from './views/tabs/StatusTab'
+import ReplTab from './views/tabs/ReplTab'
 import TabBar from './views/TabBar'
 import ActivityBar from './views/ActivityBar'
+import showPopUpWithTimeout from './views/PopUp'
 
 let screen
-let infoTab, logTab, statusTab, activityBar
+let infoTab, logTab, statusTab, replTab
+let activityBar
 let enabled
 
 export function initialize(showUi): void {
@@ -42,11 +45,13 @@ export function initialize(showUi): void {
   infoTab = new InfoTab(screen, container)
   logTab = new LogTab(screen, container)
   statusTab = new StatusTab(screen, container)
+  replTab = new ReplTab(screen, container)
 
   const tabs: any[] = []
   tabs.push(infoTab)
-  tabs.push(statusTab)
   tabs.push(logTab)
+  tabs.push(statusTab)
+  tabs.push(replTab)
 
   new TabBar(screen, tabs)
 
@@ -59,6 +64,8 @@ export function initialize(showUi): void {
   screen.key(['escape', 'q', 'C-c'], function() {
     return process.exit(0)
   })
+
+  showPopUpWithTimeout(screen)
 
   screen.render()
 }

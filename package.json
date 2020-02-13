@@ -37,7 +37,8 @@
     "live-server": "^1.2.1",
     "open": "^7.0.0",
     "source-map-support": "^0.5.16",
-    "tcp-port-used": "^1.0.1"
+    "tcp-port-used": "^1.0.1",
+    "term.js": "0.0.7"
   },
   "devDependencies": {
     "@aragon/abis": "^1.1.0",

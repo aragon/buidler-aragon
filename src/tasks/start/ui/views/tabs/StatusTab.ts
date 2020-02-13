@@ -2,14 +2,11 @@ import Tab from './Tab'
 import blessed from 'blessed'
 
 export default class StatusTab extends Tab {
-  screen: any
   boxTop: any
   boxBottom: any
 
   constructor(screen, container) {
     super(screen, container, 'Status')
-
-    this.screen = screen
 
     this.boxTop = blessed.box({
       parent: this.box,
@@ -18,7 +15,8 @@ export default class StatusTab extends Tab {
       left: 0,
       height: '48%',
       border: 'line',
-      content: '✓ Front end built\n✓Client served',
+      content:
+        '{green-fg}{bold}✓{/green-fg}{/bold} Front end built\n{green-fg}{bold}✓{/green-fg}{/bold} Client served',
       tags: true,
       label: 'Front end'
     })
@@ -30,7 +28,8 @@ export default class StatusTab extends Tab {
       left: 0,
       height: '48%',
       border: 'line',
-      content: '✓ Back end built\n✓ Implementation updated',
+      content:
+        '{green-fg}{bold}✓{/green-fg}{/bold} Back end built\n{green-fg}{bold}✓{/green-fg}{/bold} Implementation updated',
       tags: true,
       label: 'Back end'
     })
