@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import loadContract from './contracts/loadContract'
+import loadTestContract from '../test-helpers/loadTestContract'
 import {
   extractContractInfo,
   ExtractedContractInfo
@@ -7,19 +7,19 @@ import {
 
 describe('solidityExtractor.ts', () => {
   describe('extractContractInfo', () => {
-    it('Should parse an empty contract', () => {
+    it('should parse an empty contract', () => {
       const expectedContractInfo: ExtractedContractInfo = {
         roles: [],
         functions: []
       }
 
-      const sourceCode = loadContract('EmptyContract')
+      const sourceCode = loadTestContract('EmptyContract')
 
       const contractInfo = extractContractInfo(sourceCode)
       expect(contractInfo).to.deep.equal(expectedContractInfo)
     })
 
-    it('Should parse an basic contract', () => {
+    it('should parse an basic contract', () => {
       const expectedContractInfo: ExtractedContractInfo = {
         roles: [
           {
@@ -63,7 +63,7 @@ describe('solidityExtractor.ts', () => {
         ]
       }
 
-      const sourceCode = loadContract('BasicContract')
+      const sourceCode = loadTestContract('BasicContract')
 
       const contractInfo = extractContractInfo(sourceCode)
       expect(contractInfo).to.deep.equal(expectedContractInfo)

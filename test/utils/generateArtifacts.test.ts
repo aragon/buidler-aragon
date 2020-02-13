@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import loadContract from './contracts/loadContract'
+import loadTestContract from '../test-helpers/loadTestContract'
 import {
   generateApplicationArtifact,
   AragonApplicationArtifact
@@ -8,7 +8,7 @@ import { AragonAppJson, AbiItem, Role, AragonEnvironments } from '~/src/types'
 
 describe('generateArtifacts.ts', () => {
   describe('generateApplicationArtifact', () => {
-    it('Should parse an basic contract', () => {
+    it('should parse a basic contract', () => {
       const roles: Role[] = [
         {
           id: 'MODIFY_VALUE',
@@ -35,7 +35,7 @@ describe('generateArtifacts.ts', () => {
 
       const environments: AragonEnvironments = {}
 
-      const sourceCode = loadContract('BasicContract')
+      const sourceCode = loadTestContract('BasicContract')
 
       const contractEntrypointPath = 'contracts/Entrypoint.sol'
 
