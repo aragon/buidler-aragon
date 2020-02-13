@@ -4,6 +4,7 @@ import { execaLogTo, execaRun } from '../execa'
 import { generateApplicationArtifact } from '../../../../utils/generateArtifacts'
 import { readArapp, getMainContractName, getMainContractPath } from '../arapp'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
+import fetch from 'node-fetch'
 
 export const manifestPath = 'manifest.json'
 
@@ -28,19 +29,23 @@ export async function serveAppAndResolveWhenBuilt(
   appSrcPath: string,
   appServePort: number
 ): Promise<void> {
-  return new Promise(async resolve => {
-    const logger = (data: string): void => {
-      if (data.includes('Built in')) {
-        resolve()
-      }
-    }
-
-    await execaLogTo(logger)(
-      'npm',
-      ['run', 'serve', '--', '--port', `${appServePort}`],
-      { cwd: appSrcPath }
-    )
+  execaRun('npm', ['run', 'serve', '--', '--port', `${appServePort}`], {
+    cwd: appSrcPath
   })
+
+  const maxWaitingTime = 60 * 1000
+  const startingTime = Date.now()
+  while (Date.now() - startingTime < maxWaitingTime) {
+    try {
+      await fetch(`http://localhost:${appServePort}2`, { timeout: 10 * 1000 })
+      // Server is active and serving, resolve
+      return
+    } catch (e) {
+      // Ignore errors, at worse after maxWaitingTime this will resolve
+      // Pause for a bit to prevent performing requests too fast
+      await new Promise(r => setTimeout(r, 1000))
+    }
+  }
 }
 
 /**

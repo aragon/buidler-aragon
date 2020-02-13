@@ -34,6 +34,7 @@
     "fs-extra": "^8.1.0",
     "ganache-core": "^2.10.1",
     "live-server": "^1.2.1",
+    "node-fetch": "^2.6.0",
     "open": "^7.0.0",
     "source-map-support": "^0.5.16",
     "tcp-port-used": "^1.0.1"
