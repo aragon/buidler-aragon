@@ -15,6 +15,7 @@ import {
   getAppEnsName,
   isValidEnsNameForDevelopment
 } from './utils/arapp'
+import { aragenMnemonic, aragenAccounts } from '../../params'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,
@@ -37,9 +38,22 @@ task(TASK_START, 'Starts Aragon app development')
     const appEnsName = await getAppEnsName()
     const appName = await getAppName()
     const appId: string = getAppId(appEnsName)
-    logMain(`App name: ${appName}`)
-    logMain(`App ens name: ${appEnsName}`)
-    logMain(`App id: ${appId}`)
+    logMain(`
+App name: ${appName}
+App ens name: ${appEnsName}
+App id: ${appId}
+    `)
+
+    let accountsStr = ''
+    for (let i = 0; i < aragenAccounts.length; i++) {
+      const account = aragenAccounts[i]
+      accountsStr += `Account ${i} private key ${account.privateKey}\n`
+      accountsStr += `           public key ${account.publicKey}\n`
+    }
+    logMain(`
+Accounts mnemonic "${aragenMnemonic}"
+${accountsStr}
+    `)
 
     if (!isValidEnsNameForDevelopment(appEnsName)) {
       throw new BuidlerPluginError(
