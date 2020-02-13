@@ -4,7 +4,12 @@ import { Role } from '../types'
 interface ExtractedFunctions {
   sig: string
   roles: string[]
-  notice: string | null
+  notice: string
+}
+
+export interface ExtractedContractInfo {
+  roles: Role[]
+  functions: ExtractedFunctions[]
 }
 
 // See https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#types
@@ -89,10 +94,10 @@ const getSignature = (declaration: string): string => {
  * Get notice from function declaration
  * @param declaration multiline function declaration with comments
  */
-const getNotice = (declaration: string): string | null => {
+const getNotice = (declaration: string): string => {
   // capture from @notice to either next '* @' or end of comment '*/'
   const notices = declaration.match(/(@notice)([^]*?)(\* @|\*\/)/m)
-  if (!notices || notices.length === 0) return null
+  if (!notices || notices.length === 0) return ''
 
   return notices[0]
     .replace('*/', '')
@@ -193,7 +198,7 @@ const extractRolesFromFunctions = (
  */
 export const extractContractInfo = (
   sourceCode: string
-): { roles: Role[]; functions: ExtractedFunctions[] } => {
+): ExtractedContractInfo => {
   const functionDescriptors = extractFunctions(sourceCode)
   const roleDescriptors = extractRolesFromFunctions(functionDescriptors)
 
