@@ -17,7 +17,7 @@ describe('proxy.ts', function() {
   describe('when in the counter project', async function() {
     useDefaultEnvironment()
 
-    const itBehavesLikeACounterContract = function() {
+    const itBehavesLikeACounterContract = function(): void {
       it('allows any address to increment and decrement the counter', async function() {
         let value
 
