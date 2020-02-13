@@ -46,7 +46,7 @@ export async function startBackend(
    */
   const networkId = await startGanache(bre)
   if (networkId !== 0) {
-    logBack(`Started a ganache testnet instance with id ${networkId}`)
+    logBack(`Started a ganache testnet instance with id ${networkId}.`)
   }
 
   // Deploy bases.
@@ -54,7 +54,9 @@ export async function startBackend(
   const { ensAddress, daoFactoryAddress, apmAddress } = await deployAragonBases(
     bre
   )
-  logBack('Aragon bases deployed.')
+  logBack(`ENS deployed: ${ensAddress}`)
+  logBack(`DAO factory deployed: ${daoFactoryAddress}`)
+  logBack(`APM deployed: ${apmAddress}`)
 
   // Read arapp.json.
   const arapp = readArapp()
@@ -65,6 +67,7 @@ export async function startBackend(
   }
 
   // Prepare a DAO and a Repo to hold the app.
+  logBack('Deploying DAO and app repository...')
   const dao: KernelInstance = await createDao(
     bre.web3,
     bre.artifacts,
@@ -78,6 +81,8 @@ export async function startBackend(
     ensAddress,
     apmAddress
   )
+  logBack(`DAO deployed: ${dao.address}`)
+  logBack(`Repo deployed: ${repo.address}`)
 
   // Call postDao hook.
   if (hooks && hooks.postDao) {
@@ -100,12 +105,16 @@ export async function startBackend(
   }
 
   // Deploy first implementation and set it in the Repo and in a Proxy.
+  logBack('Deploying app implementation...')
   const implementation: Truffle.ContractInstance = await deployImplementation(
     bre.artifacts
   )
+  logBack(`App implementation deployed: ${implementation.address}`)
 
+  logBack('Setting implementation in app repository...')
   await majorBumpRepo(repo, implementation, config.appServePort as number)
 
+  logBack('Creating app proxy...')
   const proxy: Truffle.ContractInstance = await createProxy(
     implementation,
     appId,
@@ -114,10 +123,12 @@ export async function startBackend(
     bre.artifacts,
     proxyInitParams
   )
+  logBack(`App proxy deployed: ${proxy.address}`)
 
   // TODO: What if user wants to set custom permissions?
   // Use a hook? A way to disable all open permissions?
   await setAllPermissionsOpenly(dao, proxy, arapp, bre.web3, bre.artifacts)
+  logBack('All permissions set openly.')
 
   // Call postInit hook.
   if (hooks && hooks.postInit) {
@@ -130,7 +141,7 @@ export async function startBackend(
       awaitWriteFinish: { stabilityThreshold: 1000 }
     })
     .on('change', async () => {
-      logBack(`<<< Triggering backend build >>>`)
+      logBack(`Triggering backend build...`)
       const compilationSucceeded = await _compileDisablingOutput(
         bre,
         silent,
@@ -144,9 +155,13 @@ export async function startBackend(
       }
 
       // Update implementation and set it in Repo and Proxy.
+      logBack('Deploying app implementation...')
       const newImplementation: Truffle.ContractInstance = await deployImplementation(
         bre.artifacts
       )
+      logBack(`App implementation deployed: ${implementation.address}`)
+
+      logBack('Updating implementation in app repository and proxy...')
       await majorBumpRepo(
         repo,
         newImplementation,
@@ -163,14 +178,6 @@ export async function startBackend(
       emitEvent(BACKEND_PROXY_UPDATED)
     })
 
-  logBack(`
-  App name: ${appName}
-  App id: ${appId}
-  DAO: ${dao.address}
-  Repo: ${repo.address}
-  App proxy: ${proxy.address}
-`)
-
   return { daoAddress: dao.address, appAddress: proxy.address }
 }
 
@@ -183,7 +190,7 @@ async function _compileDisablingOutput(
   silent: boolean,
   exitOnFailure = true
 ): Promise<boolean> {
-  logBack('compiling contracts...')
+  logBack('Compiling contracts...')
 
   const consoleCache = console
 
@@ -206,7 +213,7 @@ async function _compileDisablingOutput(
   console = consoleCache
 
   if (success) {
-    logBack('contracts compiled.')
+    logBack('Contracts compiled.')
   }
 
   return success

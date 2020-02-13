@@ -33,16 +33,14 @@ task(TASK_START, 'Starts Aragon app development')
       console.log = () => {}
     }
 
-    logMain(`Starting...`)
+    logMain(`Starting Aragon app development...`)
 
     const appEnsName = await getAppEnsName()
     const appName = await getAppName()
     const appId: string = getAppId(appEnsName)
-    logMain(`
-App name: ${appName}
+    logMain(`App name: ${appName}
 App ens name: ${appEnsName}
-App id: ${appId}
-    `)
+App id: ${appId}`)
 
     let accountsStr = ''
     for (let i = 0; i < aragenAccounts.length; i++) {
@@ -50,10 +48,8 @@ App id: ${appId}
       accountsStr += `Account ${i} private key ${account.privateKey}\n`
       accountsStr += `           public key ${account.publicKey}\n`
     }
-    logMain(`
-Accounts mnemonic "${aragenMnemonic}"
-${accountsStr}
-    `)
+    logMain(`Accounts mnemonic "${aragenMnemonic}"
+${accountsStr}`)
 
     if (!isValidEnsNameForDevelopment(appEnsName)) {
       throw new BuidlerPluginError(

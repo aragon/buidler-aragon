@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 
-const mainTag = chalk.gray('main | ')
+const mainTag = chalk.gray('main     | ')
 const frontTag = chalk.yellow('frontend | ')
 const backTag = chalk.blue('backend  | ')
 

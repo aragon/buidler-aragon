@@ -48,3 +48,11 @@ export function execaLogTo(logger: (data: string) => void) {
     return subprocess
   }
 }
+
+export function execaRun(
+  file: string,
+  args?: readonly string[],
+  options?: execa.Options
+): execa.ExecaChildProcess {
+  return execa(file, args, options)
+}

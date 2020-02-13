@@ -6,6 +6,6 @@ export const FRONTEND_STARTED_SERVING = 'EVENT_FRONTEND_STARTED_SERVING '
 
 export function emitEvent(eventName: string, delay = 0): void {
   setTimeout(() => {
-    logMain(`Emitting ${eventName}`)
+    logMain(eventName)
   }, delay)
 }

@@ -22,10 +22,10 @@ export async function installAragonClientIfNeeded(
 
   // Verify installation or install if needed.
   if (fs.existsSync(path.resolve(clientPath))) {
-    logFront('Using cached client version')
+    logFront('Using cached client version.')
   } else {
     fsExtra.ensureDirSync(clientPath, { recursive: true })
-    logFront(`Installing client version ${version} locally`)
+    logFront(`Installing client version ${version} locally...`)
     const opts = { cwd: clientPath }
     await execa('git', ['clone', '--', repo, clientPath])
     await execa('git', ['checkout', version], opts)
@@ -48,7 +48,7 @@ export async function startAragonClient(
   const port: number = clientServePort
   const clientPath: string = _getClientPath(defaultVersion)
 
-  logFront(`Starting client server at port ${port}`)
+  logFront(`Starting client server at port ${port}...`)
   await _createStaticWebserver(port, path.join(clientPath, 'build'))
 
   const url = `http://localhost:${port}/#/${subPath}`

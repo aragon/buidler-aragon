@@ -29,11 +29,13 @@ export async function startFrontend(
 ): Promise<void> {
   const config: AragonConfig = bre.config.aragon as AragonConfig
 
+  logFront('Installing Aragon client...')
   await installAragonClientIfNeeded()
 
   const appBuildOutputPath = config.appBuildOutputPath as string
   await generateAppArtifacts(appBuildOutputPath, bre.artifacts)
 
+  logFront('Building front end (first time takes a bit)...')
   const appSrcPath = config.appSrcPath as string
   const appServePort = config.appServePort as number
   await copyAppUiAssets(appSrcPath)
@@ -46,8 +48,7 @@ export async function startFrontend(
     openBrowser
   )
   logFront(`You can now view the Aragon client in the browser.
- Local:  ${url}
-`)
+Local:  ${url}`)
 
   // Watch changes to app/src/script.js.
   chokidar
@@ -73,5 +74,6 @@ export async function startFrontend(
 
   emitEvent(FRONTEND_STARTED_SERVING, 1000)
 
+  logFront('Watching changes on front end...')
   await startAppWatcher(appSrcPath)
 }

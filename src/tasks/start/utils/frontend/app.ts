@@ -1,27 +1,24 @@
 import path from 'path'
 import fsExtra from 'fs-extra'
-import { execaLogTo } from '../execa'
-import { logFront } from '../logger'
+import { execaLogTo, execaRun } from '../execa'
 import { generateApplicationArtifact } from '../../../../utils/generateArtifacts'
 import { readArapp, getMainContractName, getMainContractPath } from '../arapp'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 
 export const manifestPath = 'manifest.json'
 
-const execaLogToFrontEnd = execaLogTo(logFront)
-
 /**
  * Calls the app's aragon/ui copy-aragon-ui-assets script.
  */
 export async function copyAppUiAssets(appSrcPath: string): Promise<void> {
-  await execaLogToFrontEnd('npm', ['run', 'sync-assets'], { cwd: appSrcPath })
+  await execaRun('npm', ['run', 'sync-assets'], { cwd: appSrcPath })
 }
 
 /**
  * Calls the app's front end build watcher.
  */
 export async function startAppWatcher(appSrcPath: string): Promise<void> {
-  await execaLogToFrontEnd('npm', ['run', 'watch'], { cwd: appSrcPath })
+  await execaRun('npm', ['run', 'watch'], { cwd: appSrcPath })
 }
 
 /**
@@ -36,8 +33,6 @@ export async function serveAppAndResolveWhenBuilt(
       if (data.includes('Built in')) {
         resolve()
       }
-
-      logFront(data)
     }
 
     await execaLogTo(logger)(
