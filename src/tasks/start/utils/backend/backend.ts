@@ -38,7 +38,7 @@ export async function startBackend(
   const config: AragonConfig = bre.config.aragon as AragonConfig
   const hooks: AragonConfigHooks = config.hooks as AragonConfigHooks
 
-  await _compileDisablingOutput(bre, silent)
+  await _compileDisablingOutput(bre, true)
 
   /**
    * Until BuidlerEVM JSON RPC is ready, a ganache server will be started
@@ -133,7 +133,7 @@ export async function startBackend(
       logBack(`<<< Triggering backend build >>>`)
       const compilationSucceeded = await _compileDisablingOutput(
         bre,
-        silent,
+        true,
         false
       )
 
