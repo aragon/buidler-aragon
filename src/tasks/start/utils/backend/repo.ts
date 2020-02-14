@@ -2,13 +2,12 @@ import {
   RepoContract,
   RepoInstance,
   APMRegistryContract,
-  APMRegistryInstance,
-  PublicResolverContract,
-  PublicResolverInstance
+  APMRegistryInstance
+  /* PublicResolverContract, */
+  /* PublicResolverInstance */
 } from '~/typechain'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
-import { logBack } from '../logger'
 import { getLog } from '../../../../utils/getLog'
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
@@ -18,7 +17,7 @@ const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
  * find one, creates a new repository for the app.
  * @returns Promise<RepoInstance> An APM repository for the app.
  */
-export async function createRepo(
+export async function resolveRepo(
   appName: string,
   appId: string,
   web3: Web3,
@@ -27,15 +26,18 @@ export async function createRepo(
   apmAddress: string
 ): Promise<RepoInstance> {
   // Try resolving the Repo address from ENS with the PublicResolver, or create the Repo if ZERO_ADDR is retrieved.
-  const PublicResolver: PublicResolverContract = artifacts.require(
-    'PublicResolver'
-  )
-  const resolver: PublicResolverInstance = await PublicResolver.new(ensAddress)
-  let repoAddress: string = await resolver.addr(appId)
-
-  if (repoAddress === ZERO_ADDR) {
-    repoAddress = await _createRepo(appName, web3, apmAddress)
-  }
+  // Note: This code is commented out for now, since we know that the ganache chain
+  // resets on every run, and this the repo will never be resolved between
+  // calls to the start task.
+  /* const PublicResolver: PublicResolverContract = artifacts.require( */
+  /*   'PublicResolver' */
+  /* ) */
+  /* const resolver: PublicResolverInstance = await PublicResolver.new(ensAddress) */
+  /* let repoAddress: string = await resolver.addr(appId) */
+  /* if (repoAddress === ZERO_ADDR) { */
+  /*   repoAddress = await _createRepo(appName, web3, apmAddress, artifacts) */
+  /* } */
+  const repoAddress = await _createRepo(appName, web3, apmAddress, artifacts)
 
   // Wrap Repo address with abi.
   const Repo: RepoContract = artifacts.require('Repo')
@@ -49,24 +51,24 @@ export async function createRepo(
  */
 export async function majorBumpRepo(
   repo: RepoInstance,
-  implementation: Truffle.ContractInstance,
+  implementationAddress: string,
   appServePort: number
-): Promise<void> {
+): Promise<{ version: [number, number, number]; uri: string }> {
   // Calculate next valid semver.
   const semver: [number, number, number] = [
     (await repo.getVersionsCount()).toNumber() + 1, // Updates to smart contracts require major bump.
     0,
     0
   ]
-  logBack(`Repo version: ${semver.join('.')}`)
 
   // URI where this plugin is serving the app's front end.
   const contentUri = `http://localhost:${appServePort}`
   const contentUriBytes = `0x${Buffer.from(contentUri).toString('hex')}`
-  logBack(`Repo content URI: ${contentUri}`)
 
   // Create a new version in the app's repo, with the new implementation.
-  await repo.newVersion(semver, implementation.address, contentUriBytes)
+  await repo.newVersion(semver, implementationAddress, contentUriBytes)
+
+  return { version: semver, uri: contentUri }
 }
 
 /**
@@ -76,7 +78,8 @@ export async function majorBumpRepo(
 async function _createRepo(
   appName: string,
   web3: Web3,
-  apmAddress: string
+  apmAddress: string,
+  artifacts: TruffleEnvironmentArtifacts
 ): Promise<string> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
 
