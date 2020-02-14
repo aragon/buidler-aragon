@@ -112,7 +112,13 @@ export async function startBackend(
   logBack(`App implementation deployed: ${implementation.address}`)
 
   logBack('Setting implementation in app repository...')
-  await majorBumpRepo(repo, implementation, config.appServePort as number)
+  const { version, uri } = await majorBumpRepo(
+    repo,
+    implementation.address,
+    config.appServePort as number
+  )
+  logBack(`Repo version: ${version}`)
+  logBack(`Repo content URI: ${uri}`)
 
   logBack('Creating app proxy...')
   const proxy: Truffle.ContractInstance = await createProxy(
@@ -162,11 +168,13 @@ export async function startBackend(
       logBack(`App implementation deployed: ${implementation.address}`)
 
       logBack('Updating implementation in app repository and proxy...')
-      await majorBumpRepo(
+      const { version, uri } = await majorBumpRepo(
         repo,
-        newImplementation,
+        newImplementation.address,
         config.appServePort as number
       )
+      logBack(`Repo version: ${version}`)
+      logBack(`Repo content URI: ${uri}`)
       await updateProxy(newImplementation, appId, dao, bre.web3)
       logBack(`Updated proxy implementation to: ${newImplementation.address}`)
 
