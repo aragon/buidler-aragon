@@ -34,7 +34,7 @@ export async function resolveRepo(
   let repoAddress: string = await resolver.addr(appId)
 
   if (repoAddress === ZERO_ADDR) {
-    repoAddress = await _createRepo(appName, web3, apmAddress)
+    repoAddress = await _createRepo(appName, web3, apmAddress, artifacts)
   }
 
   // Wrap Repo address with abi.
@@ -76,7 +76,8 @@ export async function majorBumpRepo(
 async function _createRepo(
   appName: string,
   web3: Web3,
-  apmAddress: string
+  apmAddress: string,
+  artifacts: TruffleEnvironmentArtifacts
 ): Promise<string> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
 
