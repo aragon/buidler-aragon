@@ -1,5 +1,5 @@
 import { assert } from 'chai'
 
-describe('build.ts', function() {
+describe('app.ts', function() {
   it.skip('more tests needed', async function() {})
 })

@@ -18,7 +18,7 @@ const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
  * find one, creates a new repository for the app.
  * @returns Promise<RepoInstance> An APM repository for the app.
  */
-export async function createRepo(
+export async function resolveRepo(
   appName: string,
   appId: string,
   web3: Web3,

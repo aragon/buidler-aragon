@@ -3,7 +3,7 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { createDao } from './dao'
 import { deployImplementation } from './app'
 import { createProxy, updateProxy } from './proxy'
-import { createRepo, majorBumpRepo } from './repo'
+import { resolveRepo, majorBumpRepo } from './repo'
 import { setAllPermissionsOpenly } from './permissions'
 import { KernelInstance, RepoInstance } from '~/typechain'
 import { logBack } from '../logger'
@@ -73,7 +73,7 @@ export async function startBackend(
     bre.artifacts,
     daoFactoryAddress
   )
-  const repo: RepoInstance = await createRepo(
+  const repo: RepoInstance = await resolveRepo(
     appName,
     appId,
     bre.web3,
