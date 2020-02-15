@@ -11,11 +11,8 @@ import tcpPortUsed from 'tcp-port-used'
 import fsExtra from 'fs-extra'
 import path from 'path'
 import { aragenMnemonic, aragenAccounts } from '../../params'
-import {
-  getAppName,
-  getAppEnsName,
-  isValidEnsNameForDevelopment
-} from '../../utils/arappUtils'
+import { getAppName, getAppEnsName } from '../../utils/arappUtils'
+import { validateEnsName } from '../../utils/validateEnsName'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,
@@ -51,7 +48,7 @@ App id: ${appId}`)
     logMain(`Accounts mnemonic "${aragenMnemonic}"
 ${accountsStr}`)
 
-    if (!isValidEnsNameForDevelopment(appEnsName)) {
+    if (!validateEnsName(appEnsName)) {
       throw new BuidlerPluginError(
         `Invalid ENS name "${appEnsName}" found in arapp.json (environments.default.appName). Only ENS names in the form "<name>.aragonpm.eth" are supported in development. Please change the value in environments.default.appName, in your project's arapp.json file. Note: Non-development environments are ignored in development and don't have this restriction.`
       )

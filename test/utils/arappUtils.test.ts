@@ -5,8 +5,7 @@ import {
   getMainContractPath,
   getAppName,
   getAppEnsName,
-  readArapp,
-  isValidEnsNameForDevelopment
+  readArapp
 } from '~/src/utils/arappUtils'
 
 describe('arapp.ts', function() {
@@ -35,16 +34,5 @@ describe('arapp.ts', function() {
 
   it('should retrieve the correct main contract name', function() {
     assert.equal(getMainContractName(), 'Counter')
-  })
-
-  it('should validate ens names for development', async function() {
-    assert.equal(isValidEnsNameForDevelopment('voting.aragonpm.eth'), true)
-    assert.equal(
-      isValidEnsNameForDevelopment('voting.open.aragonpm.eth'),
-      false
-    )
-    assert.equal(isValidEnsNameForDevelopment('Voting.aragonpm.eth'), false)
-    assert.equal(isValidEnsNameForDevelopment('voting.aragon.eth'), false)
-    assert.equal(isValidEnsNameForDevelopment('voting.aragonpm.btc'), false)
   })
 })
