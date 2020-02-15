@@ -10,7 +10,7 @@ import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import {
   FRONTEND_STARTED_SERVING,
   BACKEND_PROXY_UPDATED
-} from '../../../src/events'
+} from '../../src/events'
 
 const EMIT_START_TASK_OUTPUT = false
 const DEBUG_START_TASK_CYCLE = false
@@ -174,7 +174,7 @@ describe('start-task.ts', function() {
 async function _readHookLog(filename): Promise<any | void> {
   const filepath = path.join(
     __dirname,
-    '../../projects/token-wrapper/logs',
+    '../projects/token-wrapper/logs',
     filename
   )
 
@@ -196,7 +196,7 @@ let contractSource
 async function _modifyContractSource(): Promise<void> {
   const filepath = path.join(
     __dirname,
-    '../../projects/token-wrapper/contracts/TokenWrapper.sol'
+    '../projects/token-wrapper/contracts/TokenWrapper.sol'
   )
 
   return new Promise(resolve => {
@@ -224,7 +224,7 @@ async function _restoreContractSource(): Promise<void> {
   if (contractSource) {
     const filepath = path.join(
       __dirname,
-      '../../projects/token-wrapper/contracts/TokenWrapper.sol'
+      '../projects/token-wrapper/contracts/TokenWrapper.sol'
     )
 
     return new Promise(resolve => {

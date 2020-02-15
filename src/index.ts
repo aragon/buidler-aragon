@@ -10,7 +10,7 @@ export default function(): void {
   usePlugin('@nomiclabs/buidler-web3')
 
   // Task definitions.
-  require(path.join(__dirname, '/tasks/start/start-task'))
+  require(path.join(__dirname, '/tasks/start'))
 
   // Environment extensions.
   // No extensions atm.
