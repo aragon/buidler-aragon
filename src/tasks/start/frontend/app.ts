@@ -8,7 +8,7 @@ import {
   readArapp,
   getMainContractName,
   getMainContractPath
-} from '../utils/arapp'
+} from '../../../utils/arappUtils'
 
 export const manifestPath = 'manifest.json'
 

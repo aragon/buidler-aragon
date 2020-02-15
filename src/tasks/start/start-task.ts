@@ -15,7 +15,7 @@ import {
   getAppName,
   getAppEnsName,
   isValidEnsNameForDevelopment
-} from './utils/arapp'
+} from '../../utils/arappUtils'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,

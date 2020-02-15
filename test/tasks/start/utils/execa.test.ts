@@ -1,8 +1,11 @@
 import { assert } from 'chai'
 import { execaPipe } from '~/src/tasks/start/utils/execa'
+import { useDefaultEnvironment } from '../../../test-helpers/useEnvironment'
 import * as path from 'path'
 
 describe('execa.ts', function() {
+  useDefaultEnvironment()
+
   describe('when calling pwd', function() {
     let res: any
 

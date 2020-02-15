@@ -1,4 +1,4 @@
-import { getMainContractName } from '../utils/arapp'
+import { getMainContractName } from '../../../utils/arappUtils'
 import { KernelInstance } from '~/typechain'
 import { getLog } from '../../../utils/getLog'
 import Web3 from 'web3'

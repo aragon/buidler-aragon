@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import deployAragonBases from '~/src/tasks/start/backend/bases'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
-import { getAppName, getAppEnsName } from '~/src/tasks/start/utils/arapp'
+import { getAppName, getAppEnsName } from '~/src/utils/arappUtils'
 import { getAppId } from '~/src/tasks/start/utils/id'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { assertRevert } from '~/test/test-helpers/assertRevert'

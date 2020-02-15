@@ -1,3 +1,6 @@
+import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
+import Web3 from 'web3'
+import { getLog } from '../../../utils/getLog'
 import {
   KernelContract,
   KernelInstance,
@@ -8,9 +11,6 @@ import {
   EVMScriptRegistryFactoryContract,
   EVMScriptRegistryFactoryInstance
 } from '~/typechain'
-import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
-import Web3 from 'web3'
-import { getLog } from '../../../utils/getLog'
 
 /**
  * Deploys a new DAO with direct/pure interaction with aragonOS.

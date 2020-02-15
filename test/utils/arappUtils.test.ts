@@ -1,4 +1,5 @@
 import { assert } from 'chai'
+import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 import {
   getMainContractName,
   getMainContractPath,
@@ -6,8 +7,7 @@ import {
   getAppEnsName,
   readArapp,
   isValidEnsNameForDevelopment
-} from '~/src/tasks/start/utils/arapp'
-import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
+} from '~/src/utils/arappUtils'
 
 describe('arapp.ts', function() {
   useDefaultEnvironment()
