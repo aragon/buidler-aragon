@@ -1,23 +1,23 @@
 import chokidar from 'chokidar'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { createDao } from './dao'
-import { deployImplementation } from './app'
-import { createProxy, updateProxy } from './proxy'
-import { resolveRepo, majorBumpRepo } from './repo'
-import { setAllPermissionsOpenly } from './permissions'
+import { createDao } from './backend/dao'
+import { deployImplementation } from './backend/app'
+import { createProxy, updateProxy } from './backend/proxy'
+import { resolveRepo, majorBumpRepo } from './backend/repo'
+import { setAllPermissionsOpenly } from './backend/permissions'
 import { KernelInstance, RepoInstance } from '~/typechain'
-import { logBack } from '../../../ui/logger'
-import { readArapp } from '../../../utils/arappUtils'
+import { logBack } from '../../ui/logger'
+import { readArapp } from '../../utils/arappUtils'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
-import { TASK_COMPILE } from '../../task-names'
-import deployAragonBases from './bases'
-import { startGanache } from './ganache'
+import { TASK_COMPILE } from '../task-names'
+import deployAragonBases from './backend/bases'
+import { startGanache } from './backend/ganache'
 import { Writable } from 'stream'
 import {
   emitEvent,
   BACKEND_BUILD_STARTED,
   BACKEND_PROXY_UPDATED
-} from '../../../events'
+} from '../../events'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
