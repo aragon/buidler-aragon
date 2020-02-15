@@ -1,9 +1,9 @@
 import { assert } from 'chai'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
-import defaultAragonConfig from '~/src/config'
+import { defaultAragonConfig } from '~/src/params'
 
-describe('config.ts', () => {
+describe('index.ts', () => {
   describe('default config', async function() {
     let config
 

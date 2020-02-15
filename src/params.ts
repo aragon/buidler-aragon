@@ -1,3 +1,5 @@
+import { AragonConfig } from './types'
+
 // The Aragon web client expects certain parameters to work locally:
 // - Local testnet node to connect to (testnetPort)
 // - ENS address to resolve names (aragenMnemonic)
@@ -24,4 +26,11 @@ export const defaultLocalAragonBases = {
   ensAddress: '0x5f6F7E8cc7346a11ca2dEf8f827b7a0b612c56a1',
   daoFactoryAddress: '0x8EEaea23686c319133a7cC110b840d1591d9AeE0',
   apmAddress: '0xA53dE0b8e08b798f975D57f48384C177D410d170'
+}
+
+export const defaultAragonConfig: AragonConfig = {
+  appServePort: 8001,
+  clientServePort: 3000,
+  appSrcPath: 'app/',
+  appBuildOutputPath: 'dist/'
 }
