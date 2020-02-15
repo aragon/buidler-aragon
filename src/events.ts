@@ -1,4 +1,4 @@
-import { logMain } from './tasks/start/utils/logger'
+import { logMain } from './ui/logger'
 
 export const BACKEND_BUILD_STARTED = 'EVENT_BACKEND_BUILD_STARTED'
 export const BACKEND_PROXY_UPDATED = 'EVENT_BACKEND_PROXY_UPDATED'
