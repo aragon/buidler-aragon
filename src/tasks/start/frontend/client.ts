@@ -2,7 +2,7 @@ import path from 'path'
 import fs from 'fs'
 import fsExtra from 'fs-extra'
 import os from 'os'
-import { execaLogTo } from '../utils/execa'
+import execa from 'execa'
 import { logFront } from '../utils/logger'
 import liveServer from 'live-server'
 import open from 'open'
@@ -10,8 +10,6 @@ import open from 'open'
 const defaultRepo = 'https://github.com/aragon/aragon'
 const defaultVersion = '775edd606333a111eb2693df53900039722a95dc'
 const aragonBaseDir: string = path.join(os.homedir(), '.aragon')
-
-const execa = execaLogTo(logFront)
 
 export async function installAragonClientIfNeeded(
   repo: string = defaultRepo,
@@ -25,12 +23,16 @@ export async function installAragonClientIfNeeded(
     logFront('Using cached client version.')
   } else {
     fsExtra.ensureDirSync(clientPath, { recursive: true })
-    logFront(`Installing client version ${version} locally...`)
+
+    logFront(
+      `Installing client version ${version} locally (takes a couple of minutes)...`
+    )
     const opts = { cwd: clientPath }
     await execa('git', ['clone', '--', repo, clientPath])
     await execa('git', ['checkout', version], opts)
     await execa('npm', ['install'], opts)
     await execa('npm', ['run', 'build:local'], opts)
+    logFront('Client installed.')
   }
 
   return clientPath

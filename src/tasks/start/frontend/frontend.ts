@@ -29,13 +29,13 @@ export async function startFrontend(
 ): Promise<void> {
   const config: AragonConfig = bre.config.aragon as AragonConfig
 
-  logFront('Installing Aragon client...')
+  logFront('Checking Aragon client...')
   await installAragonClientIfNeeded()
 
   const appBuildOutputPath = config.appBuildOutputPath as string
   await generateAppArtifacts(appBuildOutputPath, bre.artifacts)
 
-  logFront('Building front end (first time takes a bit)...')
+  logFront('Building front end (takes a minute)...')
   const appSrcPath = config.appSrcPath as string
   const appServePort = config.appServePort as number
   await copyAppUiAssets(appSrcPath)

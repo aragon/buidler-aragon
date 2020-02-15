@@ -40,7 +40,7 @@ describe('start-task.ts', function() {
       })
     })
 
-    describe('when the start task is running (these tests can take aprox 2 minutes)', async function() {
+    describe('when the start task is running (takes a couple of minutes)', async function() {
       before('delete all logs created by hooks', async function() {
         await config.hooks._deleteLogs()
       })

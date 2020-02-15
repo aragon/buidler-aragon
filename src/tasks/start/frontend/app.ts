@@ -1,6 +1,6 @@
 import path from 'path'
 import fsExtra from 'fs-extra'
-import { execaRun } from '../utils/execa'
+import execa from 'execa'
 import { generateApplicationArtifact } from '../../../utils/generateArtifacts'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import fetch from 'node-fetch'
@@ -16,14 +16,14 @@ export const manifestPath = 'manifest.json'
  * Calls the app's aragon/ui copy-aragon-ui-assets script.
  */
 export async function copyAppUiAssets(appSrcPath: string): Promise<void> {
-  await execaRun('npm', ['run', 'sync-assets'], { cwd: appSrcPath })
+  await execa('npm', ['run', 'sync-assets'], { cwd: appSrcPath })
 }
 
 /**
  * Calls the app's front end build watcher.
  */
 export async function startAppWatcher(appSrcPath: string): Promise<void> {
-  await execaRun('npm', ['run', 'watch'], { cwd: appSrcPath })
+  await execa('npm', ['run', 'watch'], { cwd: appSrcPath })
 }
 
 /**
@@ -34,7 +34,7 @@ export async function serveAppAndResolveWhenBuilt(
   appServePort: number
 ): Promise<void> {
   // Trigger serving in app/.
-  execaRun('npm', ['run', 'serve', '--', '--port', `${appServePort}`], {
+  execa('npm', ['run', 'serve', '--', '--port', `${appServePort}`], {
     cwd: appSrcPath
   })
 
