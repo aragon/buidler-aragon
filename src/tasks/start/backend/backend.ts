@@ -6,10 +6,10 @@ import { createProxy, updateProxy } from './proxy'
 import { resolveRepo, majorBumpRepo } from './repo'
 import { setAllPermissionsOpenly } from './permissions'
 import { KernelInstance, RepoInstance } from '~/typechain'
-import { logBack } from '../logger'
-import { readArapp } from '../arapp'
+import { logBack } from '../utils/logger'
+import { readArapp } from '../utils/arapp'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
-import { TASK_COMPILE } from '../../../task-names'
+import { TASK_COMPILE } from '../../task-names'
 import deployAragonBases from './bases'
 import { startGanache } from './ganache'
 import { Writable } from 'stream'
@@ -17,7 +17,7 @@ import {
   emitEvent,
   BACKEND_BUILD_STARTED,
   BACKEND_PROXY_UPDATED
-} from '../../../../events'
+} from '../../../events'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.

@@ -1,4 +1,4 @@
-import { getMainContractName } from '../arapp'
+import { getMainContractName } from '../utils/arapp'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 
 /**

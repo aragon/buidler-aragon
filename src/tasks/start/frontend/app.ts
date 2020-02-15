@@ -1,10 +1,14 @@
 import path from 'path'
 import fsExtra from 'fs-extra'
-import { execaRun } from '../execa'
-import { generateApplicationArtifact } from '../../../../utils/generateArtifacts'
-import { readArapp, getMainContractName, getMainContractPath } from '../arapp'
+import { execaRun } from '../utils/execa'
+import { generateApplicationArtifact } from '../../../utils/generateArtifacts'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import fetch from 'node-fetch'
+import {
+  readArapp,
+  getMainContractName,
+  getMainContractPath
+} from '../utils/arapp'
 
 export const manifestPath = 'manifest.json'
 

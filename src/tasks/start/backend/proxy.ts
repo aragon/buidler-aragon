@@ -1,6 +1,6 @@
-import { getMainContractName } from '../arapp'
+import { getMainContractName } from '../utils/arapp'
 import { KernelInstance } from '~/typechain'
-import { getLog } from '../../../../utils/getLog'
+import { getLog } from '../../../utils/getLog'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 

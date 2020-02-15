@@ -8,9 +8,9 @@ import {
 } from '~/typechain'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
-import { getLog } from '../../../../utils/getLog'
+import { getLog } from '../../../utils/getLog'
 
-const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
+/* const ZERO_ADDR = '0x0000000000000000000000000000000000000000' */
 
 /**
  * Attempts to retrieve an APM repository for the app, and if it can't

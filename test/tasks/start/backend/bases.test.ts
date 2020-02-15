@@ -1,13 +1,10 @@
 import { assert } from 'chai'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
-import deployAragonBases from '~/src/tasks/start/utils/backend/bases'
+import deployAragonBases from '~/src/tasks/start/backend/bases'
 import { defaultLocalAragonBases } from '~/src/params'
-import {
-  startGanache,
-  stopGanache
-} from '~/src/tasks/start/utils/backend/ganache'
-import { createEns } from '~/src/tasks/start/utils/backend/ens'
+import { startGanache, stopGanache } from '~/src/tasks/start/backend/ganache'
+import { createEns } from '~/src/tasks/start/backend/ens'
 
 describe('bases.ts', function() {
   // Note: These particular tests use localhost instead of buidlerevm.

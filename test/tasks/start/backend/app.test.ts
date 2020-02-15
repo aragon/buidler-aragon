@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
-import { deployImplementation } from '~/src/tasks/start/utils/backend/app'
+import { deployImplementation } from '~/src/tasks/start/backend/app'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 
 describe('app.ts', function() {

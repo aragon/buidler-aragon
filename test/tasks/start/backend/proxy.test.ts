@@ -1,15 +1,12 @@
 import { assert } from 'chai'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
-import { deployImplementation } from '~/src/tasks/start/utils/backend/app'
-import { createProxy, updateProxy } from '~/src/tasks/start/utils/backend/proxy'
+import { deployImplementation } from '~/src/tasks/start/backend/app'
+import { createProxy, updateProxy } from '~/src/tasks/start/backend/proxy'
 import { getAppEnsName } from '~/src/tasks/start/utils/arapp'
 import { getAppId } from '~/src/tasks/start/utils/id'
-import { setAllPermissionsOpenly } from '~/src/tasks/start/utils/backend/permissions'
+import { setAllPermissionsOpenly } from '~/src/tasks/start/backend/permissions'
 import { readArapp } from '~/src/tasks/start/utils/arapp'
-import {
-  createDao,
-  createDaoFactory
-} from '~/src/tasks/start/utils/backend/dao'
+import { createDao, createDaoFactory } from '~/src/tasks/start/backend/dao'
 
 describe('proxy.ts', function() {
   let dao, implementation, proxy, appId

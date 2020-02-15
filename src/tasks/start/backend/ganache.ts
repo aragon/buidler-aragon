@@ -2,7 +2,7 @@ import tcpPortUsed from 'tcp-port-used'
 import { promisify } from 'util'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
-import { aragenGasLimit, aragenMnemonic, testnetPort } from '../../../../params'
+import { aragenGasLimit, aragenMnemonic, testnetPort } from '../../../params'
 
 // There's an issue with how web3 exports its typings that conflicts with
 // ganache-core imports of those typings. Follow https://github.com/trufflesuite/ganache-core/issues/465

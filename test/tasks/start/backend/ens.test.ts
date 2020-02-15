@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 import { ENSInstance } from '~/typechain'
-import { createEns } from '~/src/tasks/start/utils/backend/ens'
+import { createEns } from '~/src/tasks/start/backend/ens'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 
 describe('ens.ts', function() {

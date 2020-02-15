@@ -1,21 +1,21 @@
-import { task, types } from '@nomiclabs/buidler/config'
+import { task } from '@nomiclabs/buidler/config'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { TASK_START } from '../task-names'
 import { getAppId } from './utils/id'
 import { logMain } from './utils/logger'
-import { startBackend } from './utils/backend/backend'
-import { startFrontend } from './utils/frontend/frontend'
+import { startBackend } from './backend/backend'
+import { startFrontend } from './frontend/frontend'
 import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
 import fsExtra from 'fs-extra'
 import path from 'path'
+import { aragenMnemonic, aragenAccounts } from '../../params'
 import {
   getAppName,
   getAppEnsName,
   isValidEnsNameForDevelopment
 } from './utils/arapp'
-import { aragenMnemonic, aragenAccounts } from '../../params'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,

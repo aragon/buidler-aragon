@@ -1,18 +1,12 @@
 import { assert } from 'chai'
-import deployAragonBases from '~/src/tasks/start/utils/backend/bases'
+import deployAragonBases from '~/src/tasks/start/backend/bases'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { getAppName, getAppEnsName } from '~/src/tasks/start/utils/arapp'
 import { getAppId } from '~/src/tasks/start/utils/id'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { assertRevert } from '~/test/test-helpers/assertRevert'
-import {
-  startGanache,
-  stopGanache
-} from '~/src/tasks/start/utils/backend/ganache'
-import {
-  resolveRepo,
-  majorBumpRepo
-} from '~/src/tasks/start/utils/backend/repo'
+import { startGanache, stopGanache } from '~/src/tasks/start/backend/ganache'
+import { resolveRepo, majorBumpRepo } from '~/src/tasks/start/backend/repo'
 
 describe('repo.ts', function() {
   // Note: These particular tests use localhost instead of buidlerevm.

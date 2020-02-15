@@ -1,8 +1,5 @@
 import { assert } from 'chai'
-import {
-  createDao,
-  createDaoFactory
-} from '~/src/tasks/start/utils/backend/dao'
+import { createDao, createDaoFactory } from '~/src/tasks/start/backend/dao'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { KernelInstance, DAOFactoryInstance } from '~/typechain'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'

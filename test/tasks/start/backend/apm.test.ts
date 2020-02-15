@@ -1,8 +1,8 @@
 import { assert } from 'chai'
 import { APMRegistryInstance } from '~/typechain'
-import { createEns } from '~/src/tasks/start/utils/backend/ens'
-import { createDaoFactory } from '~/src/tasks/start/utils/backend/dao'
-import { createApm } from '~/src/tasks/start/utils/backend/apm'
+import { createEns } from '~/src/tasks/start/backend/ens'
+import { createDaoFactory } from '~/src/tasks/start/backend/dao'
+import { createApm } from '~/src/tasks/start/backend/apm'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 

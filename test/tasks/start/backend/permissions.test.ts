@@ -1,16 +1,13 @@
 import { assert } from 'chai'
-import {
-  createDao,
-  createDaoFactory
-} from '~/src/tasks/start/utils/backend/dao'
+import { createDao, createDaoFactory } from '~/src/tasks/start/backend/dao'
 import { readArapp } from '~/src/tasks/start/utils/arapp'
-import { deployImplementation } from '~/src/tasks/start/utils/backend/app'
-import { createProxy } from '~/src/tasks/start/utils/backend/proxy'
+import { deployImplementation } from '~/src/tasks/start/backend/app'
+import { createProxy } from '~/src/tasks/start/backend/proxy'
 import { AragonAppJson } from '~/src/types'
 import {
   setAllPermissionsOpenly,
   ANY_ADDRESS
-} from '~/src/tasks/start/utils/backend/permissions'
+} from '~/src/tasks/start/backend/permissions'
 import {
   KernelInstance,
   ACLContract,
