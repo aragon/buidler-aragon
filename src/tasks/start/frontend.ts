@@ -2,7 +2,7 @@ import chokidar from 'chokidar'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { logFront } from '../../ui/logger'
 import { AragonConfig } from '~/src/types'
-import { emitEvent, FRONTEND_STARTED_SERVING } from '../../events'
+import { emitEvent, FRONTEND_STARTED_SERVING } from '../../ui/events'
 import {
   installAragonClientIfNeeded,
   startAragonClient,

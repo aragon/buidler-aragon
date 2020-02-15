@@ -17,7 +17,7 @@ import {
   emitEvent,
   BACKEND_BUILD_STARTED,
   BACKEND_PROXY_UPDATED
-} from '../../events'
+} from '../../ui/events'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
