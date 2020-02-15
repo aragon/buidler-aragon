@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import namehash from 'eth-ens-namehash'
 import { AragonAppJson } from '~/src/types'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 
@@ -27,6 +28,10 @@ export function getAppEnsName(): string {
   }
 
   return defaultEnvironment.appName
+}
+
+export function getAppId(ensName: string): string {
+  return namehash.hash(ensName)
 }
 
 /**

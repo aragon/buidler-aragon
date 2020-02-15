@@ -1,10 +1,9 @@
 import { assert } from 'chai'
 import { createDao, createDaoFactory } from '~/src/tasks/start/backend/dao'
-import { readArapp } from '~/src/utils/arappUtils'
+import { readArapp, getAppId } from '~/src/utils/arappUtils'
 import { deployImplementation } from '~/src/tasks/start/backend/app'
 import { createProxy } from '~/src/tasks/start/backend/proxy'
 import { AragonAppJson } from '~/src/types'
-import { getAppId } from '~/src/tasks/start/utils/id'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 import {
   setAllPermissionsOpenly,
