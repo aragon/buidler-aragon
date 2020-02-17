@@ -1,5 +1,6 @@
 import { assert } from 'chai'
-import { createDao, createDaoFactory } from '~/src/tasks/start/backend/dao'
+import { createDao } from '~/src/tasks/start/backend/dao'
+import { deployDaoFactory } from '~/src/tasks/start/backend/bases/deploy-dao-factory'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { KernelInstance, DAOFactoryInstance } from '~/typechain'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
@@ -11,7 +12,7 @@ describe('dao.ts', function() {
     let daoFactory: DAOFactoryInstance
 
     before('create a dao factory', async function() {
-      daoFactory = await createDaoFactory(this.env.artifacts)
+      daoFactory = await deployDaoFactory(this.env.artifacts)
     })
 
     it('deploys a dao factory with a valid address', function() {

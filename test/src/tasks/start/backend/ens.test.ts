@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 import { ENSInstance } from '~/typechain'
-import { createEns } from '~/src/tasks/start/backend/ens'
+import { deployEns } from '~/src/tasks/start/backend/bases/deploy-ens'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 
 describe('ens.ts', function() {
@@ -11,7 +11,7 @@ describe('ens.ts', function() {
     let ens: ENSInstance
 
     before('deploy ens instance', async function() {
-      ens = await createEns(this.env.web3, this.env.artifacts)
+      ens = await deployEns(this.env.web3, this.env.artifacts)
     })
 
     it('deploys an ens instance with a valid address', function() {

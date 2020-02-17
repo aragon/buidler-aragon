@@ -10,7 +10,7 @@ import { logBack } from '../../ui/logger'
 import { readArapp } from '../../utils/arappUtils'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { TASK_COMPILE } from '../task-names'
-import deployAragonBases from './backend/bases'
+import deployBases from './backend/bases/deploy-bases'
 import { startGanache } from './backend/ganache'
 import { Writable } from 'stream'
 import {
@@ -51,7 +51,7 @@ export async function startBackend(
 
   // Deploy bases.
   logBack('Deploying Aragon bases (ENS, DAOFactory, and APM)...')
-  const { ensAddress, daoFactoryAddress, apmAddress } = await deployAragonBases(
+  const { ensAddress, daoFactoryAddress, apmAddress } = await deployBases(
     bre
   )
   logBack(`ENS deployed: ${ensAddress}`)

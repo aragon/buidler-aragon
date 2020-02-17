@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import deployAragonBases from '~/src/tasks/start/backend/bases'
+import deployBases from '~/src/tasks/start/backend/bases/deploy-bases'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { getAppName, getAppEnsName, getAppId } from '~/src/utils/arappUtils'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
@@ -21,7 +21,7 @@ describe('repo.ts', function() {
   })
 
   before('deploy bases', async function() {
-    ;({ ensAddress, apmAddress } = await deployAragonBases(this.env))
+    ;({ ensAddress, apmAddress } = await deployBases(this.env))
   })
 
   before('calculate appName and appId', async function() {

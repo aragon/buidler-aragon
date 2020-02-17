@@ -1,9 +1,9 @@
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { createEns } from './ens'
+import { deployEns } from './deploy-ens'
 import { deployApm } from './deploy-apm'
-import { createDaoFactory } from './dao'
-import { defaultLocalAragonBases } from '../../../params'
+import { deployDaoFactory } from './deploy-dao-factory'
+import { defaultLocalAragonBases } from '../../../../params'
 
 interface AragonBases {
   ensAddress: string
@@ -16,7 +16,7 @@ interface AragonBases {
  * @param bre
  * @return Object of Aragon base addresses
  */
-export default async function deployAragonBases(
+export default async function deployBases(
   bre: BuidlerRuntimeEnvironment
 ): Promise<AragonBases> {
   // First, aggregate which bases are deployed and which not
@@ -37,8 +37,8 @@ export default async function deployAragonBases(
   //    *no*   bases are deployed => deploy them,
   //    *some* bases are deployed => throw an error.
   if (noBasesAreDeployed) {
-    const ens = await createEns(bre.web3, bre.artifacts)
-    const daoFactory = await createDaoFactory(bre.artifacts)
+    const ens = await deployEns(bre.web3, bre.artifacts)
+    const daoFactory = await deployDaoFactory(bre.artifacts)
     const apm = await deployApm(bre.web3, bre.artifacts, ens, daoFactory)
 
     if (ens.address !== defaultLocalAragonBases.ensAddress)

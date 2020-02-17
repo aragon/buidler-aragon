@@ -1,5 +1,6 @@
 import { assert } from 'chai'
-import { createDao, createDaoFactory } from '~/src/tasks/start/backend/dao'
+import { createDao } from '~/src/tasks/start/backend/dao'
+import { deployDaoFactory } from '~/src/tasks/start/backend/bases/deploy-dao-factory'
 import { readArapp, getAppId } from '~/src/utils/arappUtils'
 import { deployImplementation } from '~/src/tasks/start/backend/app'
 import { createProxy } from '~/src/tasks/start/backend/proxy'
@@ -25,7 +26,7 @@ describe('permissions.ts', function() {
   let app: any
 
   before('set up dao with app', async function() {
-    const daoFactory: DAOFactoryInstance = await createDaoFactory(
+    const daoFactory: DAOFactoryInstance = await deployDaoFactory(
       this.env.artifacts
     )
     dao = await createDao(this.env.web3, this.env.artifacts, daoFactory.address)

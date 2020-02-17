@@ -1,8 +1,8 @@
 import { assert } from 'chai'
 import { APMRegistryInstance } from '~/typechain'
-import { createEns } from '~/src/tasks/start/backend/ens'
-import { createDaoFactory } from '~/src/tasks/start/backend/dao'
-import { deployApm } from '~/src/tasks/start/backend/deploy-apm'
+import { deployEns } from '~/src/tasks/start/backend/bases/deploy-ens'
+import { deployDaoFactory } from '~/src/tasks/start/backend/bases/deploy-dao-factory'
+import { deployApm } from '~/src/tasks/start/backend/bases/deploy-apm'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 
@@ -13,9 +13,9 @@ describe('apm.ts', function() {
     let apm: APMRegistryInstance
 
     before('create an apm instance', async function() {
-      const ens = await createEns(this.env.web3, this.env.artifacts)
+      const ens = await deployEns(this.env.web3, this.env.artifacts)
 
-      const daoFactory = await createDaoFactory(this.env.artifacts)
+      const daoFactory = await deployDaoFactory(this.env.artifacts)
 
       apm = await deployApm(this.env.web3, this.env.artifacts, ens, daoFactory)
     })

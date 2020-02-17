@@ -4,7 +4,8 @@ import { deployImplementation } from '~/src/tasks/start/backend/app'
 import { createProxy, updateProxy } from '~/src/tasks/start/backend/proxy'
 import { readArapp, getAppEnsName, getAppId } from '~/src/utils/arappUtils'
 import { setAllPermissionsOpenly } from '~/src/tasks/start/backend/permissions'
-import { createDao, createDaoFactory } from '~/src/tasks/start/backend/dao'
+import { createDao } from '~/src/tasks/start/backend/dao'
+import { deployDaoFactory } from '~/src/tasks/start/backend/bases/deploy-dao-factory'
 
 describe('proxy.ts', function() {
   let dao, implementation, proxy, appId
@@ -122,7 +123,7 @@ async function _createDaoAndAppImplementation(
   web3,
   artifacts
 ): Promise<{ dao: any; implementation: any }> {
-  const daoFactory = await createDaoFactory(artifacts)
+  const daoFactory = await deployDaoFactory(artifacts)
 
   const dao = await createDao(web3, artifacts, daoFactory.address)
 
