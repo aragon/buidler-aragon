@@ -1,22 +1,21 @@
-import chokidar from 'chokidar'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { createDao } from './backend/create-dao'
-import { deployImplementation } from './backend/app'
-import { createProxy, updateProxy } from './backend/proxy'
-import { resolveRepo, majorBumpRepo } from './backend/repo'
-import { setAllPermissionsOpenly } from './backend/set-permissions'
-import { KernelInstance, RepoInstance } from '~/typechain'
+import chokidar from 'chokidar'
+import { Writable } from 'stream'
+import { AragonConfig, AragonConfigHooks } from '~/src/types'
+import { KernelInstance } from '~/typechain'
 import { logBack } from '../../ui/logger'
 import { readArapp } from '../../utils/arappUtils'
-import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { TASK_COMPILE } from '../task-names'
 import deployBases from './backend/bases/deploy-bases'
+import { createDao } from './backend/create-dao'
+import { setAllPermissionsOpenly } from './backend/set-permissions'
 import { startGanache } from './backend/start-ganache'
-import { Writable } from 'stream'
+import { createApp } from './backend/create-app'
+import { updateApp } from './backend/update-app'
 import {
-  emitEvent,
   BACKEND_BUILD_STARTED,
-  BACKEND_PROXY_UPDATED
+  BACKEND_PROXY_UPDATED,
+  emitEvent
 } from '../../ui/events'
 
 /**
@@ -51,9 +50,7 @@ export async function startBackend(
 
   // Deploy bases.
   logBack('Deploying Aragon bases (ENS, DAOFactory, and APM)...')
-  const { ensAddress, daoFactoryAddress, apmAddress } = await deployBases(
-    bre
-  )
+  const { ensAddress, daoFactoryAddress, apmAddress } = await deployBases(bre)
   logBack(`ENS deployed: ${ensAddress}`)
   logBack(`DAO factory deployed: ${daoFactoryAddress}`)
   logBack(`APM deployed: ${apmAddress}`)
@@ -66,23 +63,14 @@ export async function startBackend(
     await hooks.preDao(bre)
   }
 
-  // Prepare a DAO and a Repo to hold the app.
+  // Create a DAO.
   logBack('Deploying DAO and app repository...')
   const dao: KernelInstance = await createDao(
     bre.web3,
     bre.artifacts,
     daoFactoryAddress
   )
-  const repo: RepoInstance = await resolveRepo(
-    appName,
-    appId,
-    bre.web3,
-    bre.artifacts,
-    ensAddress,
-    apmAddress
-  )
   logBack(`DAO deployed: ${dao.address}`)
-  logBack(`Repo deployed: ${repo.address}`)
 
   // Call postDao hook.
   if (hooks && hooks.postDao) {
@@ -104,32 +92,31 @@ export async function startBackend(
     logBack(`Proxy init params: ${proxyInitParams}`)
   }
 
-  // Deploy first implementation and set it in the Repo and in a Proxy.
-  logBack('Deploying app implementation...')
-  const implementation: Truffle.ContractInstance = await deployImplementation(
-    bre.artifacts
-  )
-  logBack(`App implementation deployed: ${implementation.address}`)
-
-  logBack('Setting implementation in app repository...')
-  const { version, uri } = await majorBumpRepo(
-    repo,
-    implementation.address,
-    config.appServePort as number
-  )
-  logBack(`Repo version: ${version}`)
-  logBack(`Repo content URI: ${uri}`)
-
-  logBack('Creating app proxy...')
-  const proxy: Truffle.ContractInstance = await createProxy(
-    implementation,
+  // Create app.
+  logBack('Creating app...')
+  const { proxy, repo } = await createApp(
+    appName,
     appId,
     dao,
-    bre.web3,
-    bre.artifacts,
-    proxyInitParams
+    proxyInitParams,
+    ensAddress,
+    apmAddress,
+    bre
   )
-  logBack(`App proxy deployed: ${proxy.address}`)
+  logBack(`Proxy address: ${proxy.address}`)
+  logBack(`Repo address: ${repo.address}`)
+
+  // Update app.
+  logBack('Setting up first app version...')
+  const { implementationAddress, version } = await updateApp(
+    appId,
+    dao,
+    repo,
+    config.appServePort as number,
+    bre
+  )
+  logBack(`Implementation address: ${implementationAddress}`)
+  logBack(`Version: ${version}`)
 
   // TODO: What if user wants to set custom permissions?
   // Use a hook? A way to disable all open permissions?
@@ -160,23 +147,17 @@ export async function startBackend(
         return
       }
 
-      // Update implementation and set it in Repo and Proxy.
-      logBack('Deploying app implementation...')
-      const newImplementation: Truffle.ContractInstance = await deployImplementation(
-        bre.artifacts
-      )
-      logBack(`App implementation deployed: ${implementation.address}`)
-
-      logBack('Updating implementation in app repository and proxy...')
-      const { version, uri } = await majorBumpRepo(
+      // Update app.
+      logBack('Updating app...')
+      const { implementationAddress, version } = await updateApp(
+        appId,
+        dao,
         repo,
-        newImplementation.address,
-        config.appServePort as number
+        config.appServePort as number,
+        bre
       )
-      logBack(`Repo version: ${version}`)
-      logBack(`Repo content URI: ${uri}`)
-      await updateProxy(newImplementation, appId, dao, bre.web3)
-      logBack(`Updated proxy implementation to: ${newImplementation.address}`)
+      logBack(`Implementation address: ${implementationAddress}`)
+      logBack(`Version: ${version}`)
 
       // Call postUpdate hook.
       if (hooks && hooks.postUpdate) {
