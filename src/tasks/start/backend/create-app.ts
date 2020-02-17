@@ -1,14 +1,14 @@
 import { getMainContractName } from '../../../utils/arappUtils'
 import { KernelInstance } from '~/typechain'
 import { getLog } from '../../../utils/getLog'
+import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
+import { deployImplementation } from './deploy-implementation'
 import {
   RepoContract,
   RepoInstance,
   APMRegistryContract,
   APMRegistryInstance
 } from '~/typechain'
-import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { deployImplementation } from './deploy-implementation'
 
 interface InitializableApp extends Truffle.ContractInstance {
   initialize: (...args: any[]) => void
@@ -32,7 +32,7 @@ export async function createApp(
 
   // Create an app proxy.
   const proxy = await _createProxy(
-    implementation,
+    implementation.address,
     appId,
     dao,
     proxyInitParams,
@@ -51,7 +51,7 @@ export async function createApp(
  * deployed app contract, wrapped around an upgradeably proxy address.
  */
 async function _createProxy(
-  implementation: Truffle.ContractInstance,
+  implementationAddress: string,
   appId: string,
   dao: KernelInstance,
   proxyInitParams: any[],
@@ -62,7 +62,7 @@ async function _createProxy(
   // Create a new app proxy with base implementation.
   const txResponse: Truffle.TransactionResponse = await dao.newAppInstance(
     appId,
-    implementation.address,
+    implementationAddress,
     '0x',
     false,
     { from: rootAccount }
@@ -70,13 +70,11 @@ async function _createProxy(
 
   // Retrieve proxy address and wrap around abi.
   const proxyAddress: string = getLog(txResponse, 'NewAppProxy', 'proxy')
-
   const mainContractName: string = getMainContractName()
   const App: Truffle.Contract<any> = bre.artifacts.require(mainContractName)
-
   const proxy: InitializableApp = await App.at(proxyAddress)
 
-  // Initialize the app.
+  // Initialize the proxy.
   await proxy.initialize(...proxyInitParams)
 
   return proxy
@@ -95,7 +93,7 @@ async function _createRepo(
 ): Promise<RepoInstance> {
   const rootAccount: string = (await bre.web3.eth.getAccounts())[0]
 
-  // Create new repo.
+  // Create a new repo using the APM.
   const APMRegistry: APMRegistryContract = bre.artifacts.require('APMRegistry')
   const apmRegistry: APMRegistryInstance = await APMRegistry.at(apmAddress)
   const txResponse: Truffle.TransactionResponse = await apmRegistry.newRepo(

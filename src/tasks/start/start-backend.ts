@@ -107,7 +107,6 @@ export async function startBackend(
   logBack(`Repo address: ${repo.address}`)
 
   // Update app.
-  logBack('Setting up first app version...')
   const { implementationAddress, version } = await updateApp(
     appId,
     dao,
@@ -116,7 +115,7 @@ export async function startBackend(
     bre
   )
   logBack(`Implementation address: ${implementationAddress}`)
-  logBack(`Version: ${version}`)
+  logBack(`App version: ${version}`)
 
   // TODO: What if user wants to set custom permissions?
   // Use a hook? A way to disable all open permissions?
@@ -157,7 +156,7 @@ export async function startBackend(
         bre
       )
       logBack(`Implementation address: ${implementationAddress}`)
-      logBack(`Version: ${version}`)
+      logBack(`App version: ${version}`)
 
       // Call postUpdate hook.
       if (hooks && hooks.postUpdate) {

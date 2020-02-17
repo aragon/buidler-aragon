@@ -1,0 +1,76 @@
+// import { assert } from 'chai'
+// import deployBases from '~/src/tasks/start/backend/bases/deploy-bases'
+// import { useEnvironment } from '~/test/test-helpers/useEnvironment'
+// import { getAppName, getAppEnsName, getAppId } from '~/src/utils/arappUtils'
+// import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
+// import { assertRevert } from '~/test/test-helpers/assertRevert'
+// import { startGanache, stopGanache } from '~/src/tasks/start/backend/start-ganache'
+// import { resolveRepo, majorBumpRepo } from '~/src/tasks/start/backend/repo'
+
+// describe.skip('repo.ts', function() {
+//   // Note: These particular tests use localhost instead of buidlerevm.
+//   // This is required for bases to have the expected addresses,
+//   // And because we want to restart the chain on certain tests.
+//   useEnvironment('counter', 'localhost')
+
+//   let ensAddress, apmAddress
+//   let appName, appId
+
+//   before('start ganache', async function() {
+//     await startGanache(this.env)
+//   })
+
+//   before('deploy bases', async function() {
+//     ;({ ensAddress, apmAddress } = await deployBases(this.env))
+//   })
+
+//   before('calculate appName and appId', async function() {
+//     appName = getAppName()
+//     appId = getAppId(getAppEnsName())
+//   })
+
+//   after('stop ganache', async function() {
+//     stopGanache()
+//   })
+
+//   describe('when the target repo does not exist', async function() {
+//     let repo
+
+//     describe('when calling resolveRepo()', async function() {
+//       before('call resolveRepo', async function() {
+//         repo = await resolveRepo(
+//           appName,
+//           appId,
+//           this.env.web3,
+//           this.env.artifacts,
+//           ensAddress,
+//           apmAddress
+//         )
+//       })
+
+//       describe('when bumping a repo', async function() {
+//         let version, uri
+
+//         const port = 666
+
+//         before('bump repo', async function() {
+//           ;({ version, uri } = await majorBumpRepo(repo, repo.address, port))
+//         })
+
+//         it('reports the correct repo version', async function() {
+//           assert.equal(version[0], 1, 'Incorrect major version')
+//         })
+
+//         it('reports the correct content uri', async function() {
+//           assert.equal(uri, `http://localhost:${port}`)
+//         })
+
+//         it('updates the repo version', async function() {
+//           const latest = (await repo.getLatest())[0]
+//           const major = latest[0].toNumber()
+//           assert.equal(major, 1, 'Incorrect major version')
+//         })
+//       })
+//     })
+//   })
+// })

@@ -14,10 +14,13 @@ export async function updateApp(
   version: [number, number, number]
   uri: string
 }> {
+  // Deploy a new app implementation.
   const implementation = await deployImplementation(bre.artifacts)
 
-  await _updateProxy(implementation, appId, dao, bre.web3)
+  // Update the proxy with the new implementation.
+  await _updateProxy(implementation.address, appId, dao, bre.web3)
 
+  // Update the repo with the new implementation.
   const { version, uri } = await _updateRepo(
     repo,
     implementation.address,
@@ -31,7 +34,7 @@ export async function updateApp(
  * Updates the app proxy's implementation in the Kernel.
  */
 async function _updateProxy(
-  implementation: Truffle.ContractInstance,
+  implementationAddress: string,
   appId: string,
   dao: KernelInstance,
   web3: Web3
@@ -42,7 +45,7 @@ async function _updateProxy(
   await dao.setApp(
     await dao.APP_BASES_NAMESPACE(),
     appId,
-    implementation.address,
+    implementationAddress,
     {
       from: rootAccount
     }

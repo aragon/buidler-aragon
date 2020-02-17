@@ -6,7 +6,7 @@ import { deployApm } from '~/src/tasks/start/backend/bases/deploy-apm'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 
-describe('apm.ts', function() {
+describe('deploy-apm.ts', function() {
   useDefaultEnvironment()
 
   describe('when an apm is created', async function() {

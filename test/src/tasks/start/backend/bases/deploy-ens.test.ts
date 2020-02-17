@@ -4,7 +4,7 @@ import { ENSInstance } from '~/typechain'
 import { deployEns } from '~/src/tasks/start/backend/bases/deploy-ens'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 
-describe('ens.ts', function() {
+describe('deploy-ens.ts', function() {
   useDefaultEnvironment()
 
   describe('when an ens instance is deployed', async function() {

@@ -3,10 +3,13 @@ import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import deployBases from '~/src/tasks/start/backend/bases/deploy-bases'
 import { defaultLocalAragonBases } from '~/src/params'
-import { startGanache, stopGanache } from '~/src/tasks/start/backend/start-ganache'
 import { deployEns } from '~/src/tasks/start/backend/bases/deploy-ens'
+import {
+  startGanache,
+  stopGanache
+} from '~/src/tasks/start/backend/start-ganache'
 
-describe('bases.ts', function() {
+describe('deploy-bases.ts', function() {
   // Note: These particular tests use localhost instead of buidlerevm.
   // This is required for bases to have the expected addresses,
   // And because we want to restart the chain on certain tests.
@@ -67,11 +70,9 @@ describe('bases.ts', function() {
       describe('when attempting to deploy bases again', async function() {
         before('deploy bases again', async function() {
           blockBefore = await this.env.web3.eth.getBlockNumber()
-          ;({
-            ensAddress,
-            daoFactoryAddress,
-            apmAddress
-          } = await deployBases(this.env))
+          ;({ ensAddress, daoFactoryAddress, apmAddress } = await deployBases(
+            this.env
+          ))
         })
 
         it('should not deploy any contracts', async function() {
