@@ -6,6 +6,7 @@ import { createDao } from '~/src/tasks/start/backend/create-dao'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { setAllPermissionsOpenly } from '~/src/tasks/start/backend/set-permissions'
+import { itBehavesLikeACounterContract } from './counter-behavior'
 import {
   startGanache,
   stopGanache
@@ -17,7 +18,7 @@ import {
   getAppName
 } from '~/src/utils/arappUtils'
 
-describe.only('create-app.ts', function() {
+describe('create-app.ts', function() {
   // Note: These particular tests use localhost instead of buidlerevm.
   // This is required for bases to have the expected addresses,
   // And because we want to restart the chain on certain tests.
@@ -53,25 +54,6 @@ describe.only('create-app.ts', function() {
   describe('when an app is created', function() {
     let proxy, repo, implementation
 
-    const itBehavesLikeACounterContract = function(): void {
-      it('allows any address to increment and decrement the counter', async function() {
-        let value
-
-        value = (await proxy.value()).toString()
-        assert.equal(value, 0, 'Incorrect value on proxy')
-
-        await proxy.increment(1)
-
-        value = (await proxy.value()).toString()
-        assert.equal(value, 1, 'Incorrect value on proxy')
-
-        await proxy.decrement(1)
-
-        value = (await proxy.value()).toString()
-        assert.equal(value, 0, 'Incorrect value on proxy')
-      })
-    }
-
     before('create app', async function() {
       ;({ proxy, repo, implementation } = await createApp(
         appName,
@@ -91,6 +73,9 @@ describe.only('create-app.ts', function() {
         this.env.web3,
         this.env.artifacts
       )
+
+      // Necessary for using behaviors.
+      this.proxy = proxy
     })
 
     it('dao references the correct implementation for it', async function() {
@@ -130,12 +115,6 @@ describe.only('create-app.ts', function() {
           await proxy.kernel(),
           'Incorrect kernel in proxy'
         )
-      })
-
-      it('reports the correct hardcoded version', async function() {
-        const version = (await proxy.getVersion()).toString()
-
-        assert.equal(version, '0', 'Incorrect counter proxy version')
       })
 
       itBehavesLikeACounterContract()
