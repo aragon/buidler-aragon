@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { startGanache, stopGanache } from '~/src/tasks/start/backend/ganache'
+import { startGanache, stopGanache } from '~/src/tasks/start/backend/start-ganache'
 import http from 'http'
 import { testnetPort } from '~/src/params'
 import tcpPortUsed from 'tcp-port-used'

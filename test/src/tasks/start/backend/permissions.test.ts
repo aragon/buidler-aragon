@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { createDao } from '~/src/tasks/start/backend/dao'
+import { createDao } from '~/src/tasks/start/backend/create-dao'
 import { deployDaoFactory } from '~/src/tasks/start/backend/bases/deploy-dao-factory'
 import { readArapp, getAppId } from '~/src/utils/arappUtils'
 import { deployImplementation } from '~/src/tasks/start/backend/app'
@@ -9,7 +9,7 @@ import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 import {
   setAllPermissionsOpenly,
   ANY_ADDRESS
-} from '~/src/tasks/start/backend/permissions'
+} from '~/src/tasks/start/backend/set-permissions'
 import {
   KernelInstance,
   ACLContract,

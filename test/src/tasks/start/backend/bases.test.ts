@@ -3,7 +3,7 @@ import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import deployBases from '~/src/tasks/start/backend/bases/deploy-bases'
 import { defaultLocalAragonBases } from '~/src/params'
-import { startGanache, stopGanache } from '~/src/tasks/start/backend/ganache'
+import { startGanache, stopGanache } from '~/src/tasks/start/backend/start-ganache'
 import { deployEns } from '~/src/tasks/start/backend/bases/deploy-ens'
 
 describe('bases.ts', function() {

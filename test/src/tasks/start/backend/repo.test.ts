@@ -4,7 +4,7 @@ import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { getAppName, getAppEnsName, getAppId } from '~/src/utils/arappUtils'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { assertRevert } from '~/test/test-helpers/assertRevert'
-import { startGanache, stopGanache } from '~/src/tasks/start/backend/ganache'
+import { startGanache, stopGanache } from '~/src/tasks/start/backend/start-ganache'
 import { resolveRepo, majorBumpRepo } from '~/src/tasks/start/backend/repo'
 
 describe('repo.ts', function() {

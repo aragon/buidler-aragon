@@ -3,8 +3,8 @@ import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 import { deployImplementation } from '~/src/tasks/start/backend/app'
 import { createProxy, updateProxy } from '~/src/tasks/start/backend/proxy'
 import { readArapp, getAppEnsName, getAppId } from '~/src/utils/arappUtils'
-import { setAllPermissionsOpenly } from '~/src/tasks/start/backend/permissions'
-import { createDao } from '~/src/tasks/start/backend/dao'
+import { setAllPermissionsOpenly } from '~/src/tasks/start/backend/set-permissions'
+import { createDao } from '~/src/tasks/start/backend/create-dao'
 import { deployDaoFactory } from '~/src/tasks/start/backend/bases/deploy-dao-factory'
 
 describe('proxy.ts', function() {
