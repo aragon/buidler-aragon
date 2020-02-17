@@ -3,7 +3,7 @@ import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { deployImplementation } from '~/src/tasks/start/backend/deploy-implementation'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 
-describe('app.ts', function() {
+describe('deploy-implementation.ts', function() {
   useDefaultEnvironment()
 
   describe('when deploying an implementation of an app', function() {

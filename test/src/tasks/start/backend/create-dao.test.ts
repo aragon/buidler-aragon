@@ -5,7 +5,7 @@ import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import { KernelInstance, DAOFactoryInstance } from '~/typechain'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
 
-describe('dao.ts', function() {
+describe('create-dao.ts', function() {
   useDefaultEnvironment()
 
   describe('when a dao factory is created', async function() {
