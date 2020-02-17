@@ -21,7 +21,7 @@ const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
  * Deploys a new DAOFactory with direct/pure interaction with aragonOS.
  * @returns DAOFactory's instance.
  */
-export async function createApm(
+export async function deployApm(
   web3: Web3,
   artifacts: TruffleEnvironmentArtifacts,
   ens: ENSInstance,

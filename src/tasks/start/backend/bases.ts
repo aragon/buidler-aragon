@@ -1,7 +1,7 @@
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { createEns } from './ens'
-import { createApm } from './apm'
+import { deployApm } from './deploy-apm'
 import { createDaoFactory } from './dao'
 import { defaultLocalAragonBases } from '../../../params'
 
@@ -39,7 +39,7 @@ export default async function deployAragonBases(
   if (noBasesAreDeployed) {
     const ens = await createEns(bre.web3, bre.artifacts)
     const daoFactory = await createDaoFactory(bre.artifacts)
-    const apm = await createApm(bre.web3, bre.artifacts, ens, daoFactory)
+    const apm = await deployApm(bre.web3, bre.artifacts, ens, daoFactory)
 
     if (ens.address !== defaultLocalAragonBases.ensAddress)
       throw new BuidlerPluginError(
