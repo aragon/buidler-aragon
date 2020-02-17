@@ -1,9 +1,7 @@
 import path from 'path'
 import fsExtra from 'fs-extra'
-import execa from 'execa'
 import { generateApplicationArtifact } from '../../../utils/generateArtifacts'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
-import fetch from 'node-fetch'
 import {
   readArapp,
   getMainContractName,
@@ -11,50 +9,6 @@ import {
 } from '../../../utils/arappUtils'
 
 export const manifestPath = 'manifest.json'
-
-/**
- * Calls the app's aragon/ui copy-aragon-ui-assets script.
- */
-export async function copyAppUiAssets(appSrcPath: string): Promise<void> {
-  await execa('npm', ['run', 'sync-assets'], { cwd: appSrcPath })
-}
-
-/**
- * Calls the app's front end build watcher.
- */
-export async function startAppWatcher(appSrcPath: string): Promise<void> {
-  await execa('npm', ['run', 'watch'], { cwd: appSrcPath })
-}
-
-/**
- * Starts the app's front end sever.
- */
-export async function serveAppAndResolveWhenBuilt(
-  appSrcPath: string,
-  appServePort: number
-): Promise<void> {
-  // Trigger serving in app/.
-  execa('npm', ['run', 'serve', '--', '--port', `${appServePort}`], {
-    cwd: appSrcPath
-  })
-
-  // Query the server for an index.html file.
-  // and resolve only when the file is found (with a timeout).
-  const maxWaitingTime = 60 * 1000
-  const startingTime = Date.now()
-  while (Date.now() - startingTime < maxWaitingTime) {
-    try {
-      await fetch(`http://localhost:${appServePort}`, { timeout: 10 * 1000 })
-
-      // Server is active and serving, resolve.
-      return
-    } catch (e) {
-      // Ignore errors, at worse after maxWaitingTime this will resolve.
-      // Pause for a bit to prevent performing requests too fast.
-      await new Promise(r => setTimeout(r, 1000))
-    }
-  }
-}
 
 /**
  * Generates the artifacts necessary for an Aragon App.

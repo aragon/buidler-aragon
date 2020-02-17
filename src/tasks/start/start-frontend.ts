@@ -3,17 +3,15 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { logFront } from '../../ui/logger'
 import { AragonConfig } from '~/src/types'
 import { emitEvent, FRONTEND_STARTED_SERVING } from '../../ui/events'
+import { serveAppAndResolveWhenBuilt } from './frontend/serve-app'
+import { generateAppArtifacts } from './frontend/generate-artifacts'
+import { copyAppUiAssets } from './frontend/copy-assets'
+import { startAppWatcher } from './frontend/watch-app'
 import {
   installAragonClientIfNeeded,
   startAragonClient,
   refreshClient
-} from './frontend/client'
-import {
-  generateAppArtifacts,
-  serveAppAndResolveWhenBuilt,
-  copyAppUiAssets,
-  startAppWatcher
-} from './frontend/app'
+} from './frontend/aragon-client'
 
 /**
  * Starts the task's frontend sub-tasks. Logic is contained in ./tasks/start/utils/frontend/.
