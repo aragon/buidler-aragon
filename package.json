@@ -23,7 +23,8 @@
     "lint": "eslint 'src/**/*.{js,ts}'",
     "prettier": "prettier --write '**/*.{ts,js,css,html}'",
     "test": "npm run build && mocha --exit",
-    "build": "tsc --build ."
+    "build": "tsc --build .",
+    "postbuild": "cp ./tsconfig.json ./dist/tsconfig.json"
   },
   "dependencies": {
     "chalk": "^3.0.0",
