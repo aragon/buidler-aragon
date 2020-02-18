@@ -5,6 +5,9 @@ import path from 'path'
 // import { ResolvedBuidlerConfig, BuidlerConfig } from '@nomiclabs/buidler/types'
 
 export default function(): void {
+  // Resolve tsconfig-paths at runtime.
+  require('../bootstrap-paths.js')
+
   // Plugin dependencies.
   usePlugin('@nomiclabs/buidler-truffle5')
   usePlugin('@nomiclabs/buidler-web3')

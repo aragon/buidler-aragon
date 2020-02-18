@@ -1,12 +1,12 @@
 import path from 'path'
 import fsExtra from 'fs-extra'
-import { generateApplicationArtifact } from '../../../utils/generateArtifacts'
+import { generateApplicationArtifact } from '~/src/utils/generateArtifacts'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import {
   readArapp,
   getMainContractName,
   getMainContractPath
-} from '../../../utils/arappUtils'
+} from '~/src/utils/arappUtils'
 
 export const manifestPath = 'manifest.json'
 

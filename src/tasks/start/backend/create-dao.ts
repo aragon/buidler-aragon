@@ -1,6 +1,6 @@
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import Web3 from 'web3'
-import { getLog } from '../../../utils/getLog'
+import { getLog } from '~/src/utils/getLog'
 import {
   KernelContract,
   KernelInstance,

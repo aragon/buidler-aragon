@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import loadTestContract from '../../test-helpers/loadTestContract'
+import loadTestContract from '~/test/test-helpers/loadTestContract'
 import {
   generateApplicationArtifact,
   AragonApplicationArtifact

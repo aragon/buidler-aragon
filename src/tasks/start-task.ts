@@ -9,9 +9,9 @@ import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
 import fsExtra from 'fs-extra'
 import path from 'path'
-import { aragenMnemonic, aragenAccounts } from '../params'
-import { getAppName, getAppEnsName, getAppId } from '../utils/arappUtils'
-import { validateEnsName } from '../utils/validateEnsName'
+import { aragenMnemonic, aragenAccounts } from '~/src/params'
+import { getAppName, getAppEnsName, getAppId } from '~/src/utils/arappUtils'
+import { validateEnsName } from '~/src/utils/validateEnsName'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,

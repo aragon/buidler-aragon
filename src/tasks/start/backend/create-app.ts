@@ -1,6 +1,6 @@
-import { getMainContractName } from '../../../utils/arappUtils'
+import { getMainContractName } from '~/src/utils/arappUtils'
 import { KernelInstance } from '~/typechain'
-import { getLog } from '../../../utils/getLog'
+import { getLog } from '~/src/utils/getLog'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { deployImplementation } from './deploy-implementation'
 import {

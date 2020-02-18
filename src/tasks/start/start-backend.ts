@@ -3,9 +3,9 @@ import chokidar from 'chokidar'
 import { Writable } from 'stream'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { KernelInstance } from '~/typechain'
-import { logBack } from '../../ui/logger'
-import { readArapp } from '../../utils/arappUtils'
-import { TASK_COMPILE } from '../task-names'
+import { logBack } from '~/src/ui/logger'
+import { readArapp } from '~/src/utils/arappUtils'
+import { TASK_COMPILE } from '~/src/tasks/task-names'
 import deployBases from './backend/bases/deploy-bases'
 import { createDao } from './backend/create-dao'
 import { setAllPermissionsOpenly } from './backend/set-permissions'
@@ -16,7 +16,7 @@ import {
   BACKEND_BUILD_STARTED,
   BACKEND_PROXY_UPDATED,
   emitEvent
-} from '../../ui/events'
+} from '~/src/ui/events'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.

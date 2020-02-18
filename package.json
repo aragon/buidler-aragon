@@ -37,6 +37,7 @@
     "node-fetch": "^2.6.0",
     "open": "^7.0.0",
     "source-map-support": "^0.5.16",
+    "tsconfig-paths": "^3.9.0",
     "tcp-port-used": "^1.0.1"
   },
   "devDependencies": {
@@ -58,7 +59,6 @@
     "prettier": "^1.19.1",
     "truffle-typings": "1.0.4",
     "ts-node": "^8.5.4",
-    "tsconfig-paths": "^3.9.0",
     "typechain": "^1.0.3",
     "typechain-target-truffle": "^1.0.2",
     "typescript": "^3.7.4",

@@ -10,7 +10,7 @@ import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import {
   FRONTEND_STARTED_SERVING,
   BACKEND_PROXY_UPDATED
-} from '../../../src/ui/events'
+} from '~/src/ui/events'
 
 const EMIT_START_TASK_OUTPUT = false
 const DEBUG_START_TASK_CYCLE = false

@@ -1,7 +1,7 @@
 import { hash as namehash } from 'eth-ens-namehash'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
-import { getLog } from '../../../../utils/getLog'
+import { getLog } from '~/src/utils/getLog'
 import {
   DAOFactoryInstance,
   APMRegistryInstance,

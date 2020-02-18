@@ -197,3 +197,4 @@ contract TokenWrapper is IERC20WithCheckpointing, IForwarder, IsContract, ERC20V
         return totalSupplyHistory.getValueAt(_blockNumber.toUint64Time());
     }
 }
+

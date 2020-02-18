@@ -3,7 +3,7 @@ import fs from 'fs'
 import fsExtra from 'fs-extra'
 import os from 'os'
 import execa from 'execa'
-import { logFront } from '../../../ui/logger'
+import { logFront } from '~/src/ui/logger'
 import liveServer from 'live-server'
 import open from 'open'
 

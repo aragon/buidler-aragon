@@ -3,7 +3,7 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { deployEns } from './deploy-ens'
 import { deployApm } from './deploy-apm'
 import { deployDaoFactory } from './deploy-dao-factory'
-import { defaultLocalAragonBases } from '../../../../params'
+import { defaultLocalAragonBases } from '~/src/params'
 
 interface AragonBases {
   ensAddress: string
