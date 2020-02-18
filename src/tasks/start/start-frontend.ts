@@ -40,13 +40,15 @@ export async function startFrontend(
   await serveAppAndResolveWhenBuilt(appSrcPath, appServePort)
 
   // Start Aragon client at the deployed address.
-  const url: string = await startAragonClient(
+  const appURL: string = `http://localhost:${appServePort}`
+  const clientURL: string = await startAragonClient(
     config.clientServePort as number,
     `${daoAddress}/${appAddress}`,
     openBrowser
   )
   logFront(`You can now view the Aragon client in the browser.
-Local:  ${url}`)
+App content: ${appURL}
+Client:  ${clientURL}`)
 
   // Watch changes to app/src/script.js.
   chokidar
