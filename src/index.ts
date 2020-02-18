@@ -1,5 +1,5 @@
 import { extendConfig, usePlugin } from '@nomiclabs/buidler/config'
-import defaultAragonConfig from './config'
+import { defaultAragonConfig } from './params'
 import path from 'path'
 // TODO: Don't use any type below, try to use something like these...
 // import { ResolvedBuidlerConfig, BuidlerConfig } from '@nomiclabs/buidler/types'
@@ -10,7 +10,7 @@ export default function(): void {
   usePlugin('@nomiclabs/buidler-web3')
 
   // Task definitions.
-  require(path.join(__dirname, '/tasks/start/start-task'))
+  require(path.join(__dirname, '/tasks/start-task'))
 
   // Environment extensions.
   // No extensions atm.
