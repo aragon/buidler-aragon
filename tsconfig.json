@@ -18,7 +18,7 @@
       "~/*": ["./*"]
     }
   },
-  "include": ["./src", "./test", "./bootstrap-paths.js"],
+  "include": ["./src", "./test", "./bootstrap-paths.js", "./tsconfig.json"],
   "exclude": ["./test/projects"],
   "files": [
     "./src/type-extensions.d.ts",
