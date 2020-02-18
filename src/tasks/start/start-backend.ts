@@ -77,9 +77,22 @@ export async function startBackend(
     await hooks.postDao(dao, bre)
   }
 
+  // Create app.
+  logBack('Creating app...')
+  const { proxy, repo } = await createApp(
+    appName,
+    appId,
+    dao,
+    ensAddress,
+    apmAddress,
+    bre
+  )
+  logBack(`Proxy address: ${proxy.address}`)
+  logBack(`Repo address: ${repo.address}`)
+
   // Call preInit hook.
   if (hooks && hooks.preInit) {
-    await hooks.preInit(bre)
+    await hooks.preInit(proxy, bre)
   }
 
   // Call getInitParams hook.
@@ -92,20 +105,6 @@ export async function startBackend(
     logBack(`Proxy init params: ${proxyInitParams}`)
   }
 
-  // Create app.
-  logBack('Creating app...')
-  const { proxy, repo } = await createApp(
-    appName,
-    appId,
-    dao,
-    proxyInitParams,
-    ensAddress,
-    apmAddress,
-    bre
-  )
-  logBack(`Proxy address: ${proxy.address}`)
-  logBack(`Repo address: ${repo.address}`)
-
   // Update app.
   const { implementationAddress, version } = await updateApp(
     appId,
@@ -117,15 +116,15 @@ export async function startBackend(
   logBack(`Implementation address: ${implementationAddress}`)
   logBack(`App version: ${version}`)
 
-  // TODO: What if user wants to set custom permissions?
-  // Use a hook? A way to disable all open permissions?
-  await setAllPermissionsOpenly(dao, proxy, arapp, bre.web3, bre.artifacts)
-  logBack('All permissions set openly.')
-
   // Call postInit hook.
   if (hooks && hooks.postInit) {
     await hooks.postInit(proxy, bre)
   }
+
+  // TODO: What if user wants to set custom permissions?
+  // Use a hook? A way to disable all open permissions?
+  await setAllPermissionsOpenly(dao, proxy, arapp, bre.web3, bre.artifacts)
+  logBack('All permissions set openly.')
 
   // Watch back-end files.
   chokidar

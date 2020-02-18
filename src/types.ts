@@ -25,7 +25,10 @@ export interface AragonConfigHooks {
     dao: KernelInstance,
     bre: BuidlerRuntimeEnvironment
   ) => Promise<void> | void
-  preInit?: (bre: BuidlerRuntimeEnvironment) => Promise<void> | void
+  preInit?: (
+    proxy: Truffle.ContractInstance,
+    bre: BuidlerRuntimeEnvironment
+  ) => Promise<void> | void
   postInit?: (
     proxy: Truffle.ContractInstance,
     bre: BuidlerRuntimeEnvironment

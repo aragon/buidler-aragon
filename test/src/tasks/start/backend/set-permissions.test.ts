@@ -57,11 +57,12 @@ describe('set-permissions.ts', function() {
       appName,
       appId,
       dao,
-      [],
       ensAddress,
       apmAddress,
       this.env
     ))
+
+    await proxy.initialize()
   })
 
   after('stop ganache', async function() {

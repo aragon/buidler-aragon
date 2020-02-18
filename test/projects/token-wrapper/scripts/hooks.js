@@ -23,7 +23,7 @@ async function postDao(dao, bre) {
   await _writeLog('postDao', JSON.stringify(content, null, 2))
 }
 
-async function preInit(bre) {
+async function preInit(proxy, bre) {
   console.log(`preInit hook called`)
 
   // Retrieve accounts.

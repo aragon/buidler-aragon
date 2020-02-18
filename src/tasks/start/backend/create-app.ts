@@ -18,7 +18,6 @@ export async function createApp(
   appName: string,
   appId: string,
   dao: KernelInstance,
-  proxyInitParams: any[],
   ensAddress: string,
   apmAddress: string,
   bre: BuidlerRuntimeEnvironment
@@ -35,7 +34,6 @@ export async function createApp(
     implementation.address,
     appId,
     dao,
-    proxyInitParams,
     bre
   )
 
@@ -54,7 +52,6 @@ async function _createProxy(
   implementationAddress: string,
   appId: string,
   dao: KernelInstance,
-  proxyInitParams: any[],
   bre: BuidlerRuntimeEnvironment
 ): Promise<Truffle.ContractInstance> {
   const rootAccount: string = (await bre.web3.eth.getAccounts())[0]
@@ -73,9 +70,6 @@ async function _createProxy(
   const mainContractName: string = getMainContractName()
   const App: Truffle.Contract<any> = bre.artifacts.require(mainContractName)
   const proxy: InitializableApp = await App.at(proxyAddress)
-
-  // Initialize the proxy.
-  await proxy.initialize(...proxyInitParams)
 
   return proxy
 }
