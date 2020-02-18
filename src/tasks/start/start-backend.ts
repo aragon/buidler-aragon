@@ -5,7 +5,7 @@ import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { KernelInstance } from '~/typechain'
 import { logBack } from '~/src/ui/logger'
 import { readArapp } from '~/src/utils/arappUtils'
-import { TASK_COMPILE } from '~/src/tasks/task-names'
+import { TASK_COMPILE, TASK_JSONRPC } from '~/src/tasks/task-names'
 import deployBases from './backend/bases/deploy-bases'
 import { createDao } from './backend/create-dao'
 import { setAllPermissionsOpenly } from './backend/set-permissions'
@@ -43,10 +43,11 @@ export async function startBackend(
    * Until BuidlerEVM JSON RPC is ready, a ganache server will be started
    * on the appropiate conditions.
    */
-  const networkId = await startGanache(bre)
-  if (networkId !== 0) {
-    logBack(`Started a ganache testnet instance with id ${networkId}.`)
-  }
+  // const networkId = await startGanache(bre)
+  // if (networkId !== 0) {
+  //   logBack(`Started a ganache testnet instance with id ${networkId}.`)
+  // }
+  await bre.run(TASK_JSONRPC)
 
   // Deploy bases.
   logBack('Deploying Aragon bases (ENS, DAOFactory, and APM)...')

@@ -47,8 +47,8 @@
     "@nomiclabs/buidler-web3": "^1.0.2",
     "@types/chai": "^4.2.5",
     "@types/mocha": "^5.2.7",
-    "@types/node": "12.7.5",
     "@types/web3": "^1.2.2",
+    "@types/node": "^11.11.6",
     "@typescript-eslint/eslint-plugin": "^2.16.0",
     "@typescript-eslint/parser": "^2.16.0",
     "bignumber.js": "^9.0.0",
@@ -68,6 +68,7 @@
     "@nomiclabs/buidler": "^1.0.2",
     "@nomiclabs/buidler-truffle5": "^1.0.2",
     "@nomiclabs/buidler-web3": "^1.0.2",
+    "@types/node": "^11.11.6",
     "bignumber.js": "^9.0.0",
     "web3": "^1.2.4"
   }
