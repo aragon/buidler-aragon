@@ -30,12 +30,7 @@ export async function createApp(
   const implementation = await deployImplementation(bre.artifacts)
 
   // Create an app proxy.
-  const proxy = await _createProxy(
-    implementation.address,
-    appId,
-    dao,
-    bre
-  )
+  const proxy = await _createProxy(implementation.address, appId, dao, bre)
 
   // Deploy a repo for the app.
   const repo = await _createRepo(appName, appId, ensAddress, apmAddress, bre)
