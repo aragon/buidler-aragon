@@ -78,6 +78,8 @@ export async function startBackend(
   }
 
   // Create app.
+  // Note: This creates the proxy, but doesn't
+  // initialize it yet.
   logBack('Creating app...')
   const { proxy, repo } = await createApp(
     appName,
@@ -115,6 +117,11 @@ export async function startBackend(
   )
   logBack(`Implementation address: ${implementationAddress}`)
   logBack(`App version: ${version}`)
+
+  // Initialize the proxy.
+  logBack('Initializing proxy...')
+  await proxy.initialize(...proxyInitParams)
+  logBack(`Proxy initialized: ${await proxy.hasInitialized()}`)
 
   // Call postInit hook.
   if (hooks && hooks.postInit) {
