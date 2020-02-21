@@ -12,6 +12,7 @@ import { setAllPermissionsOpenly } from './backend/set-permissions'
 import { startGanache } from './backend/start-ganache'
 import { createApp } from './backend/create-app'
 import { updateApp } from './backend/update-app'
+import onExit from '~/src/utils/onExit'
 import {
   BACKEND_BUILD_STARTED,
   BACKEND_PROXY_UPDATED,
@@ -134,7 +135,7 @@ export async function startBackend(
   logBack('All permissions set openly.')
 
   // Watch back-end files.
-  chokidar
+  const contractsWatcher = chokidar
     .watch('./contracts/', {
       awaitWriteFinish: { stabilityThreshold: 1000 }
     })
@@ -171,6 +172,10 @@ export async function startBackend(
 
       emitEvent(BACKEND_PROXY_UPDATED)
     })
+
+  onExit(() => {
+    contractsWatcher.close()
+  })
 
   return { daoAddress: dao.address, appAddress: proxy.address }
 }
