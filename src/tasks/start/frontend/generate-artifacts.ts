@@ -20,17 +20,10 @@ export async function generateAppArtifacts(
   artifacts: TruffleEnvironmentArtifacts
 ): Promise<void> {
   await _copyManifest(appBuildOutputPath)
-  await _generateUriArtifacts(appBuildOutputPath, artifacts)
+  await generateUriArtifacts(appBuildOutputPath, artifacts)
 }
 
-async function _copyManifest(appBuildOutputPath: string): Promise<void> {
-  await fsExtra.copy(
-    manifestPath,
-    path.join(appBuildOutputPath as string, manifestPath)
-  )
-}
-
-async function _generateUriArtifacts(
+export async function generateUriArtifacts(
   appBuildOutputPath: string,
   artifacts: TruffleEnvironmentArtifacts
 ): Promise<void> {
@@ -54,5 +47,12 @@ async function _generateUriArtifacts(
     path.join(appBuildOutputPath as string, 'artifact.json'),
     appArtifacts,
     { spaces: 2 }
+  )
+}
+
+async function _copyManifest(appBuildOutputPath: string): Promise<void> {
+  await fsExtra.copy(
+    manifestPath,
+    path.join(appBuildOutputPath as string, manifestPath)
   )
 }
