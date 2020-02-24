@@ -95,8 +95,8 @@ function _getClientPath(version: string): string {
 export function _createStaticWebserver(port: number, root = '.'): void {
   liveServer.start({
     open: false,
+    cors: true,
     root,
-    port,
-    cors: '*'
+    port
   })
 }

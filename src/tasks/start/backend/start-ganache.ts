@@ -36,7 +36,9 @@ export async function startGanache(
   // Start a new ganache server.
   server = ganache.server({
     gasLimit: aragenGasLimit,
-    mnemonic: aragenMnemonic
+    mnemonic: aragenMnemonic,
+    /* eslint-disable @typescript-eslint/camelcase */
+    default_balance_ether: 100
   })
   const blockchain = await promisify(server.listen)(testnetPort)
 
