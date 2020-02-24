@@ -17,15 +17,15 @@ export async function updateApp(
   // Deploy a new app implementation.
   const implementation = await deployImplementation(bre.artifacts)
 
-  // Update the proxy with the new implementation.
-  await _updateProxy(implementation.address, appId, dao, bre.web3)
-
   // Update the repo with the new implementation.
   const { version, uri } = await _updateRepo(
     repo,
     implementation.address,
     appServePort
   )
+
+  // Update the proxy with the new implementation.
+  await _updateProxy(implementation.address, appId, dao, bre.web3)
 
   return { implementationAddress: implementation.address, version, uri }
 }
