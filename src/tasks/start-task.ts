@@ -9,7 +9,7 @@ import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
 import fsExtra from 'fs-extra'
 import path from 'path'
-import { aragenMnemonic, aragenAccounts } from '~/src/params'
+import { aragenMnemonic, aragenAccountsInfo } from '~/src/params'
 import { getAppName, getAppEnsName, getAppId } from '~/src/utils/arappUtils'
 import { validateEnsName } from '~/src/utils/validateEnsName'
 
@@ -39,10 +39,16 @@ App ens name: ${appEnsName}
 App id: ${appId}`)
 
     let accountsStr = ''
-    for (let i = 0; i < aragenAccounts.length; i++) {
-      const account = aragenAccounts[i]
-      accountsStr += `Account ${i} private key ${account.privateKey}\n`
-      accountsStr += `           public key ${account.publicKey}\n`
+    const accountsInfo = aragenAccountsInfo(bre.web3)
+    for (let i = 0; i < accountsInfo.length; i++) {
+      const account = accountsInfo[i]
+      accountsStr += `Account ${i}\n`
+      accountsStr += `    private key: ${account.privateKey}\n`
+      accountsStr += `     public key: ${account.publicKey}\n`
+
+      /* const balanceUint = bre.web3.utils.hexToNumber(account.balance) */
+      const balanceETH = bre.web3.utils.fromWei(account.balance, 'ether')
+      accountsStr += `  balance (ETH): ${balanceETH}\n`
     }
     logMain(`Accounts mnemonic "${aragenMnemonic}"
 ${accountsStr}`)

@@ -14,6 +14,7 @@
   "scripts": {
     "postinstall": "npm run compile && npm run build-app",
     "build-app": "cd app && npm install && cd ..",
+    "start": "buidler start",
     "compile": "buidler compile --force"
   },
   "dependencies": {
@@ -22,9 +23,9 @@
   },
   "devDependencies": {
     "@aragon/test-helpers": "^2.1.0",
-    "@nomiclabs/buidler": "^1.0.2",
-    "@nomiclabs/buidler-truffle5": "^1.0.2",
-    "@nomiclabs/buidler-web3": "^1.0.2",
+    "@nomiclabs/buidler": "^1.2.0-rc.0",
+    "@nomiclabs/buidler-truffle5": "^1.2.0-rc.0",
+    "@nomiclabs/buidler-web3": "^1.2.0-rc.0",
     "ethereumjs-abi": "^0.6.4",
     "ethereumjs-testrpc-sc": "^6.5.1-sc.1",
     "ganache-cli": "^6.4.3",
