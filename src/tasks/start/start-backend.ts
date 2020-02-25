@@ -49,9 +49,9 @@ export async function startBackend(
   /* if (networkId !== 0) { */
   /*   logBack(`Started a ganache testnet instance with id ${networkId}.`) */
   /* } */
-  /* await bre.run(TASK_NODE) */
   /* execa('npx', ['buidler', 'node']) */
-  bre.run(TASK_NODE, { port: 8545 })
+  bre.run(TASK_NODE)
+  /* await bre.run(TASK_NODE) */
 
   // Deploy bases.
   logBack('Deploying Aragon bases (ENS, DAOFactory, and APM)...')
