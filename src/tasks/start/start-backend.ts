@@ -62,7 +62,7 @@ export async function startBackend(
 
   // Call preDao hook.
   if (hooks && hooks.preDao) {
-    await hooks.preDao(bre)
+    await hooks.preDao({}, bre)
   }
 
   // Create a DAO.
@@ -76,7 +76,7 @@ export async function startBackend(
 
   // Call postDao hook.
   if (hooks && hooks.postDao) {
-    await hooks.postDao(dao, bre)
+    await hooks.postDao({ dao }, bre)
   }
 
   // Create app.
@@ -96,13 +96,13 @@ export async function startBackend(
 
   // Call preInit hook.
   if (hooks && hooks.preInit) {
-    await hooks.preInit(proxy, bre)
+    await hooks.preInit({ proxy }, bre)
   }
 
   // Call getInitParams hook.
   let proxyInitParams: any[] = []
   if (hooks && hooks.getInitParams) {
-    const params = await hooks.getInitParams(bre)
+    const params = await hooks.getInitParams({}, bre)
     proxyInitParams = params ? params : proxyInitParams
   }
   if (proxyInitParams && proxyInitParams.length > 0) {
@@ -127,7 +127,7 @@ export async function startBackend(
 
   // Call postInit hook.
   if (hooks && hooks.postInit) {
-    await hooks.postInit(proxy, bre)
+    await hooks.postInit({ proxy }, bre)
   }
 
   // TODO: What if user wants to set custom permissions?
@@ -173,7 +173,7 @@ export async function startBackend(
 
       // Call postUpdate hook.
       if (hooks && hooks.postUpdate) {
-        await hooks.postUpdate(proxy, bre)
+        await hooks.postUpdate({ proxy }, bre)
       }
 
       emitEvent(BACKEND_PROXY_UPDATED)

@@ -4,7 +4,7 @@ const path = require('path')
 let token
 let accounts
 
-async function preDao(bre) {
+async function preDao(params, bre) {
   console.log(`preDao hook called`)
 
   // Used for testing only.
@@ -12,18 +12,18 @@ async function preDao(bre) {
   await _writeLog('preDao', JSON.stringify(content, null, 2))
 }
 
-async function postDao(dao, bre) {
-  console.log(`postDao hook called`, dao.address)
+async function postDao(params, bre) {
+  console.log(`postDao hook called`, params.dao.address)
 
   // Used for testing only.
   const content = {
     ...bre.config.aragon,
-    daoAddress: dao.address
+    daoAddress: params.dao.address
   }
   await _writeLog('postDao', JSON.stringify(content, null, 2))
 }
 
-async function preInit(proxy, bre) {
+async function preInit(params, bre) {
   console.log(`preInit hook called`)
 
   // Retrieve accounts.
@@ -48,7 +48,7 @@ async function preInit(proxy, bre) {
   await _writeLog('preInit', JSON.stringify(content, null, 2))
 }
 
-async function getInitParams(bre) {
+async function getInitParams(params, bre) {
   console.log(`getInitParams hook called`)
 
   const tokenAddress = token ? token.address : undefined
@@ -60,29 +60,29 @@ async function getInitParams(bre) {
   return [tokenAddress, 'Wrapped token', 'wORG']
 }
 
-async function postInit(proxy, bre) {
+async function postInit(params, bre) {
   console.log(`postInit hook called`)
 
   console.log(`ERC20 token:`, token.address)
-  console.log(`Proxy:`, proxy.address)
+  console.log(`Proxy:`, params.proxy.address)
   console.log(`Account 1 token balance`, (await token.balanceOf(accounts[0])).toString())
   console.log(`Account 2 token balance`, (await token.balanceOf(accounts[1])).toString())
 
   // Used for testing only.
   const content = {
     ...bre.config.aragon,
-    proxyAddress: proxy.address
+    proxyAddress: params.proxy.address
   }
   await _writeLog('postInit', JSON.stringify(content, null, 2))
 }
 
-async function postUpdate(proxy, bre) {
+async function postUpdate(params, bre) {
   console.log(`postUpdate hook called`)
 
   // Used for testing only.
   const content = {
     ...bre.config.aragon,
-    proxyAddress: proxy.address
+    proxyAddress: params.proxy.address
   }
   await _writeLog('postUpdate', JSON.stringify(content, null, 2))
 }

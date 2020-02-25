@@ -20,22 +20,25 @@ export interface AragonConfig {
 }
 
 export interface AragonConfigHooks {
-  preDao?: (bre: BuidlerRuntimeEnvironment) => Promise<void> | void
+  preDao?: (params: {}, bre: BuidlerRuntimeEnvironment) => Promise<void> | void
   postDao?: (
-    dao: KernelInstance,
+    params: { dao: KernelInstance },
     bre: BuidlerRuntimeEnvironment
   ) => Promise<void> | void
   preInit?: (
-    proxy: Truffle.ContractInstance,
+    params: { proxy: Truffle.ContractInstance },
     bre: BuidlerRuntimeEnvironment
   ) => Promise<void> | void
   postInit?: (
-    proxy: Truffle.ContractInstance,
+    params: { proxy: Truffle.ContractInstance },
     bre: BuidlerRuntimeEnvironment
   ) => Promise<void> | void
-  getInitParams?: (bre: BuidlerRuntimeEnvironment) => Promise<any[]> | any[]
+  getInitParams?: (
+    params: {},
+    bre: BuidlerRuntimeEnvironment
+  ) => Promise<any[]> | any[]
   postUpdate?: (
-    proxy: Truffle.ContractInstance,
+    params: { proxy: Truffle.ContractInstance },
     bre: BuidlerRuntimeEnvironment
   ) => Promise<void> | void
 }
