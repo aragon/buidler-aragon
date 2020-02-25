@@ -14,7 +14,8 @@
   "scripts": {
     "postinstall": "npm run compile && npm run build-app",
     "build-app": "cd app && npm install && cd ..",
-    "compile": "buidler compile --force"
+    "compile": "buidler compile --force",
+    "start": "buidler start"
   },
   "dependencies": {
     "@aragon/os": "4.3.0",
