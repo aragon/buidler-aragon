@@ -13,9 +13,10 @@ import { BuidlerAragonConfig } from '../../../src/types'
 const config: BuidlerAragonConfig = {
   defaultNetwork: 'localhost',
   networks: {
-    localhost: {
+    buidlerevm: {
       accounts: aragenAccounts
     },
+    localhost: {},
     someothernetwork: {
       url: 'http://localhost:8546'
     }
