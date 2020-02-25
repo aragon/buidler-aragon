@@ -2,7 +2,6 @@ import { assert } from 'chai'
 
 export const itBehavesLikeACounterContract = function(this: any): void {
   it('allows any address to increment and decrement the counter', async function() {
-
     let value
 
     value = (await this.proxy.value()).toString()
