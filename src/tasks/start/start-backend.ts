@@ -12,11 +12,13 @@ import { setAllPermissionsOpenly } from './backend/set-permissions'
 import { startGanache } from './backend/start-ganache'
 import { createApp } from './backend/create-app'
 import { updateApp } from './backend/update-app'
+import onExit from '~/src/utils/onExit'
 import {
   BACKEND_BUILD_STARTED,
   BACKEND_PROXY_UPDATED,
   emitEvent
 } from '~/src/ui/events'
+import { generateUriArtifacts } from './frontend/generate-artifacts'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -60,7 +62,7 @@ export async function startBackend(
 
   // Call preDao hook.
   if (hooks && hooks.preDao) {
-    await hooks.preDao(bre)
+    await hooks.preDao({}, bre)
   }
 
   // Create a DAO.
@@ -74,37 +76,38 @@ export async function startBackend(
 
   // Call postDao hook.
   if (hooks && hooks.postDao) {
-    await hooks.postDao(dao, bre)
-  }
-
-  // Call preInit hook.
-  if (hooks && hooks.preInit) {
-    await hooks.preInit(bre)
-  }
-
-  // Call getInitParams hook.
-  let proxyInitParams: any[] = []
-  if (hooks && hooks.getInitParams) {
-    const params = await hooks.getInitParams(bre)
-    proxyInitParams = params ? params : proxyInitParams
-  }
-  if (proxyInitParams && proxyInitParams.length > 0) {
-    logBack(`Proxy init params: ${proxyInitParams}`)
+    await hooks.postDao({ dao }, bre)
   }
 
   // Create app.
+  // Note: This creates the proxy, but doesn't
+  // initialize it yet.
   logBack('Creating app...')
   const { proxy, repo } = await createApp(
     appName,
     appId,
     dao,
-    proxyInitParams,
     ensAddress,
     apmAddress,
     bre
   )
   logBack(`Proxy address: ${proxy.address}`)
   logBack(`Repo address: ${repo.address}`)
+
+  // Call preInit hook.
+  if (hooks && hooks.preInit) {
+    await hooks.preInit({ proxy }, bre)
+  }
+
+  // Call getInitParams hook.
+  let proxyInitParams: any[] = []
+  if (hooks && hooks.getInitParams) {
+    const params = await hooks.getInitParams({}, bre)
+    proxyInitParams = params ? params : proxyInitParams
+  }
+  if (proxyInitParams && proxyInitParams.length > 0) {
+    logBack(`Proxy init params: ${proxyInitParams}`)
+  }
 
   // Update app.
   const { implementationAddress, version } = await updateApp(
@@ -117,18 +120,23 @@ export async function startBackend(
   logBack(`Implementation address: ${implementationAddress}`)
   logBack(`App version: ${version}`)
 
+  // Initialize the proxy.
+  logBack('Initializing proxy...')
+  await proxy.initialize(...proxyInitParams)
+  logBack(`Proxy initialized: ${await proxy.hasInitialized()}`)
+
+  // Call postInit hook.
+  if (hooks && hooks.postInit) {
+    await hooks.postInit({ proxy }, bre)
+  }
+
   // TODO: What if user wants to set custom permissions?
   // Use a hook? A way to disable all open permissions?
   await setAllPermissionsOpenly(dao, proxy, arapp, bre.web3, bre.artifacts)
   logBack('All permissions set openly.')
 
-  // Call postInit hook.
-  if (hooks && hooks.postInit) {
-    await hooks.postInit(proxy, bre)
-  }
-
   // Watch back-end files.
-  chokidar
+  const contractsWatcher = chokidar
     .watch('./contracts/', {
       awaitWriteFinish: { stabilityThreshold: 1000 }
     })
@@ -146,6 +154,11 @@ export async function startBackend(
         return
       }
 
+      // Update artifacts.
+      logBack('Updating artifacts...')
+      const appBuildOutputPath = config.appBuildOutputPath as string
+      await generateUriArtifacts(appBuildOutputPath, bre.artifacts)
+
       // Update app.
       logBack('Updating app...')
       const { implementationAddress, version } = await updateApp(
@@ -160,11 +173,15 @@ export async function startBackend(
 
       // Call postUpdate hook.
       if (hooks && hooks.postUpdate) {
-        await hooks.postUpdate(proxy, bre)
+        await hooks.postUpdate({ proxy }, bre)
       }
 
       emitEvent(BACKEND_PROXY_UPDATED)
     })
+
+  onExit(() => {
+    contractsWatcher.close()
+  })
 
   return { daoAddress: dao.address, appAddress: proxy.address }
 }

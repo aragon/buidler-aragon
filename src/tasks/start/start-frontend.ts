@@ -7,6 +7,7 @@ import { serveAppAndResolveWhenBuilt } from './frontend/serve-app'
 import { generateAppArtifacts } from './frontend/generate-artifacts'
 import { copyAppUiAssets } from './frontend/copy-assets'
 import { startAppWatcher } from './frontend/watch-app'
+import onExit from '~/src/utils/onExit'
 import {
   installAragonClientIfNeeded,
   startAragonClient,
@@ -40,16 +41,18 @@ export async function startFrontend(
   await serveAppAndResolveWhenBuilt(appSrcPath, appServePort)
 
   // Start Aragon client at the deployed address.
-  const url: string = await startAragonClient(
+  const appURL = `http://localhost:${appServePort}`
+  const clientURL: string = await startAragonClient(
     config.clientServePort as number,
     `${daoAddress}/${appAddress}`,
     openBrowser
   )
   logFront(`You can now view the Aragon client in the browser.
-Local:  ${url}`)
+App content: ${appURL}
+Client:  ${clientURL}`)
 
   // Watch changes to app/src/script.js.
-  chokidar
+  const srcWatcher = chokidar
     .watch('./app/src/script.js', {
       awaitWriteFinish: { stabilityThreshold: 1000 }
     })
@@ -60,7 +63,7 @@ Local:  ${url}`)
     })
 
   // Watch changes to artifact files.
-  chokidar
+  const artifactWatcher = chokidar
     .watch(['./arapp.json', './manifest.json'], {
       awaitWriteFinish: { stabilityThreshold: 1000 }
     })
@@ -69,6 +72,11 @@ Local:  ${url}`)
         `Warning: Changes detected on ${path}. Hot reloading is not supported on this file. Please re-run the "start" task to load these changes.`
       )
     })
+
+  onExit(() => {
+    srcWatcher.close()
+    artifactWatcher.close()
+  })
 
   emitEvent(FRONTEND_STARTED_SERVING, 1000)
 

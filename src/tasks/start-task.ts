@@ -53,17 +53,24 @@ ${accountsStr}`)
       )
     }
 
-    const config: AragonConfig = bre.config.aragon as AragonConfig
-    await _checkPorts(config)
-    await _checkScripts(config.appSrcPath as string)
-
     const { daoAddress, appAddress } = await startBackend(
       bre,
       appName,
       appId,
       params.silent
     )
-    await startFrontend(bre, daoAddress, appAddress, !params.noBrowser)
+
+    const config: AragonConfig = bre.config.aragon as AragonConfig
+    const appExists = await _checkApp(config.appSrcPath as string)
+    if (appExists) {
+      await _checkPorts(config)
+      await _checkScripts(config.appSrcPath as string)
+
+      await startFrontend(bre, daoAddress, appAddress, !params.noBrowser)
+    } else {
+      // Keep process running.
+      return await new Promise(() => {})
+    }
   })
 
 async function _checkPorts(config: AragonConfig): Promise<void> {
@@ -78,6 +85,18 @@ async function _checkPorts(config: AragonConfig): Promise<void> {
       `Cannot serve app. Port ${config.appServePort} is in use.`
     )
   }
+}
+
+async function _checkApp(appSrcPath: string): Promise<boolean> {
+  const appExists = await fsExtra.pathExists(appSrcPath)
+
+  if (!appExists) {
+    logMain(
+      'Warning: No front end found at app/, will continue development without building any front end.'
+    )
+  }
+
+  return appExists
 }
 
 async function _checkScripts(appSrcPath: string): Promise<void> {

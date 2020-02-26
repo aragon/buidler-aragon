@@ -59,11 +59,12 @@ describe('create-app.ts', function() {
         appName,
         appId,
         dao,
-        [],
         ensAddress,
         apmAddress,
         this.env
       ))
+
+      await proxy.initialize()
 
       const arapp = readArapp()
       await setAllPermissionsOpenly(
@@ -92,7 +93,7 @@ describe('create-app.ts', function() {
 
     it('reverts when attempting to create the app again', async function() {
       await assertRevert(
-        createApp(appName, appId, dao, [], ensAddress, apmAddress, this.env),
+        createApp(appName, appId, dao, ensAddress, apmAddress, this.env),
         'KERNEL_INVALID_APP_CHANGE'
       )
     })

@@ -59,11 +59,12 @@ describe('update-app.ts', function() {
         appName,
         appId,
         dao,
-        [],
         ensAddress,
         apmAddress,
         this.env
       ))
+
+      await proxy.initialize()
 
       const arapp = readArapp()
       await setAllPermissionsOpenly(

@@ -7,37 +7,27 @@ import {
   RepoContract,
   RepoInstance,
   APMRegistryContract,
-  APMRegistryInstance
+  APMRegistryInstance,
+  AppStubInstance
 } from '~/typechain'
-
-interface InitializableApp extends Truffle.ContractInstance {
-  initialize: (...args: any[]) => void
-}
 
 export async function createApp(
   appName: string,
   appId: string,
   dao: KernelInstance,
-  proxyInitParams: any[],
   ensAddress: string,
   apmAddress: string,
   bre: BuidlerRuntimeEnvironment
 ): Promise<{
   implementation: Truffle.ContractInstance
-  proxy: Truffle.ContractInstance
+  proxy: AppStubInstance
   repo: RepoInstance
 }> {
   // Deploy first app implementation.
   const implementation = await deployImplementation(bre.artifacts)
 
   // Create an app proxy.
-  const proxy = await _createProxy(
-    implementation.address,
-    appId,
-    dao,
-    proxyInitParams,
-    bre
-  )
+  const proxy = await _createProxy(implementation.address, appId, dao, bre)
 
   // Deploy a repo for the app.
   const repo = await _createRepo(appName, appId, ensAddress, apmAddress, bre)
@@ -54,9 +44,8 @@ async function _createProxy(
   implementationAddress: string,
   appId: string,
   dao: KernelInstance,
-  proxyInitParams: any[],
   bre: BuidlerRuntimeEnvironment
-): Promise<Truffle.ContractInstance> {
+): Promise<AppStubInstance> {
   const rootAccount: string = (await bre.web3.eth.getAccounts())[0]
 
   // Create a new app proxy with base implementation.
@@ -72,10 +61,7 @@ async function _createProxy(
   const proxyAddress: string = getLog(txResponse, 'NewAppProxy', 'proxy')
   const mainContractName: string = getMainContractName()
   const App: Truffle.Contract<any> = bre.artifacts.require(mainContractName)
-  const proxy: InitializableApp = await App.at(proxyAddress)
-
-  // Initialize the proxy.
-  await proxy.initialize(...proxyInitParams)
+  const proxy: AppStubInstance = await App.at(proxyAddress)
 
   return proxy
 }

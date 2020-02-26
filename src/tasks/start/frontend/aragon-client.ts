@@ -6,6 +6,7 @@ import execa from 'execa'
 import { logFront } from '~/src/ui/logger'
 import liveServer from 'live-server'
 import open from 'open'
+import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 
 const defaultRepo = 'https://github.com/aragon/aragon'
 const defaultVersion = '775edd606333a111eb2693df53900039722a95dc'
@@ -15,27 +16,77 @@ export async function installAragonClientIfNeeded(
   repo: string = defaultRepo,
   version: string = defaultVersion
 ): Promise<string> {
-  // Determine client path.
   const clientPath: string = _getClientPath(version)
 
-  // Verify installation or install if needed.
-  if (fs.existsSync(path.resolve(clientPath))) {
-    logFront('Using cached client version.')
-  } else {
+  if (await _checkClientInstallationNeeded(clientPath)) {
     fsExtra.ensureDirSync(clientPath, { recursive: true })
 
     logFront(
       `Installing client version ${version} locally (takes a couple of minutes)...`
     )
     const opts = { cwd: clientPath }
-    await execa('git', ['clone', '--', repo, clientPath])
-    await execa('git', ['checkout', version], opts)
-    await execa('npm', ['install'], opts)
-    await execa('npm', ['run', 'build:local'], opts)
+
+    let result
+
+    logFront('  cloning...')
+    result = await execa('git', [
+      'clone',
+      '--',
+      repo,
+      clientPath
+    ]).catch(() => {})
+    await _abortClientInstallationOnFailure(clientPath, result)
+
+    logFront('  checking out version...')
+    result = await execa('git', ['checkout', version], opts).catch(() => {})
+    await _abortClientInstallationOnFailure(clientPath, result)
+
+    logFront('  installing...')
+    result = await execa('npm', ['install'], opts).catch(() => {})
+    await _abortClientInstallationOnFailure(clientPath, result)
+
+    logFront('  building...')
+    result = await execa('npm', ['run', 'build:local'], opts).catch(() => {})
+    await _abortClientInstallationOnFailure(clientPath, result)
+
     logFront('Client installed.')
   }
 
   return clientPath
+}
+
+async function _checkClientInstallationNeeded(
+  clientPath: string
+): Promise<boolean> {
+  if (!fs.existsSync(path.resolve(clientPath))) {
+    return true
+  }
+
+  if (!fs.existsSync(path.resolve(clientPath, 'build/index.html'))) {
+    logFront('Malformed client detected, removing it for re-installation.')
+    await fsExtra.remove(clientPath)
+    return true
+  }
+
+  logFront('Using cached client version.')
+  return false
+}
+
+async function _abortClientInstallationOnFailure(
+  clientPath: string,
+  result: any
+): Promise<void> {
+  if (result && result.exitCode === 0) {
+    return
+  }
+
+  if (fs.existsSync(clientPath)) {
+    await fsExtra.remove(clientPath)
+  }
+
+  throw new BuidlerPluginError(
+    `There was an error while installing the Aragon client in ${clientPath}. Please make sure that this folder is deleted and try again.`
+  )
 }
 
 /**
@@ -50,8 +101,9 @@ export async function startAragonClient(
   const port: number = clientServePort
   const clientPath: string = _getClientPath(defaultVersion)
 
-  logFront(`Starting client server at port ${port}...`)
-  await _createStaticWebserver(port, path.join(clientPath, 'build'))
+  const buildPath = path.join(clientPath, 'build')
+  logFront(`Serving client files at ${clientPath} at port ${port}...`)
+  await _createStaticWebserver(port, buildPath)
 
   const url = `http://localhost:${port}/#/${subPath}`
 
@@ -95,8 +147,8 @@ function _getClientPath(version: string): string {
 export function _createStaticWebserver(port: number, root = '.'): void {
   liveServer.start({
     open: false,
+    cors: true,
     root,
-    port,
-    cors: '*'
+    port
   })
 }

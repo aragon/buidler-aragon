@@ -1,6 +1,6 @@
 {
   "name": "@aragon/buidler-aragon",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "Aragon Buidler plugin",
   "main": "dist/src/index.js",
   "author": "Aragon Association <legal@aragon.org>",
@@ -13,7 +13,7 @@
   ],
   "files": [
     "typechain",
-    "dist/src",
+    "dist",
     "src"
   ],
   "scripts": {

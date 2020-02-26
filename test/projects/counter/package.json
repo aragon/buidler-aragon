@@ -7,7 +7,8 @@
     "postinstall": "npm run compile && npm run generate && npm run build-app",
     "build-app": "cd app && npm install && cd ..",
     "compile": "buidler compile --force",
-    "generate": "typechain --target truffle --outDir typechain 'artifacts/*.json'"
+    "generate": "typechain --target truffle --outDir typechain 'artifacts/*.json'",
+    "start": "buidler start"
   },
   "dependencies": {
     "@aragon/abis": "^1.1.0",
