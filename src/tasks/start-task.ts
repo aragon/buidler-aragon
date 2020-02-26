@@ -68,9 +68,12 @@ ${accountsStr}`)
 
       await startFrontend(bre, daoAddress, appAddress, !params.noBrowser)
     } else {
-      // Keep process running.
-      return await new Promise(() => {})
+      logMain(
+        'Warning: No front end found at app/, will continue development without building any front end.'
+      )
     }
+    // Keep process running.
+    return await new Promise(() => {})
   })
 
 async function _checkPorts(config: AragonConfig): Promise<void> {
@@ -88,15 +91,7 @@ async function _checkPorts(config: AragonConfig): Promise<void> {
 }
 
 async function _checkApp(appSrcPath: string): Promise<boolean> {
-  const appExists = await fsExtra.pathExists(appSrcPath)
-
-  if (!appExists) {
-    logMain(
-      'Warning: No front end found at app/, will continue development without building any front end.'
-    )
-  }
-
-  return appExists
+  return await fsExtra.pathExists(appSrcPath)
 }
 
 async function _checkScripts(appSrcPath: string): Promise<void> {
