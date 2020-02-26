@@ -21,33 +21,42 @@ export async function installAragonClientIfNeeded(
   if (await _checkClientInstallationNeeded(clientPath)) {
     fsExtra.ensureDirSync(clientPath, { recursive: true })
 
+    const execaOpts = { cwd: clientPath }
+
+    const execaThrowOnError = async (
+      file: string,
+      args?: string[]
+    ): Promise<void> => {
+      const result = await execa(file, args, execaOpts)
+      if (result.exitCode !== 0) {
+        throw Error(`exitcode ${result.exitCode}`)
+      }
+    }
+
     logFront(
       `Installing client version ${version} locally (takes a couple of minutes)...`
     )
-    const opts = { cwd: clientPath }
 
-    let result
+    try {
+      logFront('  cloning...')
+      await execaThrowOnError('git', ['clone', '--', repo])
 
-    logFront('  cloning...')
-    result = await execa('git', [
-      'clone',
-      '--',
-      repo,
-      clientPath
-    ]).catch(() => {})
-    await _abortClientInstallationOnFailure(clientPath, result)
+      logFront('  checking out version...')
+      await execaThrowOnError('git', ['checkout', version])
 
-    logFront('  checking out version...')
-    result = await execa('git', ['checkout', version], opts).catch(() => {})
-    await _abortClientInstallationOnFailure(clientPath, result)
+      logFront('  installing...')
+      await execaThrowOnError('npm', ['install'])
 
-    logFront('  installing...')
-    result = await execa('npm', ['install'], opts).catch(() => {})
-    await _abortClientInstallationOnFailure(clientPath, result)
-
-    logFront('  building...')
-    result = await execa('npm', ['run', 'build:local'], opts).catch(() => {})
-    await _abortClientInstallationOnFailure(clientPath, result)
+      logFront('  building...')
+      await execaThrowOnError('npm', ['run', 'build:local'])
+    } catch (e) {
+      if (fs.existsSync(clientPath)) {
+        await fsExtra.remove(clientPath)
+      }
+      throw new BuidlerPluginError(
+        `There was an error while installing the Aragon client in ${clientPath}. Please make sure that this folder is deleted and try again.`
+      )
+    }
 
     logFront('Client installed.')
   }
@@ -70,23 +79,6 @@ async function _checkClientInstallationNeeded(
 
   logFront('Using cached client version.')
   return false
-}
-
-async function _abortClientInstallationOnFailure(
-  clientPath: string,
-  result: any
-): Promise<void> {
-  if (result && result.exitCode === 0) {
-    return
-  }
-
-  if (fs.existsSync(clientPath)) {
-    await fsExtra.remove(clientPath)
-  }
-
-  throw new BuidlerPluginError(
-    `There was an error while installing the Aragon client in ${clientPath}. Please make sure that this folder is deleted and try again.`
-  )
 }
 
 /**
