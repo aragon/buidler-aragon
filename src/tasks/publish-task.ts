@@ -7,6 +7,7 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import {
   publishVersion,
   parseContractFunctions,
+  getApmRepoVersion,
   ZERO_ADDRESS,
   ARTIFACT_FILE,
   MANIFEST_FILE,
@@ -21,9 +22,9 @@ import {
 } from './task-names'
 import { logMain } from '../ui/logger'
 import { AragonConfig } from '~/src/types'
-import { AragonArtifact, AragonManifest } from './publish/types'
+import { AragonArtifact, AragonManifest, ApmVersion } from './publish/types'
 import uploadReleaseToIpfs from './publish/uploadDistToIpfs'
-import checkBump from './publish/checkBump'
+import parseAndValidateBumpOrVersion from './publish/parseAndValidateBumpOrVersion'
 import matchContractRoles from './publish/matchContractRoles'
 import findMissingManifestFiles from './publish/findMissingManifestFiles'
 import {
@@ -48,7 +49,7 @@ export default function() {
   task(TASK_PUBLISH, 'Publish a new app version')
     .addPositionalParam(
       'bump',
-      'Type of bump (major, minor or patch) or version number',
+      'Type of bump (major, minor or patch) or semantic version',
       undefined,
       types.string
     )
@@ -77,50 +78,63 @@ export default function() {
     .addFlag('noVerify', 'Prevents etherscan verification.')
     .setAction(
       async (
-        { bump, contract, managerAddress, ipfsProvider, onlyContent, noVerify },
+        {
+          bump: bumpOrVersion,
+          contract,
+          managerAddress,
+          ipfsProvider,
+          onlyContent,
+          noVerify
+        },
         bre: BuidlerRuntimeEnvironment
       ) => {
-        const config: AragonConfig = bre.config.aragon as AragonConfig
+        const config = bre.config.aragon as AragonConfig
         const appSrcPath = config.appSrcPath as string
         const appBuildOutputPath = config.appBuildOutputPath as string
 
         const contractName = getMainContractName()
         const appEnsName = getAppEnsName()
-        const appName = await getAppName()
-        const appId: string = getAppId(appEnsName)
+        const appName = getAppName()
+        const appId = getAppId(appEnsName)
 
         // Hardcoded until a better way to deal with dynamic ENS address is found
         const ipfsIgnore = ['subfolder/to/ignore/**']
         const environment = 'rpc'
 
-        logMain(`Applying version bump (${bump})`)
-        const {
-          initialRepo,
-          prevVersion,
-          version,
-          shouldDeployContract
-        } = await checkBump(appId, bump, appName, environment)
+        const prevVersion: ApmVersion | undefined = await getApmRepoVersion(
+          appEnsName,
+          'latest'
+        )
 
-        let contractAddress: string
-        if (onlyContent) {
-          // No need for contract deployment
-          contractAddress = ZERO_ADDRESS
-        } else if (contract) {
-          contractAddress = contract
-          logMain(`Using provided contract address: ${contractAddress}`)
-        } else if (shouldDeployContract) {
-          // Compile contracts
-          await bre.run(TASK_COMPILE)
-          // Deploy contract
-          const MainContract = bre.artifacts.require(contractName)
-          const mainContract = await MainContract.new()
-          contractAddress = mainContract.address
-          logMain(`Implementation contract deployed: ${contractAddress}`)
-        } else {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          contractAddress = initialRepo!.contractAddress
-          logMain(`Reusing contract from previous version: ${contractAddress}`)
+        const { bump, nextVersion } = parseAndValidateBumpOrVersion(
+          bumpOrVersion,
+          prevVersion ? prevVersion.version : undefined
+        )
+        logMain(`Applying version bump ${bump}, next version: ${nextVersion}`)
+
+        async function getContractAddress(): Promise<string> {
+          if (onlyContent) {
+            // No need for contract deployment
+            return ZERO_ADDRESS
+          } else if (contract) {
+            logMain('Using provided contract address')
+            return contract
+          } else if (!prevVersion || bump === 'major') {
+            // Compile contracts
+            await bre.run(TASK_COMPILE)
+            // Deploy contract
+            const MainContract = bre.artifacts.require(contractName)
+            const mainContract = await MainContract.new()
+            logMain('Implementation contract deployed')
+            return mainContract.address
+          } else {
+            logMain('Reusing contract from previous version')
+            return prevVersion.contractAddress
+          }
         }
+
+        const contractAddress = await getContractAddress()
+        logMain(`contractAddress: ${contractAddress}`)
 
         // Prepare release directory
         // npm run build must create: index.html, src.js, script.js
@@ -144,7 +158,7 @@ export default function() {
 
         // Generate tx to publish new app to aragonPM
         const versionInfo = {
-          version,
+          version: nextVersion,
           contractAddress,
           contentUri: contentHash
         }
@@ -158,7 +172,7 @@ export default function() {
           }
         )
         logMain(
-          `Successfully generate tx data. Will publish ${appName} ${version}:
+          `Successfully generate tx data. Will publish ${appName} ${nextVersion}:
           
           to: ${to}
           methodName: ${methodName}
