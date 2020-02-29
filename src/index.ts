@@ -12,9 +12,12 @@ export default function(): void {
   // Plugin dependencies.
   usePlugin('@nomiclabs/buidler-truffle5')
   usePlugin('@nomiclabs/buidler-web3')
+  usePlugin('@nomiclabs/buidler-etherscan')
 
   // Task definitions.
   require(path.join(__dirname, '/tasks/start-task'))
+  require(path.join(__dirname, '/tasks/publish-task'))
+  require(path.join(__dirname, '/tasks/aragon-artifact-task'))
 
   // Environment extensions.
   // No extensions atm.
