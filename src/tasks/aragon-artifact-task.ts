@@ -49,7 +49,8 @@ export default function() {
     TASK_ARAGON_ARTIFACT,
     'Generate and prints Aragon artifact for the project',
     async (_, { run }) => {
-      logMain(await run(TASK_ARAGON_ARTIFACT_GET))
+      const { artifact } = await run(TASK_ARAGON_ARTIFACT_GET)
+      logMain(artifact)
     }
   )
 }
