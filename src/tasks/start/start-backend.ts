@@ -1,23 +1,26 @@
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
+import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import chokidar from 'chokidar'
 import { Writable } from 'stream'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { KernelInstance } from '~/typechain'
 import { logBack } from '~/src/ui/logger'
 import { readArapp } from '~/src/utils/arappUtils'
-import { TASK_COMPILE } from '~/src/tasks/task-names'
+import { TASK_COMPILE, TASK_NODE } from '~/src/tasks/task-names'
 import deployBases from './backend/bases/deploy-bases'
 import { createDao } from './backend/create-dao'
 import { setAllPermissionsOpenly } from './backend/set-permissions'
 import { startGanache } from './backend/start-ganache'
 import { createApp } from './backend/create-app'
 import { updateApp } from './backend/update-app'
+import tcpPortUsed from 'tcp-port-used'
 import onExit from '~/src/utils/onExit'
 import {
   BACKEND_BUILD_STARTED,
   BACKEND_PROXY_UPDATED,
   emitEvent
 } from '~/src/ui/events'
+import { testnetPort } from '~/src/params'
 import { generateUriArtifacts } from './frontend/generate-artifacts'
 
 /**
@@ -45,9 +48,21 @@ export async function startBackend(
    * Until BuidlerEVM JSON RPC is ready, a ganache server will be started
    * on the appropiate conditions.
    */
-  const networkId = await startGanache(bre)
-  if (networkId !== 0) {
-    logBack(`Started a ganache testnet instance with id ${networkId}.`)
+  if (bre.network.name === 'buidlerevm') {
+    // Run the "node" task with starts a JSON-RPC attached to the buidlerevm network
+    // NOTE: The "node" task can NOT be awaited since it now waits until the server closes
+    // TODO: add a configuration to the task that awaits only until listen
+    bre.run(TASK_NODE, { port: testnetPort })
+    await _waitForPortUsed(testnetPort)
+  } else if (bre.network.name === 'localhost') {
+    const networkId = await startGanache(bre)
+    if (networkId !== 0) {
+      logBack(`Started a ganache testnet instance with id ${networkId}.`)
+    }
+  } else {
+    throw new BuidlerPluginError(
+      'This task only supports networks buidlerevm and localhost'
+    )
   }
 
   // Deploy bases.
@@ -184,6 +199,19 @@ export async function startBackend(
   })
 
   return { daoAddress: dao.address, appAddress: proxy.address }
+}
+
+/**
+ * Waits for a port to be used until a given timeout
+ * @param port 8545
+ * @param timeout in ms
+ */
+async function _waitForPortUsed(port: number, timeout = 10000): Promise<void> {
+  const startTime = Date.now()
+  while (Date.now() - startTime < timeout) {
+    if (await tcpPortUsed.check(port)) return
+  }
+  throw new BuidlerPluginError('Testnet is not running as expected')
 }
 
 /**

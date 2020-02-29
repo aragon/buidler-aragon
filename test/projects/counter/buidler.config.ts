@@ -1,4 +1,5 @@
 import { usePlugin } from '@nomiclabs/buidler/config'
+import { aragenAccounts } from '../../../src/params'
 
 usePlugin('@nomiclabs/buidler-truffle5')
 usePlugin('@nomiclabs/buidler-web3')
@@ -10,7 +11,7 @@ loadPluginFile(__dirname + '/../../../src/index')
 import { BuidlerAragonConfig } from '../../../src/types'
 
 const config: BuidlerAragonConfig = {
-  defaultNetwork: 'localhost',
+  defaultNetwork: 'buidlerevm',
   networks: {
     localhost: {
       url: 'http://localhost:8545',
@@ -21,6 +22,12 @@ const config: BuidlerAragonConfig = {
     },
     someothernetwork: {
       url: 'http://localhost:8546'
+    },
+    buidlerevm: {
+      accounts: aragenAccounts.map(account => ({
+        privateKey: account.privateKey,
+        balance: "0x21e19e0c9bab2400000"
+      }))
     }
   },
   solc: {
