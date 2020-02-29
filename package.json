@@ -53,6 +53,7 @@
     "@types/chai": "^4.2.5",
     "@types/mocha": "^5.2.7",
     "@types/node": "12.7.5",
+    "@types/semver": "^7.1.0",
     "@types/web3": "^1.2.2",
     "@typescript-eslint/eslint-plugin": "^2.16.0",
     "@typescript-eslint/parser": "^2.16.0",
