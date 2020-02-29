@@ -37,7 +37,7 @@ import {
 const readFile = (filepath: string): string => fs.readFileSync(filepath, 'utf8')
 const readJson = <T>(filepath: string): T =>
   JSON.parse(fs.readFileSync(filepath, 'utf8'))
-const writeJson = <T>(filepath: string, data: T) =>
+const writeJson = <T>(filepath: string, data: T): void =>
   fs.writeFileSync(filepath, JSON.stringify(data, null, 2))
 
 const artifactName: string = ARTIFACT_FILE
@@ -45,7 +45,8 @@ const manifestName: string = MANIFEST_FILE
 const flatCodeName: string = SOLIDITY_FILE
 const arappName: string = ARAPP_FILE
 
-export default function() {
+// # Todo: Consolidate start and publish to have the same format, run / export function
+export default (): void => {
   task(TASK_PUBLISH, 'Publish a new app version')
     .addPositionalParam(
       'bump',
@@ -126,6 +127,15 @@ export default function() {
             const MainContract = bre.artifacts.require(contractName)
             const mainContract = await MainContract.new()
             logMain('Implementation contract deployed')
+            if (!noVerify) {
+              logMain('Verifying on Etherscan')
+              await bre.run(TASK_VERIFY_CONTRACT, {
+                contractName,
+                address: contractAddress
+                // TODO: constructorArguments
+              })
+              logMain(`Successfully verified contract on Etherscan`)
+            }
             return mainContract.address
           } else {
             logMain('Reusing contract from previous version')
@@ -152,6 +162,7 @@ export default function() {
 
         // Upload release directory to IPFS
         const contentHash = await uploadReleaseToIpfs(appBuildOutputPath, {
+          ipfsProvider,
           ignorePatterns: ipfsIgnore
         })
         logMain(`Release directory uploaded to IPFS: ${contentHash}`)
@@ -163,32 +174,17 @@ export default function() {
           contentUri: contentHash
         }
 
-        const { to, methodName, params } = await publishVersion(
-          appId,
-          versionInfo,
-          environment,
-          {
-            managerAddress
-          }
-        )
+        const txData = await publishVersion(appId, versionInfo, environment, {
+          managerAddress
+        })
         logMain(
           `Successfully generate tx data. Will publish ${appName} ${nextVersion}:
           
-          to: ${to}
-          methodName: ${methodName}
-          params: ${params}
+          to: ${txData.to}
+          methodName: ${txData.methodName}
+          params: ${txData.params}
           `
         )
-
-        if (!noVerify) {
-          // Etherscan verification
-          await bre.run(TASK_VERIFY_CONTRACT, {
-            contractName,
-            address: contractAddress
-            // TODO: constructorArguments
-          })
-          logMain(`Successfully verified contract.`)
-        }
       }
     )
 }
