@@ -9,6 +9,7 @@ usePlugin('@nomiclabs/buidler-web3')
 import { loadPluginFile } from '@nomiclabs/buidler/plugins-testing'
 loadPluginFile(__dirname + '/../../../src/index')
 import { BuidlerAragonConfig } from '../../../src/types'
+import { BuidlerNetworkConfig } from '@nomiclabs/buidler/types'
 
 const config: BuidlerAragonConfig = {
   defaultNetwork: 'localhost',
@@ -24,11 +25,12 @@ const config: BuidlerAragonConfig = {
       url: 'http://localhost:8546'
     },
     buidlerevm: {
+      loggingEnabled: false,
       accounts: aragenAccounts.map(account => ({
         privateKey: account.privateKey,
         balance: "0x21e19e0c9bab2400000"
       }))
-    }
+    } as BuidlerNetworkConfig
   },
   solc: {
     version: '0.4.24'
