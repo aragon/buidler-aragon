@@ -11,7 +11,7 @@ loadPluginFile(__dirname + '/../../../src/index')
 import { BuidlerAragonConfig } from '../../../src/types'
 
 const config: BuidlerAragonConfig = {
-  defaultNetwork: 'buidlerevm',
+  defaultNetwork: 'localhost',
   networks: {
     localhost: {
       url: 'http://localhost:8545',

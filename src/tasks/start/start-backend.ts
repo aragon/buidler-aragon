@@ -44,20 +44,25 @@ export async function startBackend(
 
   await _compileDisablingOutput(bre, silent)
 
+  // Dev: Single boolean to do A/B testing
+  const useNodeTask = true
+
   /**
    * Until BuidlerEVM JSON RPC is ready, a ganache server will be started
    * on the appropiate conditions.
    */
-  if (bre.network.name === 'buidlerevm') {
-    // Run the "node" task with starts a JSON-RPC attached to the buidlerevm network
-    // NOTE: The "node" task can NOT be awaited since it now waits until the server closes
-    // TODO: add a configuration to the task that awaits only until listen
-    bre.run(TASK_NODE, { port: testnetPort })
-    await _waitForPortUsed(testnetPort)
-  } else if (bre.network.name === 'localhost') {
-    const networkId = await startGanache(bre)
-    if (networkId !== 0) {
-      logBack(`Started a ganache testnet instance with id ${networkId}.`)
+  if (bre.network.name === 'localhost') {
+    if (useNodeTask) {
+      // Run the "node" task with starts a JSON-RPC attached to the buidlerevm network
+      // NOTE: The "node" task can NOT be awaited since it now waits until the server closes
+      // TODO: add a configuration to the task that awaits only until listen
+      bre.run(TASK_NODE, { port: testnetPort })
+      await _waitForPortUsed(testnetPort)
+    } else {
+      const networkId = await startGanache(bre)
+      if (networkId !== 0) {
+        logBack(`Started a ganache testnet instance with id ${networkId}.`)
+      }
     }
   } else {
     throw new BuidlerPluginError(
