@@ -16,8 +16,7 @@ export default function(): void {
 
   // Task definitions.
   require(path.join(__dirname, '/tasks/start-task'))
-  require(path.join(__dirname, '/tasks/publish-task'))
-  require(path.join(__dirname, '/tasks/aragon-artifact-task'))
+  require(path.join(__dirname, '/tasks/publish'))
 
   // Environment extensions.
   // No extensions atm.

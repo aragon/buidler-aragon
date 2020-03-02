@@ -20,7 +20,7 @@ export default async function uploadReleaseToIpfs(
     progress?: (totalBytes: number) => void
   }
 ): Promise<string> {
-  const { ipfsProvider, ignorePatterns, rootPath } = options || {}
+  const { ipfsProvider, rootPath, ignorePatterns, progress } = options || {}
   const ipfs = IpfsHttpClient(ipfsProvider || defaultIpfsProvider)
 
   const ignore: string[] = []
@@ -28,7 +28,7 @@ export default async function uploadReleaseToIpfs(
   if (rootPath) ignore.push(...readIgnoreFiles(rootPath))
 
   const results = await all(
-    ipfs.add(globSource(distPath, { recursive: true, ignore }))
+    ipfs.add(globSource(distPath, { recursive: true, ignore }), { progress })
   )
   const rootDir = results[results.length - 1]
   return rootDir.cid.toString()

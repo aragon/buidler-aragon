@@ -1,3 +1,18 @@
+import { AragonConfig } from './types'
+import {
+  ARTIFACT_FILE,
+  MANIFEST_FILE,
+  ARAPP_FILE,
+  SOLIDITY_FILE,
+  ZERO_ADDRESS
+} from '@aragon/toolkit'
+
+export const artifactName: string = ARTIFACT_FILE
+export const manifestName: string = MANIFEST_FILE
+export const flatCodeName: string = SOLIDITY_FILE
+export const arappName: string = ARAPP_FILE
+export const zeroAddress: string = ZERO_ADDRESS
+
 // The Aragon web client expects certain parameters to work locally:
 // - Local testnet node to connect to (testnetPort)
 // - ENS address to resolve names (aragenMnemonic)
