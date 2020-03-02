@@ -7,12 +7,21 @@ interface RoleMatchError {
   message: string
 }
 
+/**
+ * Verifies that the roles used in the contract match the ones
+ * defined in a roles array, from arapp.json.
+ * Returns JSON data so the consumer can choose to show a warning or throw
+ * @param functions
+ * @param roles
+ */
 export default function matchContractRoles(
   functions: AragonContractFunction[],
   roles: Role[]
 ): RoleMatchError[] {
   const errors: RoleMatchError[] = []
-  const addError = (id: string, message: string) => errors.push({ id, message })
+  const addError = (id: string, message: string): void => {
+    errors.push({ id, message })
+  }
 
   const contractRoles = uniqBy(
     flatten(functions.map(fn => fn.roles)),
@@ -32,7 +41,7 @@ export default function matchContractRoles(
 
   for (const contractRole of contractRoles) {
     const role = roles.find(({ id }) => id === contractRole.id)
-    if (!role) addError(role.id, 'Role not declared in arapp')
+    if (!role) addError(contractRole.id, 'Role not declared in arapp')
   }
 
   return errors
