@@ -1,49 +1,42 @@
 import path from 'path'
-import fs from 'fs'
 import execa from 'execa'
 import { task, types } from '@nomiclabs/buidler/config'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import {
   publishVersion,
-  parseContractFunctions,
   getApmRepoVersion,
-  ZERO_ADDRESS,
-  ARTIFACT_FILE,
-  MANIFEST_FILE,
-  ARAPP_FILE,
-  SOLIDITY_FILE
+  getAragonArtifact,
+  parseContractFunctions
 } from '@aragon/toolkit'
+import {
+  artifactName,
+  manifestName,
+  flatCodeName,
+  zeroAddress
+} from '../../params'
+import { writeFile, readJson, writeJson } from '../../utils/fsUtils'
 import {
   TASK_COMPILE,
   TASK_VERIFY_CONTRACT,
   TASK_PUBLISH,
-  TASK_ARAGON_ARTIFACT_GET
-} from './task-names'
-import { logMain } from '../ui/logger'
+  TASK_FLATTEN_GET_FLATTENED_SOURCE
+} from '../task-names'
+import { logMain } from '../../ui/logger'
 import { AragonConfig } from '~/src/types'
-import { AragonArtifact, AragonManifest, ApmVersion } from './publish/types'
-import uploadReleaseToIpfs from './publish/uploadDistToIpfs'
-import parseAndValidateBumpOrVersion from './publish/parseAndValidateBumpOrVersion'
-import matchContractRoles from './publish/matchContractRoles'
-import findMissingManifestFiles from './publish/findMissingManifestFiles'
+import { AragonManifest, ApmVersion } from './types'
+import uploadReleaseToIpfs from './uploadDistToIpfs'
+import parseAndValidateBumpOrVersion from './parseAndValidateBumpOrVersion'
+import validateRelease from './validateRelease'
+import readArtifacts from './readArtifacts'
 import {
   getMainContractName,
   getAppEnsName,
   getAppName,
-  getAppId
-} from '../utils/arappUtils'
-
-const readFile = (filepath: string): string => fs.readFileSync(filepath, 'utf8')
-const readJson = <T>(filepath: string): T =>
-  JSON.parse(fs.readFileSync(filepath, 'utf8'))
-const writeJson = <T>(filepath: string, data: T): void =>
-  fs.writeFileSync(filepath, JSON.stringify(data, null, 2))
-
-const artifactName: string = ARTIFACT_FILE
-const manifestName: string = MANIFEST_FILE
-const flatCodeName: string = SOLIDITY_FILE
-const arappName: string = ARAPP_FILE
+  getAppId,
+  readArapp
+} from '../../utils/arappUtils'
+import encodePublishVersionTxData from './encodePublishVersionTxData'
 
 // # Todo: Consolidate start and publish to have the same format, run / export function
 export default (): void => {
@@ -91,7 +84,7 @@ export default (): void => {
       ) => {
         const config = bre.config.aragon as AragonConfig
         const appSrcPath = config.appSrcPath as string
-        const appBuildOutputPath = config.appBuildOutputPath as string
+        const distPath = config.appBuildOutputPath as string
 
         const contractName = getMainContractName()
         const appEnsName = getAppEnsName()
@@ -116,7 +109,7 @@ export default (): void => {
         async function getContractAddress(): Promise<string> {
           if (onlyContent) {
             // No need for contract deployment
-            return ZERO_ADDRESS
+            return zeroAddress
           } else if (contract) {
             logMain('Using provided contract address')
             return contract
@@ -151,21 +144,26 @@ export default (): void => {
         await execa('npm', ['run', 'build'], { cwd: appSrcPath })
 
         // Generate Aragon artifacts
-        const { artifact, flatCode } = await bre.run(TASK_ARAGON_ARTIFACT_GET)
+        const arapp = readArapp()
         const manifest = readJson<AragonManifest>(manifestName)
-        writeJson(path.join(appBuildOutputPath, artifactName), artifact)
-        writeJson(path.join(appBuildOutputPath, manifestName), manifest)
-        fs.writeFileSync(path.join(appBuildOutputPath, flatCodeName), flatCode)
+        const abi = readArtifacts(contractName)
+        const flatCode = await _flatten(bre)
+        const contractFunctions = parseContractFunctions(flatCode, contractName)
+        const artifact = getAragonArtifact(arapp, contractFunctions, abi)
+        writeJson(path.join(distPath, artifactName), artifact)
+        writeJson(path.join(distPath, manifestName), manifest)
+        writeFile(path.join(distPath, flatCodeName), flatCode)
 
         // Validate release files
-        _validateRelease(appBuildOutputPath)
+        validateRelease(distPath)
 
         // Upload release directory to IPFS
-        const contentHash = await uploadReleaseToIpfs(appBuildOutputPath, {
+        logMain('Uploading release assets to IPFS...')
+        const contentHash = await uploadReleaseToIpfs(distPath, {
           ipfsProvider,
           ignorePatterns: ipfsIgnore
         })
-        logMain(`Release directory uploaded to IPFS: ${contentHash}`)
+        logMain(`Release assets uploaded to IPFS: ${contentHash}`)
 
         // Generate tx to publish new app to aragonPM
         const versionInfo = {
@@ -177,48 +175,34 @@ export default (): void => {
         const txData = await publishVersion(appId, versionInfo, environment, {
           managerAddress
         })
+
         logMain(
-          `Successfully generate tx data. Will publish ${appName} ${nextVersion}:
-          
-          to: ${txData.to}
-          methodName: ${txData.methodName}
-          params: ${txData.params}
-          `
+          `Successfully generated TX data for publishing ${appName} version ${nextVersion}
+
+  to: ${txData.to}
+  data: ${encodePublishVersionTxData(txData)}
+`
         )
       }
     )
 }
 
 /**
- *
+ * Returns flatten source code
+ * # TODO: Of which contract?
+ * # TODO: Verify that buidler's flatten algorythm supports cyclic imports
+ * @param bre
  */
-function _validateRelease(distPath: string) {
-  // Load files straight from the dist directory
-  const artifact = readJson<AragonArtifact>(path.join(distPath, artifactName))
-  const manifest = readJson<AragonManifest>(path.join(distPath, manifestName))
-  const flatCode = readFile(path.join(distPath, flatCodeName))
-  const functions = parseContractFunctions(flatCode, artifact.path)
-
-  // Make sure all declared files in the manifest are there
-  const missingFiles = findMissingManifestFiles(manifest, distPath)
-  if (missingFiles.length)
+async function _flatten(bre: BuidlerRuntimeEnvironment): Promise<string> {
+  try {
+    return await bre.run(TASK_FLATTEN_GET_FLATTENED_SOURCE)
+  } catch (e) {
     throw new BuidlerPluginError(
-      `
-Some files declared in manifest.json are not found in dist dir: ${distPath}
-${missingFiles.map(file => ` - ${file.id}: ${file.path}`).join('\n')}
-      
-Make sure your app build process includes them in the dist directory on
-every run of the designated NPM build script
+      `Your contract constains a cyclic dependency. You can:
+  - Remove unnecessary import statements, if any
+  - Abstract the interface of imported contracts in a separate file
+  - Merge multiple contracts in a single .sol file
 `
     )
-
-  // Make sure that the roles in the contract match the ones in arapp.json
-  const roleMatchErrors = matchContractRoles(functions, artifact.roles)
-  if (roleMatchErrors.length)
-    throw new BuidlerPluginError(
-      `
-Some contract roles do not match declared roles in ${arappName}:
-${roleMatchErrors.map(err => ` - ${err.id}: ${err.message}`).join('\n')}
-`
-    )
+  }
 }
