@@ -1,30 +1,45 @@
 const fs = require('fs')
 const path = require('path')
+const { promisify } = require('util')
+const rimraf = require('rimraf')
 
 let token
 let accounts
 
-async function preDao(params, bre) {
-  console.log(`preDao hook called`)
+async function preDao({ log }, bre) {
+  log(`preDao hook called`)
 
   // Used for testing only.
   const content = bre.config.aragon
-  await _writeLog('preDao', JSON.stringify(content, null, 2))
+  await _writeLog('preDao', content, log)
 }
 
-async function postDao(params, bre) {
-  console.log(`postDao hook called`, params.dao.address)
+async function postDao({ dao, log }, bre) {
+  log(`postDao hook called`, dao.address)
 
   // Used for testing only.
   const content = {
     ...bre.config.aragon,
-    daoAddress: params.dao.address
+    daoAddress: dao.address
   }
-  await _writeLog('postDao', JSON.stringify(content, null, 2))
+  await _writeLog('postDao', content, log)
 }
 
-async function preInit(params, bre) {
-  console.log(`preInit hook called`)
+async function preInit({ appInstaller, log }, bre) {
+  log(`preInit hook called`)
+  
+  // Demo installing external apps
+  log(`Installing dependant apps from mainnet...`)
+  const vault = await appInstaller("vault");
+  const finance = await appInstaller("finance", {
+    initializeArgs: [vault.address, 60 * 60 * 24 * 31]
+  });
+  log(`Installed vault: ${vault.address}`)
+  log(`Installed finance: ${finance.address}`)
+
+  await vault.createPermission("TRANSFER_ROLE", finance.address);
+  await finance.createPermission("CREATE_PAYMENTS_ROLE");
+  log(`Granted permissions to installed apps`)
 
   // Retrieve accounts.
   accounts = await bre.web3.eth.getAccounts()
@@ -45,46 +60,46 @@ async function preInit(params, bre) {
     rootAccount: accounts[0],
     tokenAddress: token.address
   }
-  await _writeLog('preInit', JSON.stringify(content, null, 2))
+  await _writeLog('preInit', content, log)
 }
 
-async function getInitParams(params, bre) {
-  console.log(`getInitParams hook called`)
+async function getInitParams({ log }, bre) {
+  log(`getInitParams hook called`)
 
   const tokenAddress = token ? token.address : undefined
 
   // Used for testing only.
   const content = bre.config.aragon
-  await _writeLog('getInitParams', JSON.stringify(content, null, 2))
+  await _writeLog('getInitParams', content, log)
 
   return [tokenAddress, 'Wrapped token', 'wORG']
 }
 
-async function postInit(params, bre) {
-  console.log(`postInit hook called`)
+async function postInit({ proxy, log }, bre) {
+  log(`postInit hook called`)
 
-  console.log(`ERC20 token:`, token.address)
-  console.log(`Proxy:`, params.proxy.address)
-  console.log(`Account 1 token balance`, (await token.balanceOf(accounts[0])).toString())
-  console.log(`Account 2 token balance`, (await token.balanceOf(accounts[1])).toString())
+  log(`ERC20 token:`, token.address)
+  log(`Proxy:`, proxy.address)
+  log(`Account 1 token balance`, (await token.balanceOf(accounts[0])).toString())
+  log(`Account 2 token balance`, (await token.balanceOf(accounts[1])).toString())
 
   // Used for testing only.
   const content = {
     ...bre.config.aragon,
-    proxyAddress: params.proxy.address
+    proxyAddress: proxy.address
   }
-  await _writeLog('postInit', JSON.stringify(content, null, 2))
+  await _writeLog('postInit', content, log)
 }
 
-async function postUpdate(params, bre) {
-  console.log(`postUpdate hook called`)
+async function postUpdate({ proxy, log }, bre) {
+  log(`postUpdate hook called`)
 
   // Used for testing only.
   const content = {
     ...bre.config.aragon,
-    proxyAddress: params.proxy.address
+    proxyAddress: proxy.address
   }
-  await _writeLog('postUpdate', JSON.stringify(content, null, 2))
+  await _writeLog('postUpdate', content, log)
 }
 
 // ----------------------------------------------------
@@ -92,50 +107,33 @@ async function postUpdate(params, bre) {
 // Used for testing hooks.
 // ----------------------------------------------------
 
-async function _writeLog(filename, content) {
+/**
+ * Writes a text log to file
+ * @param {string} filename 
+ * @param {string} content 
+ * @param {(message: string) => void} log 
+ * @return {Promise<void>}
+ */
+async function _writeLog(filename, content, log = console.log) {
   const logsPath = path.join(__dirname, '../logs')
   if (!fs.existsSync(logsPath)){
       fs.mkdirSync(logsPath);
   }
 
-  return new Promise(resolve => {
-    const logPath = path.join(__dirname, '../logs', filename)
-    console.log(`writing log: ${logPath}`)
+  const logPath = path.join(__dirname, '../logs', filename)
+  const data = typeof content === "object" 
+      ? JSON.stringify(content, null, 2)
+      : content
+  log(`writing log: ${logPath}`)
 
-    fs.writeFile(logPath, content, err => {
-      if (err) {
-        console.log(`Error while writing log: ${err.message}`)
-      }
-
-      resolve()
-    })
+  return promisify(fs.writeFile)(logPath, data).catch(e => {
+    log(`Error while writing log: ${e.message}`)
   })
 }
 
 async function _deleteLogs() {
-  return new Promise(resolve => {
-    const logsPath = path.join(__dirname, '../logs')
-
-    if (fs.existsSync(logsPath)) {
-      fs.readdir(logsPath, (err, files) => {
-        if (err) {
-          throw err
-        }
-
-        for (const file of files) {
-          fs.unlink(path.join(logsPath, file), err => {
-            if (err) {
-              throw err
-            }
-          })
-        }
-
-        resolve()
-      })
-    } else {
-      resolve()
-    }
-  })
+  const logsPath = path.join(__dirname, '../logs')
+  return promisify(rimraf)(logsPath)
 }
 
 // ----------------------------------------------------

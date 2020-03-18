@@ -3,7 +3,7 @@ import chokidar from 'chokidar'
 import { Writable } from 'stream'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { KernelInstance } from '~/typechain'
-import { logBack, appendLogger } from '~/src/ui/logger'
+import { logBack, logHook } from '~/src/ui/logger'
 import { readArapp } from '~/src/utils/arappUtils'
 import { TASK_COMPILE } from '~/src/tasks/task-names'
 import deployBases from './backend/bases/deploy-bases'
@@ -64,7 +64,7 @@ export async function startBackend(
 
   // Call preDao hook.
   if (hooks && hooks.preDao) {
-    await hooks.preDao({}, bre)
+    await hooks.preDao({ log: logHook('preDao') }, bre)
   }
 
   // Create a DAO.
@@ -78,9 +78,7 @@ export async function startBackend(
 
   // Call postDao hook.
   if (hooks && hooks.postDao) {
-    const appInstaller = AppInstaller({ apmAddress, dao, ipfsGateway }, bre)
-    const log = appendLogger(logBack)('postDao', 'blueBright')
-    await hooks.postDao({ dao, appInstaller, log }, bre)
+    await hooks.postDao({ dao, log: logHook('postDao') }, bre)
   }
 
   // Create app.
@@ -97,16 +95,17 @@ export async function startBackend(
   )
   logBack(`Proxy address: ${proxy.address}`)
   logBack(`Repo address: ${repo.address}`)
+  const appInstaller = AppInstaller({ apmAddress, dao, ipfsGateway }, bre)
 
   // Call preInit hook.
   if (hooks && hooks.preInit) {
-    await hooks.preInit({ proxy, log: logBack }, bre)
+    await hooks.preInit({ proxy, appInstaller, log: logHook('preInit') }, bre)
   }
 
   // Call getInitParams hook.
   let proxyInitParams: any[] = []
   if (hooks && hooks.getInitParams) {
-    const params = await hooks.getInitParams({ log: logBack }, bre)
+    const params = await hooks.getInitParams({ log: logHook('initP') }, bre)
     proxyInitParams = params ? params : proxyInitParams
   }
   if (proxyInitParams && proxyInitParams.length > 0) {
@@ -131,7 +130,7 @@ export async function startBackend(
 
   // Call postInit hook.
   if (hooks && hooks.postInit) {
-    await hooks.postInit({ proxy, log: logBack }, bre)
+    await hooks.postInit({ proxy, appInstaller, log: logHook('postInit') }, bre)
   }
 
   // TODO: What if user wants to set custom permissions?

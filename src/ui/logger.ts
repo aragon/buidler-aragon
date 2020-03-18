@@ -31,7 +31,5 @@ export function logBack(data: string): void {
   console.log(_prependTag(data, backTag))
 }
 
-export const appendLogger = (log: (message: string) => void) => (
-  tag: string,
-  color: typeof ForegroundColor
-) => (data: string): void => log(_prependTag(data, `${tag} | `, color))
+export const logHook = (tag: string) => (data: string): void =>
+  logBack(_prependTag(data, `${tag} | `, 'blueBright'))
