@@ -1,10 +1,15 @@
-import chalk from 'chalk'
+import chalk, { ForegroundColor } from 'chalk'
 
 const mainTag = chalk.gray('main     | ')
 const frontTag = chalk.yellow('frontend | ')
 const backTag = chalk.blue('backend  | ')
 
-function _prependTag(lines: string, tag: string): string {
+export function _prependTag(
+  lines: string,
+  tag: string,
+  color?: typeof ForegroundColor
+): string {
+  if (color) tag = chalk[color](tag)
   return lines
     .split('\n')
     .map(line => tag + line)
@@ -25,3 +30,8 @@ export function logBack(data: string): void {
   // eslint-disable-next-line no-console
   console.log(_prependTag(data, backTag))
 }
+
+export const appendLogger = (log: (message: string) => void) => (
+  tag: string,
+  color: typeof ForegroundColor
+) => (data: string): void => log(_prependTag(data, `${tag} | `, color))

@@ -1,6 +1,6 @@
-import { ethers } from 'ethers'
 import fetch from 'node-fetch'
 import { AbiItem } from '~/src/types'
+import { getContentHash } from './utils'
 
 /**
  * Gets the ABI from an Aragon App release directory
@@ -12,9 +12,7 @@ export default async function getAbiFromContentUri(
   options: { ipfsGateway: string }
 ): Promise<AbiItem[]> {
   const { ipfsGateway } = options
-  const contentHash = ethers.utils
-    .toUtf8String(contentURI, true)
-    .replace('ipfs:', '')
+  const contentHash = getContentHash(contentURI)
   if (!ipfsGateway) throw Error('ipfsGateway must be defined')
   if (!contentHash) throw Error('contentHash must be defined')
 

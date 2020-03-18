@@ -9,7 +9,13 @@ import {
   AppInstalled,
   NetworkType
 } from '~/src/types'
-import { toVersionArray, getFullName, namehash } from './utils'
+import {
+  toVersionArray,
+  getFullName,
+  namehash,
+  getContentHash,
+  utf8ToHex
+} from './utils'
 import getAbiFromContentUri from './getAbiFromContentUri'
 import getExternalRepoVersion from './getRepoVersion'
 import assertEnsDomain from './assertEnsDomain'
@@ -90,16 +96,21 @@ async function _installExternalApp(
     throw Error('Error re-deploying contract code, it is not equal')
 
   // Create new repo and publish its version
-  const initialVersion = '1.0.0'
+  // Force the client to fetch from this specific ipfsGateway instead of localhost:8080
+  const shortName = name.split('.')[0]
+  const initialVersionArray = toVersionArray('1.0.0')
+  const contentUriHttpFromPublicGateway = utf8ToHex(
+    `http:${ipfsGateway}${getContentHash(contentURI)}`
+  )
   const APMRegistry = bre.artifacts.require('APMRegistry')
   const apmRegistry: APMRegistryInstance = await APMRegistry.at(apmAddress)
   const repoAddress: string = await apmRegistry
     .newRepoWithVersion(
-      name.split('.')[0],
+      shortName,
       rootAccount,
-      toVersionArray(initialVersion),
+      initialVersionArray,
       newContractAddress,
-      contentURI
+      contentUriHttpFromPublicGateway
     )
     .then(txResponse => getLog(txResponse, 'NewRepo', 'repo'))
   // Make sure the resulting repoAddress is accessible from the client
