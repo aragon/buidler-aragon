@@ -11,8 +11,21 @@ async function postDao(params, bre) {
   console.log(`postDao hook called`, params.dao.address)
 }
 
-async function preInit(params, bre) {
-  console.log(`preInit hook called`)
+async function preInit({ appInstaller, log }, bre) {
+  log(`preInit hook called`)
+  
+  // Demo installing external apps
+  log(`Installing dependant apps from mainnet...`)
+  const vault = await appInstaller("vault");
+  const finance = await appInstaller("finance", {
+    initializeArgs: [vault.address, 60 * 60 * 24 * 31]
+  });
+  log(`Installed vault: ${vault.address}`)
+  log(`Installed finance: ${finance.address}`)
+
+  await vault.createPermission("TRANSFER_ROLE", finance.address);
+  await finance.createPermission("CREATE_PAYMENTS_ROLE");
+  log(`Granted permissions to installed apps`)
 
   // Retrieve accounts.
   accounts = await bre.web3.eth.getAccounts()
@@ -34,16 +47,16 @@ async function preInit(params, bre) {
   }
 }
 
-async function getInitParams(params, bre) {
-  console.log(`getInitParams hook called`)
+async function getInitParams({ log }, bre) {
+  log(`getInitParams hook called`)
 
   const tokenAddress = token ? token.address : undefined
 
   return [tokenAddress, 'Wrapped token', 'wORG']
 }
 
-async function postInit(params, bre) {
-  console.log(`postInit hook called`)
+async function postInit({ proxy, log }, bre) {
+  log(`postInit hook called`)
 
   console.log(`ERC20 token:`, token.address)
   console.log(`Proxy:`, params.proxy.address)

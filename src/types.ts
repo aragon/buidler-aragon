@@ -35,13 +35,16 @@ type AragonHook<T, R> = (
 ) => Promise<R> | R
 
 export interface AragonConfigHooks {
-  preDao?: (params: {}, bre: BuidlerRuntimeEnvironment) => Promise<void> | void
-  postDao?: AragonHook<
-    { dao: KernelInstance; appInstaller: AppInstaller },
+  preDao?: AragonHook<{}, void>
+  postDao?: AragonHook<{ dao: KernelInstance }, void>
+  preInit?: AragonHook<
+    { proxy: Truffle.ContractInstance; appInstaller: AppInstaller },
     void
   >
-  preInit?: AragonHook<{ proxy: Truffle.ContractInstance }, void>
-  postInit?: AragonHook<{ proxy: Truffle.ContractInstance }, void>
+  postInit?: AragonHook<
+    { proxy: Truffle.ContractInstance; appInstaller: AppInstaller },
+    void
+  >
   getInitParams?: AragonHook<{}, any[]>
   postUpdate?: AragonHook<{ proxy: Truffle.ContractInstance }, void>
 }

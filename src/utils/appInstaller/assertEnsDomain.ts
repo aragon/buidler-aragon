@@ -9,4 +9,7 @@
 export default async function assertEnsDomain(
   ensDomain,
   address
-): Promise<void> {}
+): Promise<void> {
+  ensDomain
+  address
+}
