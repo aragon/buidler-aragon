@@ -91,3 +91,10 @@ export const etherscanSupportedChainIds = new Set([
   // Kovan
   42
 ])
+export const defaultAragonConfig: AragonConfig = {
+  appServePort: 8001,
+  clientServePort: 3000,
+  appSrcPath: 'app/',
+  appBuildOutputPath: 'dist/',
+  ipfsGateway: 'https://ipfs.eth.aragon.network/ipfs/'
+}

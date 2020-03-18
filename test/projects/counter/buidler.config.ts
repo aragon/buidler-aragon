@@ -25,8 +25,25 @@ const config: BuidlerAragonConfig = {
   },
   solc: {
     version: '0.4.24'
-  }
+  },
   // Note: Intentionally not specifying aragon: AragonConfig.
+  // Note 2: Intentionally specifying aragon.hooks to test appInstaller
+  aragon: {
+    hooks: {
+      postDao: async ({ appInstaller, log }) => {
+        // Install apps fetching them from mainnet
+        const vault = await appInstaller("vault");
+        const finance = await appInstaller("finance", {
+          initializeArgs: [vault.address, 60 * 60 * 24 * 31]
+        });
+        log(`Installed vault: ${vault.address}, finance: ${finance.address}`)
+
+        await vault.createPermission("TRANSFER_ROLE", finance.address);
+        await finance.createPermission("CREATE_PAYMENTS_ROLE");
+        log(`Granted permissions to installed apps`)
+      }
+    }
+  }
 }
 
 export default config

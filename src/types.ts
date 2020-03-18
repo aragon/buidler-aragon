@@ -25,31 +25,25 @@ export interface AragonConfig {
    * ```
    */
   appName?: string | { [network: string]: string }
+  ipfsGateway?: string
   hooks?: AragonConfigHooks
 }
 
+type AragonHook<T, R> = (
+  params: T & { log: (message: string) => void },
+  bre: BuidlerRuntimeEnvironment
+) => Promise<R> | R
+
 export interface AragonConfigHooks {
   preDao?: (params: {}, bre: BuidlerRuntimeEnvironment) => Promise<void> | void
-  postDao?: (
-    params: { dao: KernelInstance },
-    bre: BuidlerRuntimeEnvironment
-  ) => Promise<void> | void
-  preInit?: (
-    params: { proxy: Truffle.ContractInstance },
-    bre: BuidlerRuntimeEnvironment
-  ) => Promise<void> | void
-  postInit?: (
-    params: { proxy: Truffle.ContractInstance },
-    bre: BuidlerRuntimeEnvironment
-  ) => Promise<void> | void
-  getInitParams?: (
-    params: {},
-    bre: BuidlerRuntimeEnvironment
-  ) => Promise<any[]> | any[]
-  postUpdate?: (
-    params: { proxy: Truffle.ContractInstance },
-    bre: BuidlerRuntimeEnvironment
-  ) => Promise<void> | void
+  postDao?: AragonHook<
+    { dao: KernelInstance; appInstaller: AppInstaller },
+    void
+  >
+  preInit?: AragonHook<{ proxy: Truffle.ContractInstance }, void>
+  postInit?: AragonHook<{ proxy: Truffle.ContractInstance }, void>
+  getInitParams?: AragonHook<{}, any[]>
+  postUpdate?: AragonHook<{ proxy: Truffle.ContractInstance }, void>
 }
 
 export interface IpfsConfig {
@@ -203,4 +197,39 @@ export interface AclPermission {
   role: string // Role hash '0x0b719b33c83b8e5d300c521cb8b54ae9bd933996a14bef8c2f4e0285d2d2400a'
   allowedEntities: string[] // [ '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7' ]
   manager: string // '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7'
+}
+
+/**
+ * App Installer types
+ */
+
+export type NetworkType =
+  | 'homestead'
+  | 'rinkeby'
+  | 'ropsten'
+  | 'kovan'
+  | 'goerli'
+
+export type AppInstaller = (
+  name: string,
+  appOptions?: AppOptions
+) => Promise<AppInstalled>
+
+export interface AppInstalled {
+  initialize: (_initializeArgs: any[]) => Promise<void>
+  createPermission: (roleName: string, entity?: string) => Promise<void>
+  address: string
+}
+
+export interface AppOptions {
+  version?: string
+  initializeArgs?: any[]
+  skipInitialize?: boolean
+  network?: NetworkType
+}
+
+export interface AppInstallerOptions {
+  apmAddress: string
+  dao: KernelInstance
+  ipfsGateway: string
 }

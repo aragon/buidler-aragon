@@ -13,7 +13,15 @@ import { startGanache } from './backend/start-ganache'
 import { createApp } from './backend/create-app'
 import { updateApp } from './backend/update-app'
 import onExit from '~/src/utils/onExit'
-import { generateArtifacts } from '~/src/utils/artifact'
+import {
+  BACKEND_BUILD_STARTED,
+  BACKEND_PROXY_UPDATED,
+  emitEvent
+} from '~/src/ui/events'
+import { generateUriArtifacts } from './frontend/generate-artifacts'
+import AppInstaller from '~/src/utils/appInstaller'
+
+const log = logBack // Todo: Change rest of invocations if renaming is ok
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -38,6 +46,7 @@ export async function startBackend(
 }> {
   const config: AragonConfig = bre.config.aragon as AragonConfig
   const hooks: AragonConfigHooks = config.hooks as AragonConfigHooks
+  const ipfsGateway: string = config.ipfsGateway as string
 
   await _compileDisablingOutput(bre, silent)
 
@@ -77,7 +86,8 @@ export async function startBackend(
 
   // Call postDao hook.
   if (hooks && hooks.postDao) {
-    await hooks.postDao({ dao }, bre)
+    const appInstaller = AppInstaller({ apmAddress, dao, ipfsGateway }, bre)
+    await hooks.postDao({ dao, appInstaller, log }, bre)
   }
 
   // Create app.
@@ -97,13 +107,13 @@ export async function startBackend(
 
   // Call preInit hook.
   if (hooks && hooks.preInit) {
-    await hooks.preInit({ proxy }, bre)
+    await hooks.preInit({ proxy, log }, bre)
   }
 
   // Call getInitParams hook.
   let proxyInitParams: any[] = []
   if (hooks && hooks.getInitParams) {
-    const params = await hooks.getInitParams({}, bre)
+    const params = await hooks.getInitParams({ log }, bre)
     proxyInitParams = params ? params : proxyInitParams
   }
   if (proxyInitParams && proxyInitParams.length > 0) {
@@ -128,7 +138,7 @@ export async function startBackend(
 
   // Call postInit hook.
   if (hooks && hooks.postInit) {
-    await hooks.postInit({ proxy }, bre)
+    await hooks.postInit({ proxy, log }, bre)
   }
 
   // TODO: What if user wants to set custom permissions?
@@ -174,7 +184,7 @@ export async function startBackend(
 
       // Call postUpdate hook.
       if (hooks && hooks.postUpdate) {
-        await hooks.postUpdate({ proxy }, bre)
+        await hooks.postUpdate({ proxy, log }, bre)
       }
     })
 
