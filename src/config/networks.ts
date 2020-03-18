@@ -6,6 +6,7 @@ const aragonRpc = (network: string): string =>
   `https://${network}.eth.aragon.network`
 const localRpc = 'http://localhost:8545'
 const coverageRpc = 'http://localhost:8555'
+const frameRpc = 'ws://localhost:1248'
 
 const defaultNetworks: Networks = {
   rpc: {
@@ -51,6 +52,9 @@ const defaultNetworks: Networks = {
     url: localRpc,
     gas: 6.9e6,
     gasPrice: 15000000001
+  },
+  frame: {
+    url: frameRpc
   }
 }
 
