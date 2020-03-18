@@ -3,7 +3,7 @@ import chokidar from 'chokidar'
 import { Writable } from 'stream'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { KernelInstance } from '~/typechain'
-import { logBack } from '~/src/ui/logger'
+import { logBack, appendLogger } from '~/src/ui/logger'
 import { readArapp } from '~/src/utils/arappUtils'
 import { TASK_COMPILE } from '~/src/tasks/task-names'
 import deployBases from './backend/bases/deploy-bases'
@@ -20,8 +20,6 @@ import {
 } from '~/src/ui/events'
 import { generateUriArtifacts } from './frontend/generate-artifacts'
 import AppInstaller from '~/src/utils/appInstaller'
-
-const log = logBack // Todo: Change rest of invocations if renaming is ok
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -87,6 +85,7 @@ export async function startBackend(
   // Call postDao hook.
   if (hooks && hooks.postDao) {
     const appInstaller = AppInstaller({ apmAddress, dao, ipfsGateway }, bre)
+    const log = appendLogger(logBack)('postDao', 'blueBright')
     await hooks.postDao({ dao, appInstaller, log }, bre)
   }
 
@@ -107,13 +106,13 @@ export async function startBackend(
 
   // Call preInit hook.
   if (hooks && hooks.preInit) {
-    await hooks.preInit({ proxy, log }, bre)
+    await hooks.preInit({ proxy, log: logBack }, bre)
   }
 
   // Call getInitParams hook.
   let proxyInitParams: any[] = []
   if (hooks && hooks.getInitParams) {
-    const params = await hooks.getInitParams({ log }, bre)
+    const params = await hooks.getInitParams({ log: logBack }, bre)
     proxyInitParams = params ? params : proxyInitParams
   }
   if (proxyInitParams && proxyInitParams.length > 0) {
@@ -138,7 +137,7 @@ export async function startBackend(
 
   // Call postInit hook.
   if (hooks && hooks.postInit) {
-    await hooks.postInit({ proxy, log }, bre)
+    await hooks.postInit({ proxy, log: logBack }, bre)
   }
 
   // TODO: What if user wants to set custom permissions?
@@ -184,7 +183,7 @@ export async function startBackend(
 
       // Call postUpdate hook.
       if (hooks && hooks.postUpdate) {
-        await hooks.postUpdate({ proxy, log }, bre)
+        await hooks.postUpdate({ proxy, log: logBack }, bre)
       }
     })
 

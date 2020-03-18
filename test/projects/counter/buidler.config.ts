@@ -31,12 +31,13 @@ const config: BuidlerAragonConfig = {
   aragon: {
     hooks: {
       postDao: async ({ appInstaller, log }) => {
-        // Install apps fetching them from mainnet
+        log(`Installing dependant apps from mainnet...`)
         const vault = await appInstaller("vault");
         const finance = await appInstaller("finance", {
           initializeArgs: [vault.address, 60 * 60 * 24 * 31]
         });
-        log(`Installed vault: ${vault.address}, finance: ${finance.address}`)
+        log(`Installed vault: ${vault.address}`)
+        log(`Installed finance: ${finance.address}`)
 
         await vault.createPermission("TRANSFER_ROLE", finance.address);
         await finance.createPermission("CREATE_PAYMENTS_ROLE");
