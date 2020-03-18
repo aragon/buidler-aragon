@@ -16,31 +16,25 @@ export interface AragonConfig {
   clientServePort?: number
   appSrcPath?: string
   appBuildOutputPath?: string
+  ipfsGateway?: string
   hooks?: AragonConfigHooks
 }
 
+type AragonHook<T, R> = (
+  params: T & { log: (message: string) => void },
+  bre: BuidlerRuntimeEnvironment
+) => Promise<R> | R
+
 export interface AragonConfigHooks {
   preDao?: (params: {}, bre: BuidlerRuntimeEnvironment) => Promise<void> | void
-  postDao?: (
-    params: { dao: KernelInstance },
-    bre: BuidlerRuntimeEnvironment
-  ) => Promise<void> | void
-  preInit?: (
-    params: { proxy: Truffle.ContractInstance },
-    bre: BuidlerRuntimeEnvironment
-  ) => Promise<void> | void
-  postInit?: (
-    params: { proxy: Truffle.ContractInstance },
-    bre: BuidlerRuntimeEnvironment
-  ) => Promise<void> | void
-  getInitParams?: (
-    params: {},
-    bre: BuidlerRuntimeEnvironment
-  ) => Promise<any[]> | any[]
-  postUpdate?: (
-    params: { proxy: Truffle.ContractInstance },
-    bre: BuidlerRuntimeEnvironment
-  ) => Promise<void> | void
+  postDao?: AragonHook<
+    { dao: KernelInstance; appInstaller: AppInstaller },
+    void
+  >
+  preInit?: AragonHook<{ proxy: Truffle.ContractInstance }, void>
+  postInit?: AragonHook<{ proxy: Truffle.ContractInstance }, void>
+  getInitParams?: AragonHook<{}, any[]>
+  postUpdate?: AragonHook<{ proxy: Truffle.ContractInstance }, void>
 }
 
 /**
@@ -68,4 +62,39 @@ interface AragonEnvironment {
   appName: string
   registry: string
   wsRPC: string
+}
+
+/**
+ * App Installer types
+ */
+
+export type NetworkType =
+  | 'homestead'
+  | 'rinkeby'
+  | 'ropsten'
+  | 'kovan'
+  | 'goerli'
+
+export type AppInstaller = (
+  name: string,
+  appOptions?: AppOptions
+) => Promise<AppInstalled>
+
+export interface AppInstalled {
+  initialize: (_initializeArgs: any[]) => Promise<void>
+  createPermission: (roleName: string, entity?: string) => Promise<void>
+  address: string
+}
+
+export interface AppOptions {
+  version?: string
+  initializeArgs?: any[]
+  skipInitialize?: boolean
+  network?: NetworkType
+}
+
+export interface AppInstallerOptions {
+  apmAddress: string
+  dao: KernelInstance
+  ipfsGateway: string
 }
