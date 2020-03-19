@@ -38,154 +38,151 @@ import {
 } from '../../utils/arappUtils'
 import encodePublishVersionTxData from './encodePublishVersionTxData'
 
-// # Todo: Consolidate start and publish to have the same format, run / export function
-export default (): void => {
-  task(TASK_PUBLISH, 'Publish a new app version')
-    .addPositionalParam(
-      'bump',
-      'Type of bump (major, minor or patch) or semantic version',
-      undefined,
-      types.string
-    )
-    .addOptionalParam(
-      'contract',
-      'Contract address previously deployed.',
-      undefined,
-      types.string
-    )
-    .addOptionalParam(
-      'managerAddress',
-      'Owner of the APM repo. Must be provided in the initial release',
-      undefined,
-      types.string
-    )
-    .addOptionalParam(
-      'ipfsProvider',
-      'Provider URL to connect to an ipfs daemon API server',
-      'http://localhost:5001',
-      types.string
-    )
-    .addFlag(
-      'onlyContent',
-      'Prevents contract compilation, deployment and artifact generation.'
-    )
-    .addFlag('noVerify', 'Prevents etherscan verification.')
-    .setAction(
-      async (
-        {
-          bump: bumpOrVersion,
-          contract,
-          managerAddress,
-          ipfsProvider,
-          onlyContent,
-          noVerify
-        },
-        bre: BuidlerRuntimeEnvironment
-      ) => {
-        const config = bre.config.aragon as AragonConfig
-        const appSrcPath = config.appSrcPath as string
-        const distPath = config.appBuildOutputPath as string
+task(TASK_PUBLISH, 'Publish a new app version')
+  .addPositionalParam(
+    'bump',
+    'Type of bump (major, minor or patch) or semantic version',
+    undefined,
+    types.string
+  )
+  .addOptionalParam(
+    'contract',
+    'Contract address previously deployed.',
+    undefined,
+    types.string
+  )
+  .addOptionalParam(
+    'managerAddress',
+    'Owner of the APM repo. Must be provided in the initial release',
+    undefined,
+    types.string
+  )
+  .addOptionalParam(
+    'ipfsProvider',
+    'Provider URL to connect to an ipfs daemon API server',
+    'http://localhost:5001',
+    types.string
+  )
+  .addFlag(
+    'onlyContent',
+    'Prevents contract compilation, deployment and artifact generation.'
+  )
+  .addFlag('noVerify', 'Prevents etherscan verification.')
+  .setAction(
+    async (
+      {
+        bump: bumpOrVersion,
+        contract,
+        managerAddress,
+        ipfsProvider,
+        onlyContent,
+        noVerify
+      },
+      bre: BuidlerRuntimeEnvironment
+    ) => {
+      const config = bre.config.aragon as AragonConfig
+      const appSrcPath = config.appSrcPath as string
+      const distPath = config.appBuildOutputPath as string
 
-        const contractName = getMainContractName()
-        const appEnsName = getAppEnsName()
-        const appName = getAppName()
-        const appId = getAppId(appEnsName)
+      const contractName = getMainContractName()
+      const appEnsName = getAppEnsName()
+      const appName = getAppName()
+      const appId = getAppId(appEnsName)
 
-        // Hardcoded until a better way to deal with dynamic ENS address is found
-        const ipfsIgnore = ['subfolder/to/ignore/**']
-        const environment = 'rpc'
+      // Hardcoded until a better way to deal with dynamic ENS address is found
+      const ipfsIgnore = ['subfolder/to/ignore/**']
+      const environment = 'rpc'
 
-        const prevVersion: ApmVersion | undefined = await getApmRepoVersion(
-          appEnsName,
-          'latest'
-        )
+      const prevVersion: ApmVersion | undefined = await getApmRepoVersion(
+        appEnsName,
+        'latest'
+      )
 
-        const { bump, nextVersion } = parseAndValidateBumpOrVersion(
-          bumpOrVersion,
-          prevVersion ? prevVersion.version : undefined
-        )
-        logMain(`Applying version bump ${bump}, next version: ${nextVersion}`)
+      const { bump, nextVersion } = parseAndValidateBumpOrVersion(
+        bumpOrVersion,
+        prevVersion ? prevVersion.version : undefined
+      )
+      logMain(`Applying version bump ${bump}, next version: ${nextVersion}`)
 
-        async function getContractAddress(): Promise<string> {
-          if (onlyContent) {
-            // No need for contract deployment
-            return zeroAddress
-          } else if (contract) {
-            logMain('Using provided contract address')
-            return contract
-          } else if (!prevVersion || bump === 'major') {
-            // Compile contracts
-            await bre.run(TASK_COMPILE)
-            // Deploy contract
-            const MainContract = bre.artifacts.require(contractName)
-            const mainContract = await MainContract.new()
-            logMain('Implementation contract deployed')
-            if (!noVerify) {
-              logMain('Verifying on Etherscan')
-              await bre.run(TASK_VERIFY_CONTRACT, {
-                contractName,
-                address: contractAddress
-                // TODO: constructorArguments
-              })
-              logMain(`Successfully verified contract on Etherscan`)
-            }
-            return mainContract.address
-          } else {
-            logMain('Reusing contract from previous version')
-            return prevVersion.contractAddress
+      async function getContractAddress(): Promise<string> {
+        if (onlyContent) {
+          // No need for contract deployment
+          return zeroAddress
+        } else if (contract) {
+          logMain('Using provided contract address')
+          return contract
+        } else if (!prevVersion || bump === 'major') {
+          // Compile contracts
+          await bre.run(TASK_COMPILE)
+          // Deploy contract
+          const MainContract = bre.artifacts.require(contractName)
+          const mainContract = await MainContract.new()
+          logMain('Implementation contract deployed')
+          if (!noVerify) {
+            logMain('Verifying on Etherscan')
+            await bre.run(TASK_VERIFY_CONTRACT, {
+              contractName,
+              address: contractAddress
+              // TODO: constructorArguments
+            })
+            logMain(`Successfully verified contract on Etherscan`)
           }
+          return mainContract.address
+        } else {
+          logMain('Reusing contract from previous version')
+          return prevVersion.contractAddress
         }
+      }
 
-        const contractAddress = await getContractAddress()
-        logMain(`contractAddress: ${contractAddress}`)
+      const contractAddress = await getContractAddress()
+      logMain(`contractAddress: ${contractAddress}`)
 
-        // Prepare release directory
-        // npm run build must create: index.html, src.js, script.js
-        await execa('npm', ['run', 'build'], { cwd: appSrcPath })
+      // Prepare release directory
+      // npm run build must create: index.html, src.js, script.js
+      await execa('npm', ['run', 'build'], { cwd: appSrcPath })
 
-        // Generate Aragon artifacts
-        const arapp = readArapp()
-        const manifest = readJson<AragonManifest>(manifestName)
-        const abi = readArtifacts(contractName)
-        const flatCode = await _flatten(bre)
-        const contractFunctions = parseContractFunctions(flatCode, contractName)
-        const artifact = getAragonArtifact(arapp, contractFunctions, abi)
-        writeJson(path.join(distPath, artifactName), artifact)
-        writeJson(path.join(distPath, manifestName), manifest)
-        writeFile(path.join(distPath, flatCodeName), flatCode)
+      // Generate Aragon artifacts
+      const arapp = readArapp()
+      const manifest = readJson<AragonManifest>(manifestName)
+      const abi = readArtifacts(contractName)
+      const flatCode = await _flatten(bre)
+      const contractFunctions = parseContractFunctions(flatCode, contractName)
+      const artifact = getAragonArtifact(arapp, contractFunctions, abi)
+      writeJson(path.join(distPath, artifactName), artifact)
+      writeJson(path.join(distPath, manifestName), manifest)
+      writeFile(path.join(distPath, flatCodeName), flatCode)
 
-        // Validate release files
-        validateRelease(distPath)
+      // Validate release files
+      validateRelease(distPath)
 
-        // Upload release directory to IPFS
-        logMain('Uploading release assets to IPFS...')
-        const contentHash = await uploadReleaseToIpfs(distPath, {
-          ipfsProvider,
-          ignorePatterns: ipfsIgnore
-        })
-        logMain(`Release assets uploaded to IPFS: ${contentHash}`)
+      // Upload release directory to IPFS
+      logMain('Uploading release assets to IPFS...')
+      const contentHash = await uploadReleaseToIpfs(distPath, {
+        ipfsProvider,
+        ignorePatterns: ipfsIgnore
+      })
+      logMain(`Release assets uploaded to IPFS: ${contentHash}`)
 
-        // Generate tx to publish new app to aragonPM
-        const versionInfo = {
-          version: nextVersion,
-          contractAddress,
-          contentUri: contentHash
-        }
+      // Generate tx to publish new app to aragonPM
+      const versionInfo = {
+        version: nextVersion,
+        contractAddress,
+        contentUri: contentHash
+      }
 
-        const txData = await publishVersion(appId, versionInfo, environment, {
-          managerAddress
-        })
+      const txData = await publishVersion(appId, versionInfo, environment, {
+        managerAddress
+      })
 
-        logMain(
-          `Successfully generated TX data for publishing ${appName} version ${nextVersion}
+      logMain(
+        `Successfully generated TX data for publishing ${appName} version ${nextVersion}
 
   to: ${txData.to}
   data: ${encodePublishVersionTxData(txData)}
 `
-        )
-      }
-    )
-}
+      )
+    }
+  )
 
 /**
  * Returns flatten source code
