@@ -16,6 +16,14 @@ export function readArapp(): AragonAppJson {
 }
 
 /**
+ * Reads and parses an arapp.json file only if exists
+ * otherwise returns undefined
+ */
+export function readArappIfExists(): AragonAppJson | undefined {
+  if (fs.existsSync(arappPath)) return readArapp()
+}
+
+/**
  * Returns app ens name.
  * @return "voting.open.aragonpm.eth"
  */
