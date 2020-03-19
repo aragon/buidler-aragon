@@ -16,6 +16,15 @@ export interface AragonConfig {
   clientServePort?: number
   appSrcPath?: string
   appBuildOutputPath?: string
+  /**
+   * If the appName is different per network use object form
+   * ```ts
+   * appName: {
+   *   rinkeby: "myapp.open.aragonpm.eth"
+   * }
+   * ```
+   */
+  appName?: string | { [network: string]: string }
   hooks?: AragonConfigHooks
 }
 
