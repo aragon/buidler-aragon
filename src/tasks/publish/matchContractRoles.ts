@@ -1,6 +1,6 @@
 import { flatten, uniqBy } from 'lodash'
-import { AragonContractFunction } from './types'
-import { Role } from './types'
+import { Role } from '~/src/types'
+import { AragonContractFunction } from '~/src/utils/ast'
 
 interface RoleMatchError {
   id: string

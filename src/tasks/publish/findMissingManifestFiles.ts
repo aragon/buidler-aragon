@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs'
-import { AragonManifest } from './types'
+import { AragonManifest } from '~/src/types'
 
 interface MissingFile {
   path: string

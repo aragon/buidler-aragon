@@ -1,8 +1,9 @@
-import { AragonConfig } from './types'
+import { AragonConfig, IpfsConfig } from './types'
 
 declare module '@nomiclabs/buidler/types' {
   interface BuidlerConfig {
     aragon?: AragonConfig
+    ipfs?: IpfsConfig
   }
 
   interface HttpNetworkConfig {

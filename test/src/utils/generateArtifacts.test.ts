@@ -1,10 +1,13 @@
 import { expect } from 'chai'
 import loadTestContract from '~/test/test-helpers/loadTestContract'
+import { generateAragonArtifact } from '~/src/utils/artifact'
 import {
-  generateApplicationArtifact,
-  AragonApplicationArtifact
-} from '~/src/utils/generateArtifacts'
-import { AragonAppJson, AbiItem, Role, AragonEnvironments } from '~/src/types'
+  AragonAppJson,
+  AbiItem,
+  Role,
+  AragonEnvironments,
+  AragonArtifact
+} from '~/src/types'
 
 describe('generateArtifacts.ts', () => {
   describe('generateApplicationArtifact', () => {
@@ -35,7 +38,8 @@ describe('generateArtifacts.ts', () => {
 
       const environments: AragonEnvironments = {}
 
-      const sourceCode = loadTestContract('BasicContract')
+      const contractName = 'BasicContract'
+      const sourceCode = loadTestContract(contractName)
 
       const contractEntrypointPath = 'contracts/Entrypoint.sol'
 
@@ -80,7 +84,7 @@ describe('generateArtifacts.ts', () => {
       }
       const abi: AbiItem[] = [abiModify, abiRemove, abiRemoveOverload]
 
-      const expectedAragonArtifact: AragonApplicationArtifact = {
+      const expectedAragonArtifact: AragonArtifact = {
         flattenedCode: './code.sol',
         environments,
         roles,
@@ -108,7 +112,12 @@ describe('generateArtifacts.ts', () => {
         path: contractEntrypointPath
       }
 
-      const aragonArtifact = generateApplicationArtifact(arapp, abi, sourceCode)
+      const aragonArtifact = generateAragonArtifact(
+        arapp,
+        abi,
+        sourceCode,
+        contractName
+      )
       expect(aragonArtifact).to.deep.equal(expectedAragonArtifact)
     })
   })
