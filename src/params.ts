@@ -1,17 +1,12 @@
-import { AragonConfig } from './types'
-import {
-  ARTIFACT_FILE,
-  MANIFEST_FILE,
-  ARAPP_FILE,
-  SOLIDITY_FILE,
-  ZERO_ADDRESS
-} from '@aragon/toolkit'
+// Standard expected Aragon file paths
+export const artifactName = 'artifact.json'
+export const manifestName = 'manifest.json'
+export const flatCodeName = 'code.sol'
+export const arappName = 'arapp.json'
 
-export const artifactName: string = ARTIFACT_FILE
-export const manifestName: string = MANIFEST_FILE
-export const flatCodeName: string = SOLIDITY_FILE
-export const arappName: string = ARAPP_FILE
-export const zeroAddress: string = ZERO_ADDRESS
+// Special addresses used for permissions
+export const zeroAddress = '0x0000000000000000000000000000000000000000'
+export const anyEntity = '0xffffffffffffffffffffffffffffffffffffffff'
 
 // The Aragon web client expects certain parameters to work locally:
 // - Local testnet node to connect to (testnetPort)
@@ -80,3 +75,19 @@ export const defaultLocalAragonBases = {
   daoFactoryAddress: '0x8EEaea23686c319133a7cC110b840d1591d9AeE0',
   apmAddress: '0xA53dE0b8e08b798f975D57f48384C177D410d170'
 }
+
+/**
+ * Chain ids of networks that support Etherscan contract verification
+ */
+export const etherscanSupportedChainIds = new Set([
+  // Mainnet
+  1,
+  // Ropsten
+  3,
+  // Rinkeby
+  4,
+  // Goerli
+  5,
+  // Kovan
+  42
+])

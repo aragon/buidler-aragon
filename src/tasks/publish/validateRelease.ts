@@ -7,10 +7,10 @@ import {
   arappName
 } from '../../params'
 import { readFile, readJson } from '../../utils/fsUtils'
-import { parseContractFunctions } from '@aragon/toolkit'
-import { AragonArtifact, AragonManifest } from './types'
+import { AragonArtifact, AragonManifest } from '~/src/types'
 import matchContractRoles from './matchContractRoles'
 import findMissingManifestFiles from './findMissingManifestFiles'
+import { parseContractFunctions } from '~/src/utils/ast'
 
 /**
  * Validates a release directory. Throws if there are issues

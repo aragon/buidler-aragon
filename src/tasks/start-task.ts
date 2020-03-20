@@ -10,8 +10,9 @@ import tcpPortUsed from 'tcp-port-used'
 import fsExtra from 'fs-extra'
 import path from 'path'
 import { aragenMnemonic, aragenAccounts } from '~/src/params'
-import { getAppName, getAppEnsName, getAppId } from '~/src/utils/arappUtils'
+import { getAppName, getAppEnsName } from '~/src/utils/arappUtils'
 import { validateEnsName } from '~/src/utils/validateEnsName'
+import { getAppId } from '../utils/appName'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,

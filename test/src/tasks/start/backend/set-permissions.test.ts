@@ -12,12 +12,8 @@ import {
   startGanache,
   stopGanache
 } from '~/src/tasks/start/backend/start-ganache'
-import {
-  readArapp,
-  getAppEnsName,
-  getAppId,
-  getAppName
-} from '~/src/utils/arappUtils'
+import { readArapp, getAppEnsName, getAppName } from '~/src/utils/arappUtils'
+import { getAppId } from '~/src/utils/appName'
 
 describe('set-permissions.ts', function() {
   // Note: These particular tests use localhost instead of buidlerevm.

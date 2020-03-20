@@ -1,6 +1,6 @@
 import path from 'path'
 import fsExtra from 'fs-extra'
-import { generateApplicationArtifact } from '~/src/utils/generateArtifacts'
+import { generateAragonArtifact } from '~/src/utils/artifact'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import {
   readArapp,
@@ -40,7 +40,7 @@ export async function generateUriArtifacts(
   const arapp = readArapp()
 
   // Generate artifacts file.
-  const appArtifacts = await generateApplicationArtifact(arapp, abi, source)
+  const appArtifacts = await generateAragonArtifact(arapp, abi, source)
 
   // Write artifacts to file.
   await fsExtra.writeJSON(
