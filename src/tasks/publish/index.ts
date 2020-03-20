@@ -110,7 +110,8 @@ async function publishTask(
       : typeof aragonConfig.appName === 'object'
       ? aragonConfig.appName[selectedNetwork]
       : undefined
-  if (!appName) throw Error(`appName must be defined in buidler.config`)
+  if (!appName)
+    throw new BuidlerPluginError(`appName must be defined in buidler.config`)
   const contractName = getMainContractName()
 
   // Initialize clients
@@ -162,7 +163,8 @@ async function publishTask(
   const arapp = readArapp()
   const manifest = readJson<AragonManifest>(manifestName)
   const abi = readArtifacts(contractName)
-  const flatCode = await _flatten(bre)
+  // buidler will detect and throw for cyclic dependencies
+  const flatCode = await bre.run(TASK_FLATTEN_GET_FLATTENED_SOURCE)
   const artifact = generateAragonArtifact(arapp, abi, flatCode, contractName)
   writeJson(path.join(distPath, artifactName), artifact)
   writeJson(path.join(distPath, manifestName), manifest)
@@ -252,24 +254,4 @@ async function _deployMainContract(
     logMain(`Successfully verified contract on Etherscan`)
   }
   return mainContract.address
-}
-
-/**
- * Returns flatten source code
- * # TODO: Of which contract?
- * # TODO: Verify that buidler's flatten algorythm supports cyclic imports
- * @param bre
- */
-async function _flatten(bre: BuidlerRuntimeEnvironment): Promise<string> {
-  try {
-    return await bre.run(TASK_FLATTEN_GET_FLATTENED_SOURCE)
-  } catch (e) {
-    throw new BuidlerPluginError(
-      `Your contract constains a cyclic dependency. You can:
-  - Remove unnecessary import statements, if any
-  - Abstract the interface of imported contracts in a separate file
-  - Merge multiple contracts in a single .sol file
-`
-    )
-  }
 }
