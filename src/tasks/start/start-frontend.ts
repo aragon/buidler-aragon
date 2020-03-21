@@ -4,9 +4,9 @@ import { logFront } from '~/src/ui/logger'
 import { AragonConfig } from '~/src/types'
 import { emitEvent, FRONTEND_STARTED_SERVING } from '~/src/ui/events'
 import { serveAppAndResolveWhenBuilt } from './frontend/serve-app'
-import { generateAppArtifacts } from './frontend/generate-artifacts'
 import { copyAppUiAssets } from './frontend/copy-assets'
 import { startAppWatcher } from './frontend/watch-app'
+import { generateArtifacts } from '~/src/utils/artifact'
 import onExit from '~/src/utils/onExit'
 import {
   installAragonClientIfNeeded,
@@ -32,7 +32,7 @@ export async function startFrontend(
   await installAragonClientIfNeeded()
 
   const appBuildOutputPath = config.appBuildOutputPath as string
-  await generateAppArtifacts(appBuildOutputPath, bre.artifacts)
+  await generateArtifacts(appBuildOutputPath, bre)
 
   logFront('Building front end (takes a minute)...')
   const appSrcPath = config.appSrcPath as string

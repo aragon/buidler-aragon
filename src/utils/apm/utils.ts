@@ -1,24 +1,6 @@
 import { ethers } from 'ethers'
 import semver from 'semver'
-import fetch from 'node-fetch'
 import { ApmVersion, ApmVersionReturn } from './types'
-
-/**
- * Clean an IPFS hash of prefixes and suffixes commonly found
- * in both gateway URLs and content URLs
- * @param ipfsDirtyHash
- */
-function stipIpfsPrefix(ipfsDirtyHash: string): string {
-  return (
-    ipfsDirtyHash
-      // Trim ending /ipfs/ tag
-      // "site.io:8080//ipfs//" => "site.io:8080"
-      .replace(/\/*ipfs\/*$/, '')
-      // Trim starting /ipfs/, ipfs: tag
-      // "/ipfs/Qm" => "Qm"
-      .replace(/^\/*ipfs[/:]*/, '')
-  )
-}
 
 /**
  * Parse a raw version response from an APM repo
@@ -44,11 +26,28 @@ export function toApmVersionArray(version: string): [number, number, number] {
 }
 
 /**
+ * Clean an IPFS hash of prefixes and suffixes commonly found
+ * in both gateway URLs and content URLs
+ * @param ipfsDirtyHash
+ */
+function stipIpfsPrefix(ipfsDirtyHash: string): string {
+  return (
+    ipfsDirtyHash
+      // Trim ending /ipfs/ tag
+      // "site.io:8080//ipfs//" => "site.io:8080"
+      .replace(/\/*ipfs\/*$/, '')
+      // Trim starting /ipfs/, ipfs: tag
+      // "/ipfs/Qm" => "Qm"
+      .replace(/^\/*ipfs[/:]*/, '')
+  )
+}
+
+/**
  * Return a fetchable URL to get the resources of a contentURI
  * @param contentUri "ipfs:QmaT4Eef..."
  * @param options
  */
-export function getFetchUrlFromContentUri(
+export function contentUriToFetchUrl(
   contentUri: string,
   options?: { ipfsGateway?: string }
 ): string {
@@ -85,24 +84,16 @@ export function toContentUri(
 }
 
 /**
- * Fetch and parse JSON from an HTTP(s) URL
- * @param url
- */
-export async function fetchJson<T>(url: string): Promise<T> {
-  return fetch(url).then(res => res.json())
-}
-
-/**
  * Returns true if is an address
  * @param address
  */
 export function isAddress(address: string): boolean {
   try {
     ethers.utils.getAddress(address)
+    return true
   } catch (e) {
     return false
   }
-  return true
 }
 
 /**

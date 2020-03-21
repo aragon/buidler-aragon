@@ -8,8 +8,8 @@ import {
 } from '../../params'
 import { readFile, readJson } from '../../utils/fsUtils'
 import { AragonArtifact, AragonManifest } from '~/src/types'
-import matchContractRoles from './matchContractRoles'
-import findMissingManifestFiles from './findMissingManifestFiles'
+import { matchContractRoles } from './matchContractRoles'
+import { findMissingManifestFiles } from './findMissingManifestFiles'
 import { parseContractFunctions } from '~/src/utils/ast'
 
 /**
@@ -17,7 +17,7 @@ import { parseContractFunctions } from '~/src/utils/ast'
  * - Make sure contract roles match arapp.json roles
  * - Make sure filepaths in the manifest exist
  */
-export default function validateRelease(distPath: string): void {
+export function validateArtifacts(distPath: string): void {
   // Load files straight from the dist directory
   const artifact = readJson<AragonArtifact>(path.join(distPath, artifactName))
   const manifest = readJson<AragonManifest>(path.join(distPath, manifestName))
