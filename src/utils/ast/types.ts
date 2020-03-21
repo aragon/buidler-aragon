@@ -1,6 +1,6 @@
 export interface AragonContractFunction {
   name: string
-  notice: string
-  paramTypes: string[]
+  sig: string
+  notice: string | null
   roles: { id: string; paramCount: number }[]
 }

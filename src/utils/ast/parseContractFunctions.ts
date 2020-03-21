@@ -1,7 +1,9 @@
 import * as parser from 'solidity-parser-antlr'
 import path from 'path'
 import { AragonContractFunction } from './types'
-// import { parseFunctionsNotices } from './parseFunctionNotices'
+import { coerceFunctionSignature } from './utils'
+import { parseFunctionsNotices } from './parseFunctionNotices'
+import { keyBy } from 'lodash'
 
 /**
  * Helper to parse the role name from a modifier node
@@ -49,30 +51,47 @@ function parseRoleParamCountFromNode(
 }
 
 /**
- * Helper to parse the paramType of an argument to guess the signature
- * Using an isolated function to use a switch / return structure
+ * Parse the function signature from a node to latter match it with
+ * it ABI, as it's necessary for artifact.json's .functions property
  * @param node
  */
-function parseParamTypeFromNode(node: parser.VariableDeclaration): string {
-  switch (node.typeName.type) {
-    case 'ElementaryTypeName':
-      return node.typeName.name
-    case 'ArrayTypeName':
-      // eslint-disable-next-line no-case-declarations
-      const { baseTypeName, length } = node.typeName
-      if (
-        baseTypeName.type === 'ElementaryTypeName' &&
-        length &&
-        length.type === 'NumberLiteral'
-      ) {
-        return `${baseTypeName.name}[${length.number}]`
-      } else {
-        return ''
+function parseFunctionSignatureFromNode(
+  node: parser.FunctionDefinition
+): string {
+  const paramTypes = node.parameters.map(
+    /**
+     * Helper to parse the paramType of an argument to guess the signature
+     * Using an isolated function to use a switch / return structure
+     */
+    (nodeParam: parser.VariableDeclaration): string => {
+      switch (nodeParam.typeName.type) {
+        case 'ElementaryTypeName':
+          return nodeParam.typeName.name
+        case 'ArrayTypeName':
+          // eslint-disable-next-line no-case-declarations
+          const { baseTypeName, length } = nodeParam.typeName
+          if (baseTypeName.type === 'ElementaryTypeName') {
+            if (length && length.type === 'NumberLiteral') {
+              // Known length uint[3]
+              return `${baseTypeName.name}[${length.number}]`
+            } else if (!length) {
+              // Unknown length uint[]
+              return `${baseTypeName.name}[]`
+            } else {
+              return ''
+            }
+          }
+          return ''
+        case 'UserDefinedTypeName':
+          return 'address'
       }
-    case 'UserDefinedTypeName':
       return 'address'
-  }
-  return 'address'
+    }
+  )
+  // Don't return "fallback()" for the fallback function
+  return node.name
+    ? coerceFunctionSignature(`${node.name}(${paramTypes.join(',')})`)
+    : 'fallback'
 }
 
 /**
@@ -87,11 +106,18 @@ function parseParamTypeFromNode(node: parser.VariableDeclaration): string {
  *
  * @param sourceCode Solidity flatten source code
  * @param targetContract "Counter" | "contract/Counter.sol"
+ * @param options
+ * - onlyTargetContract Only include functions from the target contract
  */
 export function parseContractFunctions(
   sourceCode: string,
-  targetContract: string
+  targetContract: string,
+  options?: {
+    onlyTargetContract?: boolean
+  }
 ): AragonContractFunction[] {
+  const { onlyTargetContract } = options || {}
+
   const targetContractName = path.parse(targetContract).name
   const ast = parser.parse(sourceCode, {})
   const functions: AragonContractFunction[] = []
@@ -140,16 +166,14 @@ export function parseContractFunctions(
         subNode.visibility !== 'private' &&
         subNode.stateMutability !== 'view' &&
         subNode.stateMutability !== 'pure' &&
-        subNode.stateMutability !== 'constant' &&
-        // Ignore the initialize function
-        subNode.name !== 'initialize'
+        subNode.stateMutability !== 'constant'
       ) {
         // Check the modifiers
         functions.push({
           name: subNode.name || '',
           notice: '',
           // Parse parameters for signature, some functions may be overloaded
-          paramTypes: subNode.parameters.map(parseParamTypeFromNode),
+          sig: parseFunctionSignatureFromNode(subNode),
           // Parse the auth modifiers
           roles: subNode.modifiers
             .filter(modNode => ['auth', 'authP'].includes(modNode.name))
@@ -171,7 +195,7 @@ export function parseContractFunctions(
       if (baseName && !parsedContract.has(baseName)) {
         parsedContract.add(node.name)
         const contract = contracts.find(node => node.name === baseName)
-        if (contract) parseContract(contract)
+        if (contract && !onlyTargetContract) parseContract(contract)
       }
     }
   }
@@ -189,7 +213,13 @@ export function parseContractFunctions(
   // which are parsed here separately using regex against the source string
   // Functions are mapped with each other on a best effort using their
   // guessed signature, which may be wrong if complex syntax is used
-  // const functionNotices = parseFunctionsNotices(sourceCode)
-
+  const notices = parseFunctionsNotices(sourceCode)
+  const noticesBySignature = keyBy(notices, n => n.signature)
+  for (const fn of functions)
+    if (!fn.notice) {
+      const extractedNotice = (noticesBySignature[fn.sig] || {}).notice
+      // notice = null if notice not found, '' if empty
+      fn.notice = typeof extractedNotice === 'string' ? extractedNotice : null
+    }
   return functions
 }

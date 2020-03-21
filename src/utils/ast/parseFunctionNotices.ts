@@ -50,7 +50,7 @@ const expandTypeForSignature = (type: string): string =>
  */
 function getSignature(declaration: string): string {
   const declarationMatch = declaration.match(/^\s*function ([^]*?)\)/m)
-  if (!declarationMatch) throw Error('Not a function')
+  if (!declarationMatch) return ''
 
   const [name, params] = declarationMatch[1].split('(')
 

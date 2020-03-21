@@ -72,10 +72,10 @@ export interface IpfsConfig {
  */
 
 export interface Role {
-  name: string
-  id: string
-  params: string[]
-  bytes: string
+  name: string // 'Create new payments'
+  id: string // 'CREATE_PAYMENTS_ROLE'
+  params: string[] //  ['Token address', ... ]
+  bytes: string // '0x5de467a460382d13defdc02aacddc9c7d6605d6d4e0b8bd2f70732cae8ea17bc'
 }
 
 // The aragon manifest requires the use of camelcase for some names
@@ -84,7 +84,7 @@ export interface AragonManifest {
   name: string // 'Counter'
   author: string // 'Aragon Association'
   description: string // 'An application for Aragon'
-  changelog_url: string // "https://github.com/aragon/aragon-apps/releases",
+  changelog_url: string // 'https://github.com/aragon/aragon-apps/releases',
   details_url: string // '/meta/details.md'
   source_url: string // 'https://<placeholder-repository-url>'
   icons: {
@@ -99,19 +99,49 @@ export interface AragonManifest {
 }
 /* eslint-enable camelcase */
 
+interface AragonArtifactFunction {
+  roles: string[]
+  sig: string
+  /**
+   * This field might not be able if the contract does not use
+   * conventional solidity syntax and Aragon naming standards
+   * null if there in no notice
+   */
+  notice: string | null
+  /**
+   * The function's ABI element is included for convenience of the client
+   * null if ABI is not found for this signature
+   */
+  abi: AbiItem | null
+}
+
 export interface AragonArtifact extends AragonAppJson {
-  roles: RoleWithBytes[]
-  functions: {
-    roles: string[]
-    notice: string
-    abi: AbiItem | undefined
-    sig: string | undefined
-  }[]
-  environments: AragonEnvironments
+  roles: Role[]
   abi: AbiItem[]
-  path: string // 'contracts/Finance.sol'
-  // Additional metadata for accountability
-  flattenedCode: string
+  /**
+   * All publicly accessible functions
+   * Includes metadata needed for radspec and transaction pathing
+   * initialize() function should also be included for completeness
+   */
+  functions: AragonArtifactFunction[]
+  /**
+   * Functions that are no longer available at `version`
+   */
+  deprecatedFunctions: {
+    [version: string]: AragonArtifactFunction[]
+  }
+  /**
+   * The flaten source code of the contracts must be included in
+   * any type of release at this path
+   */
+  flattenedCode: string // "./code.sol"
+  appId: string
+  appName: string
+
+  // env: AragonEnvironment // DEPRECATED
+  // deployment: any // DEPRECATED
+  // path: string // DEPRECATED 'contracts/Finance.sol'
+  // environments: AragonEnvironments // DEPRECATED
 }
 
 export interface AragonAppJson {
@@ -128,16 +158,6 @@ export interface AragonAppJson {
       params: string // '*'
     }[]
   }[]
-}
-
-export interface Role {
-  name: string // "Change period duration",
-  id: string // "CHANGE_PERIOD_ROLE",
-  params: string[] // [ "New period duration", "Old period duration"]
-}
-
-interface RoleWithBytes extends Role {
-  bytes: string //  '0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d'
 }
 
 export interface AragonEnvironments {
