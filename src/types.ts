@@ -136,7 +136,7 @@ export interface Role {
   params: string[] // [ "New period duration", "Old period duration"]
 }
 
-export interface RoleWithBytes extends Role {
+interface RoleWithBytes extends Role {
   bytes: string //  '0xd35e458bacdd5343c2f050f574554b2f417a8ea38d6a9a65ce2225dbe8bb9a9d'
 }
 
