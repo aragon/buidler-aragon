@@ -30,7 +30,7 @@ export function toApmVersionArray(version: string): [number, number, number] {
  * in both gateway URLs and content URLs
  * @param ipfsDirtyHash
  */
-function stipIpfsPrefix(ipfsDirtyHash: string): string {
+export function stipIpfsPrefix(ipfsDirtyHash: string): string {
   return (
     ipfsDirtyHash
       // Trim ending /ipfs/ tag
@@ -51,11 +51,11 @@ export function contentUriToFetchUrl(
   contentUri: string,
   options?: { ipfsGateway?: string }
 ): string {
-  const [protocol, location] = contentUri.split(/:(.+)/)
+  const [protocol, location] = contentUri.split(/[/:](.+)/)
   switch (protocol) {
     case 'http':
     case 'https':
-      return contentUri
+      return location.includes('://') ? location : contentUri
     case 'ipfs':
       if (!options || !options.ipfsGateway)
         throw Error(`Must provide an ipfsGateway for protocol 'ipfs'`)
