@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import parseAndValidateBumpOrVersion from '~/src/tasks/publish/parseAndValidateBumpOrVersion'
 
-describe.only('parseAndValidateBumpOrVersion', () => {
+describe('parseAndValidateBumpOrVersion', () => {
   const testCases: {
     id: string
     // Arguments

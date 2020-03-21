@@ -265,6 +265,10 @@ async function _runStartTask(): Promise<void> {
     {}
   )
 
+  // Piping output because it's crucial to debugging errors
+  // Otherwise when the test fails / hangs there are no clues
+  if (startTaskProcess.stdout) startTaskProcess.stdout.pipe(process.stdout)
+
   // Trigger the process but don't wait for it!
   if (DEBUG_START_TASK_CYCLE) {
     // eslint-disable-next-line no-console
@@ -275,7 +279,10 @@ async function _runStartTask(): Promise<void> {
     (async (): Promise<void> => {
       // The task will be intentionally terminated by _killStartTask()
       // so we want to catch that SIGTERM error.
-      await startTaskProcess.catch(() => {})
+      await startTaskProcess.catch((e) => {
+        console.log(`Captured error running start task`)
+        console.log(e)
+      })
     })()
   }
 

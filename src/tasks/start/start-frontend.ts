@@ -31,6 +31,7 @@ export async function startFrontend(
   logFront('Checking Aragon client...')
   await installAragonClientIfNeeded()
 
+  logFront('Generating app artifacts...')
   const appBuildOutputPath = config.appBuildOutputPath as string
   await generateArtifacts(appBuildOutputPath, bre)
 

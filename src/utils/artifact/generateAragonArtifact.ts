@@ -1,41 +1,45 @@
-import { mapValues } from 'lodash'
-import { AragonAppJson, AragonArtifact } from '~/src/types'
+import { AragonAppJson, AragonArtifact, AragonEnvironment } from '~/src/types'
 import { keccak256, AbiItem } from 'web3-utils'
 import { getAppId } from '../appName'
 import { parseContractFunctions, AragonContractFunction } from '../ast'
+import { keyBy } from 'lodash'
+import { ethers } from 'ethers'
+
+const abiFallback = {
+  payable: true,
+  stateMutability: 'payable',
+  type: 'fallback'
+}
 
 function _generateAragonArtifact(
   arapp: AragonAppJson,
   abi: AbiItem[],
   functions: AragonContractFunction[]
 ): AragonArtifact {
+  const abiFunctions = abi.filter(abiElem => abiElem.type === 'function')
+  const abiBySignature = keyBy(abiFunctions, ethers.utils.formatSignature)
+
+  // Get mainnet env
+  const mainnetEnv: AragonEnvironment | undefined =
+    arapp.environments['mainnet']
+  const appName = (mainnetEnv || {}).appName || ''
+
   return {
     ...arapp,
 
-    // Artifact appears to require the appId of each environment
-    environments: mapValues(arapp.environments, environment => ({
-      ...environment,
-      appId: environment.appName ? getAppId(environment.appName) : undefined
+    // Artifact appears to require the abi of each function
+    functions: functions.map(parsedFn => ({
+      roles: parsedFn.roles.map(role => role.id),
+      notice: parsedFn.notice,
+      abi:
+        abiBySignature[parsedFn.sig] ||
+        (parsedFn.sig === 'fallback' ? abiFallback : null),
+      // #### Todo: Is the signature actually necessary?
+      // > Will keep them for know just in case, they are found in current release
+      sig: parsedFn.sig
     })),
 
-    // Artifact appears to require the abi of each function
-    functions: functions.map(fn => {
-      const fnAbi = abi.find(
-        abiElem =>
-          abiElem.type === 'function' &&
-          abiElem.name === fn.name &&
-          abiElem.inputs &&
-          abiElem.inputs.length === fn.paramTypes.length
-      )
-      return {
-        roles: fn.roles.map(role => role.id),
-        notice: fn.notice,
-        abi: fnAbi,
-        // #### Todo: Is the signature actually necessary?
-        // > Will keep them for know just in case, they are found in current release
-        sig: ''
-      }
-    }),
+    deprecatedFunctions: {},
 
     // Artifact appears to require the roleId to have bytes precomputed
     roles: (arapp.roles || []).map(role => ({
@@ -45,7 +49,9 @@ function _generateAragonArtifact(
 
     abi,
     // Additional metadata
-    flattenedCode: `./code.sol`
+    flattenedCode: './code.sol',
+    appName,
+    appId: appName ? getAppId(appName) : ''
   }
 }
 
