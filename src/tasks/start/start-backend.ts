@@ -18,7 +18,7 @@ import {
   BACKEND_PROXY_UPDATED,
   emitEvent
 } from '~/src/ui/events'
-import { generateUriArtifacts } from './frontend/generate-artifacts'
+import { generateArtifacts } from '~/src/utils/artifact'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -157,7 +157,7 @@ export async function startBackend(
       // Update artifacts.
       logBack('Updating artifacts...')
       const appBuildOutputPath = config.appBuildOutputPath as string
-      await generateUriArtifacts(appBuildOutputPath, bre.artifacts)
+      await generateArtifacts(appBuildOutputPath, bre)
 
       // Update app.
       logBack('Updating app...')

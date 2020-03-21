@@ -14,7 +14,7 @@ interface RoleMatchError {
  * @param functions
  * @param roles
  */
-export default function matchContractRoles(
+export function matchContractRoles(
   functions: AragonContractFunction[],
   roles: Role[]
 ): RoleMatchError[] {

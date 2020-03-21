@@ -1,19 +1,7 @@
 import { ethers } from 'ethers'
 import { repoAbi } from './abis'
-import {
-  parseApmVersionReturn,
-  toApmVersionArray,
-  getFetchUrlFromContentUri,
-  fetchJson
-} from './utils'
-import {
-  ApmVersion,
-  ApmVersionReturn,
-  ApmRepoInstance,
-  AragonApmRepoData
-} from './types'
-import { AragonManifest, AragonArtifact } from '~/src/types'
-import { isAddress } from 'web3-utils'
+import { parseApmVersionReturn, toApmVersionArray, isAddress } from './utils'
+import { ApmVersion, ApmVersionReturn, ApmRepoInstance } from './types'
 import { getFullAppName } from '../appName'
 
 /**
@@ -34,71 +22,34 @@ async function _getRepoVersion(
   return parseApmVersionReturn(res)
 }
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-export function Repo(
-  provider: ethers.providers.Provider,
-  optionsGlobal?: { ipfsGateway?: string }
-) {
-  /**
-   * Returns ApmRepoInstance ethers contract instance
-   * Make sure appId is a full ENS domain
-   * @param appId
-   */
-  function _getApmRepoInstance(appId: string): ApmRepoInstance {
-    const addressOrFullEnsName = isAddress(appId)
-      ? appId
-      : getFullAppName(appId)
-    return new ethers.Contract(
-      addressOrFullEnsName,
-      repoAbi,
-      provider
-    ) as ApmRepoInstance
-  }
+/**
+ * Return a Repo instance of an ethers contract
+ * @param appId "finance", "finance.aragonpm.eth", "0xa600c17..."
+ * @param provider Initialized ethers provider
+ */
+function _getRepoInstance(
+  appId: string,
+  provider: ethers.providers.Provider
+): ApmRepoInstance {
+  const addressOrFullEnsName = isAddress(appId) ? appId : getFullAppName(appId) // Make sure appId is a full ENS domain
+  return new ethers.Contract(
+    addressOrFullEnsName,
+    repoAbi,
+    provider
+  ) as ApmRepoInstance
+}
 
-  return {
-    /**
-     * Fetch a single version of an APM Repo
-     * @param appId 'finance.aragonpm.eth'
-     * @param version Version to fetch: 'latest', '0.2.0', 14
-     * @param provider Initialized ethers provider
-     */
-    getVersion: async function(
-      appId: string,
-      version: 'latest' | string | number = 'latest'
-    ): Promise<ApmVersion> {
-      const repo = _getApmRepoInstance(appId)
-      return _getRepoVersion(repo, version)
-    },
-
-    /**
-     * Fetch a single version of an APM Repo and resolve its contents
-     * @param appId 'finance.aragonpm.eth'
-     * @param version Version to fetch: 'latest', '0.2.0', 14
-     * @param options additional options to process version data
-     * @param options.ipfsGateway 'http://localhost:8080' | 'https://my-remote-ipfs.io'
-     */
-    getVersionContent: async function(
-      appId: string,
-      version: 'latest' | string | number = 'latest',
-      options?: { ipfsGateway?: string }
-    ): Promise<AragonApmRepoData> {
-      const versionInfo = await this.getVersion(appId, version)
-
-      const { contentUri } = versionInfo
-      const ipfsGateway =
-        (options || {}).ipfsGateway || (optionsGlobal || {}).ipfsGateway
-      const url = getFetchUrlFromContentUri(contentUri, { ipfsGateway })
-
-      const [manifest, artifact] = await Promise.all([
-        fetchJson<AragonManifest>(`${url}/manifest.json`),
-        fetchJson<AragonArtifact>(`${url}/artifact.json`)
-      ])
-
-      return {
-        ...versionInfo,
-        ...manifest,
-        ...artifact
-      }
-    }
-  }
+/**
+ * Fetch a single version of an APM Repo
+ * @param repoNameOrAddress "finance", "finance.aragonpm.eth", "0xa600c17..."
+ * @param version Version to fetch: 'latest', '0.2.0', 14
+ * @param provider Initialized ethers provider
+ */
+export function getRepoVersion(
+  repoNameOrAddress: string,
+  version: 'latest' | string | number = 'latest',
+  provider: ethers.providers.Provider
+): Promise<ApmVersion> {
+  const repo = _getRepoInstance(repoNameOrAddress, provider)
+  return _getRepoVersion(repo, version)
 }

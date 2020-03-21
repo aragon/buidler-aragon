@@ -15,7 +15,7 @@ interface MissingFile {
  * @param manifest
  * @param distPath
  */
-export default function findMissingManifestFiles(
+export function findMissingManifestFiles(
   manifest: AragonManifest,
   distPath: string
 ): MissingFile[] {

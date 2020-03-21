@@ -1,4 +1,3 @@
-import { AragonManifest, AragonArtifact } from '~/src/types'
 import { ethers } from 'ethers'
 
 export interface AragonJsIntent {
@@ -7,12 +6,6 @@ export interface AragonJsIntent {
   methodName: string
   params: string[]
   targetContract: string
-}
-
-interface ApmRepoVersion {
-  version: string
-  contract: string
-  contentHash: string
 }
 
 /**
@@ -33,6 +26,12 @@ export interface ApmVersionReturn {
   contentURI: string // bytes
 }
 
+export interface PublishVersionTxData {
+  to: string
+  methodName: 'newVersion' | 'newRepoWithVersion'
+  params: any[]
+}
+
 /**
  * Typed contract instance for APM Repo
  * ### TODO: Migrate to a better system such as Typechain
@@ -44,12 +43,3 @@ export interface ApmRepoInstance extends ethers.Contract {
     version: [number, number, number]
   ) => Promise<ApmVersionReturn>
 }
-
-/**
- * Complex type used in the current apm.js API
- * ### TODO: Simplify return types
- */
-export interface AragonApmRepoData
-  extends ApmVersion,
-    AragonArtifact,
-    AragonManifest {}

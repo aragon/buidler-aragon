@@ -1,39 +1,21 @@
-import path from 'path'
-import execa from 'execa'
 import { task, types } from '@nomiclabs/buidler/config'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import {
   BuidlerRuntimeEnvironment,
   HttpNetworkConfig
 } from '@nomiclabs/buidler/types'
-import {
-  artifactName,
-  manifestName,
-  flatCodeName,
-  zeroAddress,
-  etherscanSupportedChainIds
-} from '../../params'
-import { writeFile, readJson, writeJson } from '../../utils/fsUtils'
-import {
-  TASK_COMPILE,
-  TASK_VERIFY_CONTRACT,
-  TASK_PUBLISH,
-  TASK_FLATTEN_GET_FLATTENED_SOURCE
-} from '../task-names'
+import { zeroAddress, etherscanSupportedChainIds } from '../../params'
+import execa from 'execa'
+import { TASK_COMPILE, TASK_VERIFY_CONTRACT, TASK_PUBLISH } from '../task-names'
 import { logMain } from '../../ui/logger'
-import { AragonConfig, AragonManifest } from '~/src/types'
+import { AragonConfig } from '~/src/types'
 import uploadReleaseToIpfs from './uploadDistToIpfs'
 import parseAndValidateBumpOrVersion from './parseAndValidateBumpOrVersion'
-import validateRelease from './validateRelease'
-import readArtifacts from './readArtifacts'
-import { getMainContractName, readArapp } from '../../utils/arappUtils'
-import encodePublishVersionTxData from './encodePublishVersionTxData'
-import { Apm } from '~/src/utils/apm'
-import { generateAragonArtifact } from '~/src/utils/artifact'
+import { getMainContractName } from '../../utils/arappUtils'
+import * as apm from '~/src/utils/apm'
+import { generateArtifacts, validateArtifacts } from '~/src/utils/artifact'
 import { getFullAppName } from '~/src/utils/appName'
 import { ethers } from 'ethers'
-import { ApmVersion } from '~/src/utils/apm/types'
-import { toContentUri } from '~/src/utils/apm/utils'
 
 task(TASK_PUBLISH, 'Publish a new app version')
   .addPositionalParam(
@@ -115,7 +97,6 @@ async function publishTask(
   const contractName = getMainContractName()
 
   // Initialize clients
-  const globalOptions = {}
   const networkConfig = bre.network.config as HttpNetworkConfig
   const provider = new ethers.providers.Web3Provider(
     bre.web3.currentProvider,
@@ -125,7 +106,6 @@ async function publishTask(
       ensAddress: networkConfig.ensAddress
     }
   )
-  const apm = Apm(provider, globalOptions)
 
   const prevVersion = await _getLastestVersionIfExists(appName, provider)
 
@@ -158,20 +138,10 @@ async function publishTask(
   logMain(`Building app front-end at ${appSrcPath}`)
   await execa('npm', ['run', 'build'], { cwd: appSrcPath })
 
-  // Generate Aragon artifacts
+  // Generate and validate Aragon artifacts, release files
   logMain(`Generating Aragon app artifacts`)
-  const arapp = readArapp()
-  const manifest = readJson<AragonManifest>(manifestName)
-  const abi = readArtifacts(contractName)
-  // buidler will detect and throw for cyclic dependencies
-  const flatCode = await bre.run(TASK_FLATTEN_GET_FLATTENED_SOURCE)
-  const artifact = generateAragonArtifact(arapp, abi, flatCode, contractName)
-  writeJson(path.join(distPath, artifactName), artifact)
-  writeJson(path.join(distPath, manifestName), manifest)
-  writeFile(path.join(distPath, flatCodeName), flatCode)
-
-  // Validate release files
-  validateRelease(distPath)
+  await generateArtifacts(distPath, bre)
+  validateArtifacts(distPath)
 
   // Upload release directory to IPFS
   logMain('Uploading release assets to IPFS...')
@@ -185,10 +155,10 @@ async function publishTask(
   const versionInfo = {
     version: nextVersion,
     contractAddress,
-    contentUri: toContentUri('ipfs', contentHash)
+    contentUri: apm.toContentUri('ipfs', contentHash)
   }
 
-  const txData = await apm.publishVersion(appName, versionInfo, {
+  const txData = await apm.publishVersion(appName, versionInfo, provider, {
     managerAddress
   })
 
@@ -196,7 +166,7 @@ async function publishTask(
     `Successfully generated TX data for publishing ${appName} version ${nextVersion}
 
 to: ${txData.to}
-data: ${encodePublishVersionTxData(txData)}
+data: ${apm.encodePublishVersionTxData(txData)}
 `
   )
 }
@@ -210,7 +180,7 @@ data: ${encodePublishVersionTxData(txData)}
 async function _getLastestVersionIfExists(
   appName: string,
   provider: ethers.providers.Provider
-): Promise<ApmVersion | undefined> {
+): Promise<apm.ApmVersion | undefined> {
   const fullAppName = getFullAppName(appName)
   // Check ENS name first since ethers causes an UnhandledPromiseRejectionWarning
   const repoAddress = await provider.resolveName(fullAppName)
@@ -218,8 +188,7 @@ async function _getLastestVersionIfExists(
 
   // Check for latest version but expect errors
   try {
-    const apm = Apm(provider)
-    return await apm.getVersion(repoAddress)
+    return await apm.getRepoVersion(repoAddress, 'latest', provider)
   } catch (e) {
     if (e.message.includes('ENS name not configured')) return
     throw e
