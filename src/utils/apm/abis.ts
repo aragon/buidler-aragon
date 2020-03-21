@@ -1,5 +1,5 @@
 export const apmRegistryAbi = [
-  'function newRepoWithVersion(string _name, address _dev, uint16[3] _initialSemanticVersion, address _contractAddress, bytes _contentURI) public auth(CREATE_REPO_ROLE) returns (Repo)',
+  'function newRepoWithVersion(string _name, address _dev, uint16[3] _initialSemanticVersion, address _contractAddress, bytes _contentURI) public returns (address)',
   'event NewRepo(bytes32 id, string name, address repo)'
 ]
 
