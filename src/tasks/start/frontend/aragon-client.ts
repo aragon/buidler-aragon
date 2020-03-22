@@ -19,7 +19,7 @@ export async function installAragonClientIfNeeded(
   const clientPath: string = _getClientPath(version)
 
   if (await _checkClientInstallationNeeded(clientPath)) {
-    fsExtra.ensureDirSync(clientPath, { recursive: true })
+    fsExtra.ensureDirSync(clientPath)
 
     logFront(
       `Installing client version ${version} locally (takes a couple of minutes)...`

@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build-projects": "npm run build-counter && npm run build-token-wrapper",
+    "build-projects": "npm run build-counter && npm run build-token-wrapper && npm run build-test-app",
+    "build-counter": "cd counter && npm install && cd ..",
     "build-token-wrapper": "cd token-wrapper && npm install && cd ..",
-    "build-counter": "cd counter && npm install && cd .."
+    "build-test-app": "cd test-app && npm install && cd .."
   },
   "keywords": [],
   "author": "",

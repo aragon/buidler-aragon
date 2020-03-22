@@ -1,0 +1,16 @@
+{
+  "name": "Test app",
+  "author": "testing",
+  "description": "Test app",
+  "details_url": "/meta/details.md",
+  "source_url": "",
+  "icons": [
+    {
+      "src": "/meta/icon.svg",
+      "sizes": "56x56"
+    }
+  ],
+  "screenshots": [{ "src": "/meta/screenshot-1.png" }],
+  "start_url": "/index.html",
+  "script": "/script.js"
+}
