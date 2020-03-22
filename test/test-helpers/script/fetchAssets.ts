@@ -5,14 +5,13 @@
  */
 
 import path from 'path'
-import fs from 'fs'
 import {
   getRepoVersion,
   resolveRepoContentUri,
   resolveRepoContentUriFile
 } from '~/src/utils/apm'
 import { getMainnetProvider } from '~/test/test-helpers/providers'
-import { writeJson, writeFile } from '~/src/utils/fsUtils'
+import { writeJson, writeFile, ensureDir } from '~/src/utils/fsUtils'
 import { artifactName, flatCodeName } from '~/src/params'
 
 const ipfsGateway = 'https://ipfs.eth.aragon.network/ipfs/'
@@ -34,9 +33,9 @@ async function fetchAppPublishedAssets(
     options
   )
   const appPath = path.join(outDir, appName)
-  if (!fs.existsSync(appPath)) fs.mkdirSync(appPath, { recursive: true })
-  writeJson(path.join(appPath, artifactName), artifact)
-  writeFile(path.join(appPath, flatCodeName), flatCode)
+  ensureDir(appPath)
+  writeJson([appPath, artifactName], artifact)
+  writeFile([appPath, flatCodeName], flatCode)
 }
 
 export async function fetchPublishedAssets(outDir): Promise<void> {

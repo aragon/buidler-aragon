@@ -25,17 +25,13 @@ export function listTestCases(): TestCase[] {
   for (const appName of fs.readdirSync(dir)) {
     const appPath = path.join(dir, appName)
     if (fs.lstatSync(appPath).isDirectory()) {
-      const arappPath = path.join(appPath, arappName)
-      const artifactPath = path.join(appPath, artifactName)
-      const manifestPath = path.join(appPath, manifestName)
-      const flatCodePath = path.join(appPath, flatCodeName)
       const testCase: TestCase = {
         appName,
         appPath,
-        arapp: readJsonIfExists(arappPath),
-        artifact: readJsonIfExists(artifactPath),
-        manifest: readJsonIfExists(manifestPath),
-        flatCode: readFileIfExists(flatCodePath)
+        arapp: readJsonIfExists([appPath, arappName]),
+        artifact: readJsonIfExists([appPath, artifactName]),
+        manifest: readJsonIfExists([appPath, manifestName]),
+        flatCode: readFileIfExists([appPath, flatCodeName])
       }
       testCases.push(testCase)
     }

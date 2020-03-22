@@ -1,10 +1,8 @@
 import { assert } from 'chai'
-import path from 'path'
-import fs from 'fs'
 import { generateAragonArtifact } from '~/src/utils/artifact'
 import { listTestCases } from '~/test/test-helpers/test-cases-apps/listCases'
 import { sortBy, keyBy } from 'lodash'
-import { writeJson } from '~/src/utils/fsUtils'
+import { writeJson, ensureDir } from '~/src/utils/fsUtils'
 import { artifactName } from '~/src/params'
 import { AragonArtifact } from '~/src/types'
 import { debugDir } from '~/test/testParams'
@@ -25,12 +23,8 @@ describe('ast > generateAragonArtifact', () => {
 
         // Store the created files for easier debugging
         if (writeToDebug) {
-          if (!fs.existsSync(debugDir))
-            fs.mkdirSync(debugDir, { recursive: true })
-          writeJson(
-            path.join(debugDir, `${appName}_${artifactName}`),
-            newArtifact
-          )
+          ensureDir(debugDir)
+          writeJson([debugDir, `${appName}_${artifactName}`], newArtifact)
         }
 
         // Compare the functions array as an object before

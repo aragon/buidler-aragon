@@ -7,13 +7,12 @@ import { startBackend } from './start/start-backend'
 import { startFrontend } from './start/start-frontend'
 import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
-import fsExtra from 'fs-extra'
-import path from 'path'
 import { aragenMnemonic, aragenAccounts } from '~/src/params'
 import { getAppName, getAppEnsName } from '~/src/utils/arappUtils'
 import { validateEnsName } from '~/src/utils/validateEnsName'
 import { getAppId } from '../utils/appName'
 import onExit from '../utils/onExit'
+import { readJson, pathExists } from '../utils/fsUtils'
 
 type CallbackClose = () => void
 
@@ -71,11 +70,18 @@ ${accountsStr}`)
       const closeHandlers: CallbackClose[] = []
       closeHandlers.push(closeBackend)
 
-      const config: AragonConfig = bre.config.aragon as AragonConfig
-      const appExists = await _checkApp(config.appSrcPath as string)
-      if (appExists) {
-        await _checkPorts(config)
-        await _checkScripts(config.appSrcPath as string)
+    const config: AragonConfig = bre.config.aragon as AragonConfig
+    if (!config.appSrcPath) {
+      logMain(
+        'Warning: appSrcPath is not defined, will continue development without building any front end.'
+      )
+    } else if (!pathExists(config.appSrcPath)) {
+      logMain(
+        `Warning: No front end found ${config.appSrcPath}, will continue development without building any front end.`
+      )
+    } else {
+      await _checkPorts(config)
+      await _checkScripts(config.appSrcPath as string)
 
         // #### Here the app closes after 10 seconds
         // The delay is caused by buidler artifact instances that may be doing polling
@@ -113,23 +119,8 @@ async function _checkPorts(config: AragonConfig): Promise<void> {
   }
 }
 
-async function _checkApp(appSrcPath: string): Promise<boolean> {
-  const appExists = await fsExtra.pathExists(appSrcPath)
-
-  if (!appExists) {
-    logMain(
-      'Warning: No front end found at app/, will continue development without building any front end.'
-    )
-  }
-
-  return appExists
-}
-
 async function _checkScripts(appSrcPath: string): Promise<void> {
-  const appPackageJson = await fsExtra.readJson(
-    path.join(appSrcPath, 'package.json')
-  )
-
+  const appPackageJson = readJson([appSrcPath, 'package.json'])
   _checkScript(appPackageJson, 'sync-assets')
   _checkScript(appPackageJson, 'watch')
   _checkScript(appPackageJson, 'serve')
