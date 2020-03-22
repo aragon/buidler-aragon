@@ -1,0 +1,28 @@
+{
+  "name": "test-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "babel-plugin-styled-components": "^1.10.7",
+    "parcel-bundler": "^1.10.1",
+    "styled-components": "^5.0.1"
+  },
+  "scripts": {
+    "build": "npm run build:app && npm run build:script",
+    "build:app": "parcel build index.html -d ../dist/ --public-url \".\" --no-cache",
+    "build:script": "parcel build src/script.js --out-dir ../dist/ --no-cache",
+    "watch:script": "parcel watch src/script.js --out-dir ../dist/ --no-hmr",
+    "serve": "parcel serve index.html --out-dir ../dist/ --no-cache",
+    "watch": "npm run watch:script",
+    "sync-assets": "echo 'ok'"
+  },
+  "browserslist": [
+    ">2%",
+    "last 1 edge versions",
+    "not ie > 0",
+    "not op_mini all"
+  ]
+}

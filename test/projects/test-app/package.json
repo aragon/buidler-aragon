@@ -1,0 +1,29 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "Test app",
+  "author": "testing",
+  "license": "(GPL-3.0-or-later OR AGPL-3.0-or-later)",
+  "files": [
+    "/abi",
+    "/arapp.json",
+    "/build",
+    "/contracts",
+    "/test"
+  ],
+  "scripts": {
+    "postinstall": "npm run compile && npm run build-app",
+    "build-app": "cd app && npm install && cd ..",
+    "compile": "buidler compile --force",
+    "start": "buidler start"
+  },
+  "dependencies": {
+    "@aragon/abis": "^1.1.0"
+  },
+  "devDependencies": {
+    "@nomiclabs/buidler": "^1.0.2",
+    "@nomiclabs/buidler-truffle5": "^1.0.2",
+    "@nomiclabs/buidler-web3": "^1.0.2",
+    "typescript": "^3.7.4"
+  }
+}
