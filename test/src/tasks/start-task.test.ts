@@ -12,12 +12,19 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import killPort from 'kill-port'
 import { mapValues } from 'lodash'
 
+const testAppDir = 'test-app'
+const testAppContract = 'TestContract'
+const testNetwork = 'localhost'
+
 const contractPathToModify = path.join(
   __dirname,
-  '../../projects/token-wrapper/contracts/TokenWrapper.sol'
+  '../../projects',
+  testAppDir,
+  'contracts',
+  `${testAppContract}.sol`
 )
 
-describe('Run start-task - token-wrapper', function() {
+describe(`Run start-task - ${testAppDir}`, function() {
   let config: AragonConfig
   let closeApp: () => void | undefined
   const sandbox = sinon.createSandbox()
@@ -46,10 +53,11 @@ describe('Run start-task - token-wrapper', function() {
     return { params, bre, returnValue: returnValue && (await returnValue) }
   }
 
-  useEnvironment('token-wrapper', 'localhost')
+  useEnvironment(testAppDir, testNetwork)
 
   before('Retrieve config and hooks', async function() {
     config = this.env.config.aragon as AragonConfig
+
     // Intercept hook calls an call an event emitter
     config.hooks = mapValues(
       config.hooks,
@@ -106,17 +114,15 @@ describe('Run start-task - token-wrapper', function() {
     it('preInit - with bre, returns deployed token contract', async function() {
       const { bre, returnValue } = await getHookCall('preInit')
       assert(bre.config.aragon, 'no aragon config')
-      assert(isNonZeroAddress(returnValue.tokenAddress), 'no token address')
       assert(isNonZeroAddress(returnValue.rootAccount), 'no root account')
+      assert.typeOf(returnValue.intialCount, 'number', 'no intialCount')
     })
 
     it('getInitParams - returns init params', async function() {
       const { bre, returnValue } = await getHookCall('getInitParams')
       assert(bre.config.aragon, 'no aragon config')
-      const [tokenAddress, name, symbol] = returnValue
-      assert(isNonZeroAddress(tokenAddress), 'no token address')
-      assert.equal(name, 'Wrapped token', 'wrong token name')
-      assert.equal(symbol, 'wORG', 'wrong token symbol')
+      const [intialCount] = returnValue
+      assert.typeOf(intialCount, 'number', 'wrong intialCount param')
     })
 
     it('postInit - with bre, proxy', async function() {
