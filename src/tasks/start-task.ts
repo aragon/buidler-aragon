@@ -77,7 +77,7 @@ ${accountsStr}`)
       )
     } else if (!pathExists(config.appSrcPath)) {
       logMain(
-        `Warning: No front end found ${config.appSrcPath}, will continue development without building any front end.`
+        `Warning: No front end found at ${config.appSrcPath}, will continue development without building any front end.`
       )
     } else {
       await _checkPorts(config)
