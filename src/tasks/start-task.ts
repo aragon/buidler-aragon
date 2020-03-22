@@ -10,8 +10,10 @@ import tcpPortUsed from 'tcp-port-used'
 import fsExtra from 'fs-extra'
 import path from 'path'
 import { aragenMnemonic, aragenAccounts } from '~/src/params'
-import { getAppName, getAppEnsName, getAppId } from '~/src/utils/arappUtils'
+import { getAppName, getAppEnsName } from '~/src/utils/arappUtils'
 import { validateEnsName } from '~/src/utils/validateEnsName'
+import { getAppId } from '../utils/appName'
+import onExit from '../utils/onExit'
 
 /**
  * Main, composite, task. Calls startBackend, then startFrontend,
@@ -53,12 +55,15 @@ ${accountsStr}`)
       )
     }
 
-    const { daoAddress, appAddress } = await startBackend(
+    const { daoAddress, appAddress, close: closeBackend } = await startBackend(
       bre,
       appName,
       appId,
       params.silent
     )
+
+    const closeHandlers: (() => void)[] = []
+    closeHandlers.push(closeBackend)
 
     const config: AragonConfig = bre.config.aragon as AragonConfig
     const appExists = await _checkApp(config.appSrcPath as string)
@@ -66,11 +71,25 @@ ${accountsStr}`)
       await _checkPorts(config)
       await _checkScripts(config.appSrcPath as string)
 
-      await startFrontend(bre, daoAddress, appAddress, !params.noBrowser)
-    } else {
-      // Keep process running.
-      return await new Promise(() => {})
+      // #### Here the app closes after 10 seconds
+      // The delay is caused by buidler artifact instances that may be doing polling
+      const { close: closeFrontend } = await startFrontend(
+        bre,
+        daoAddress,
+        appAddress,
+        !params.noBrowser
+      )
+      closeHandlers.push(closeFrontend)
     }
+
+    function close(): void {
+      for (const closeHandler of closeHandlers) closeHandler()
+    }
+
+    onExit(close)
+
+    if (params.noBlocking) return { close }
+    else await new Promise(() => {})
   })
 
 async function _checkPorts(config: AragonConfig): Promise<void> {

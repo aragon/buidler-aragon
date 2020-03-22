@@ -1,19 +1,5 @@
-import { keccak256 } from 'web3-utils'
-import { Role } from '../types'
-
-interface ExtractedFunctions {
-  sig: string
-  roles: string[]
-  notice: string
-}
-
-export interface ExtractedContractInfo {
-  roles: Role[]
-  functions: ExtractedFunctions[]
-}
-
 // See https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#types
-const SOLIDITY_SHORTHAND_TYPES_MAP = {
+const SOLIDITY_TYPES = {
   address: 'address',
   bytes: 'bytes',
   uint: 'uint256',
@@ -23,7 +9,6 @@ const SOLIDITY_SHORTHAND_TYPES_MAP = {
   bool: 'bool',
   string: 'string'
 }
-const SOLIDITY_BASIC_TYPES = Object.keys(SOLIDITY_SHORTHAND_TYPES_MAP)
 
 // In the all functions that accept the parameter `declaration` it referes
 // to a string similar to the example below
@@ -49,7 +34,7 @@ const modifiesStateAndIsPublic = (declaration: string): boolean =>
  * @return "address"
  */
 const typeOrAddress = (type: string): string =>
-  SOLIDITY_BASIC_TYPES.some(t => type.startsWith(t)) ? type : 'address'
+  Object.keys(SOLIDITY_TYPES).some(t => type.startsWith(t)) ? type : 'address'
 
 /**
  * Expand shorthands into their full types for calculating function signatures
@@ -57,15 +42,15 @@ const typeOrAddress = (type: string): string =>
  * @return "uint256"
  */
 const expandTypeForSignature = (type: string): string =>
-  SOLIDITY_SHORTHAND_TYPES_MAP[type] || type
+  type in SOLIDITY_TYPES ? SOLIDITY_TYPES[type] : type
 
 /**
  * extracts function signature from function declaration
  * @param declaration multiline function declaration with comments
  */
-const getSignature = (declaration: string): string => {
+function getSignature(declaration: string): string {
   const declarationMatch = declaration.match(/^\s*function ([^]*?)\)/m)
-  if (!declarationMatch) throw Error('Not a function')
+  if (!declarationMatch) return ''
 
   const [name, params] = declarationMatch[1].split('(')
 
@@ -94,7 +79,7 @@ const getSignature = (declaration: string): string => {
  * Get notice from function declaration
  * @param declaration multiline function declaration with comments
  */
-const getNotice = (declaration: string): string => {
+function getNotice(declaration: string): string {
   // capture from @notice to either next '* @' or end of comment '*/'
   const notices = declaration.match(/(@notice)([^]*?)(\* @|\*\/)/m)
   if (!notices || notices.length === 0) return ''
@@ -111,99 +96,36 @@ const getNotice = (declaration: string): string => {
 }
 
 /**
- * Extracts required role from function declaration
- * @param declaration multiline function declaration with comments
- * @return roles = ["INCREMENT_ROLE"]
- */
-const getRoles = (declaration: string): string[] => {
-  const auths = declaration.match(/auth.?\(([^]*?)\)/gm)
-  if (!auths) return []
-
-  return auths.map(
-    authStatement =>
-      authStatement
-        .split('(')[1]
-        .split(',')[0]
-        .split(')')[0]
-  )
-}
-
-/**
  * Extracts relevant function information from their source code
  * Only returns functions that are state modifying
  * @param sourceCode Full solidity source code
+ * @return [{
+ *   signature: "baz(uint32,bool)",
+ *   notice: "Sample radspec documentation..."
+ * }, ... ]
  */
-const extractFunctions = (sourceCode: string): ExtractedFunctions[] => {
+export function parseFunctionsNotices(
+  sourceCode: string
+): {
+  /**
+   * signature: "baz(uint32,bool)"
+   */
+  signature: string
+  /**
+   * notice: "Sample radspec documentation..."
+   */
+  notice: string
+}[] {
   // Everything between every 'function' and '{' and its @notice.
-  const functionDeclarations = sourceCode.match(
-    /(@notice|^\s*function)(?:[^]*?){/gm
-  )
-
-  if (!functionDeclarations) {
-    return []
-  }
+  const functionDeclarations =
+    sourceCode.match(/(@notice|^\s*function)(?:[^]*?){/gm) || []
 
   return functionDeclarations
     .filter(functionDeclaration =>
       modifiesStateAndIsPublic(functionDeclaration)
     )
     .map(functionDeclaration => ({
-      sig: getSignature(functionDeclaration),
-      roles: getRoles(functionDeclaration),
+      signature: getSignature(functionDeclaration),
       notice: getNotice(functionDeclaration)
     }))
-}
-
-/**
- * Extracts all role ids from the function descriptors and parses them into objects
- * @param functionDescriptors
- */
-const extractRolesFromFunctions = (
-  functionDescriptors: ExtractedFunctions[]
-): Role[] => {
-  // Extract all role ids from the function descriptors.
-  const roleSet: Set<string> = new Set()
-  functionDescriptors.forEach(({ roles }) =>
-    roles.forEach(role => roleSet.add(role))
-  )
-  const roleIds = [...roleSet]
-
-  // Parse role ids into objects.
-  // TODO: Name and parameters are currently not being extracted,
-  // and it's probably better to get it from an AST instead of
-  // the Solidity code. For now, the properties are merely place holders.
-  return roleIds.map(id => ({
-    id,
-    bytes: keccak256(id),
-    name: '',
-    params: []
-  }))
-}
-
-/**
- * Given a Solidity file, parses relevant functions and roles info
- * @param sourceCode Full .sol source code
- * @return roles: [{
- *    id: "MINT_ROLE",
- *    bytes: "0x0xbf05b9322505d747ab5880dfb677dc4864381e9fc3a25ccfa184a3a53d02f4b2",
- *    name: "",
- *    params: []
- *  }, ... ],
- *  functions: [{
- *    sig: "baz(uint32,bool)",
- *    roles: [ "MINT_ROLE", "BURN_ROLE" ],
- *    notice: "Sample radspec documentation..."
- *  }, ... ]
- * }
- */
-export const extractContractInfo = (
-  sourceCode: string
-): ExtractedContractInfo => {
-  const functionDescriptors = extractFunctions(sourceCode)
-  const roleDescriptors = extractRolesFromFunctions(functionDescriptors)
-
-  return {
-    roles: roleDescriptors,
-    functions: functionDescriptors
-  }
 }
