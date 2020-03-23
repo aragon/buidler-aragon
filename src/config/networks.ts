@@ -1,11 +1,6 @@
-import {
-  ConfigExtender,
-  HttpNetworkConfig,
-  NetworkConfig
-} from '@nomiclabs/buidler/types'
+import { ConfigExtender, HttpNetworkConfig } from '@nomiclabs/buidler/types'
 import { Networks } from '@nomiclabs/buidler/types'
 import { readArappIfExists } from '../utils/arappUtils'
-import { defaultLocalAragonBases, aragenMnemonic } from '../params'
 
 const aragonRpc = (network: string): string =>
   `https://${network}.eth.aragon.network`
@@ -13,22 +8,19 @@ const localRpc = 'http://localhost:8545'
 const coverageRpc = 'http://localhost:8555'
 const frameRpc = 'ws://localhost:1248'
 
-const aragenNetwork: NetworkConfig = {
-  url: localRpc,
-  gas: 6.9e6,
-  ensAddress: defaultLocalAragonBases.ensAddress,
-  accounts: { mnemonic: aragenMnemonic }
-}
-
 const defaultNetworks: Networks = {
-  // Local networks
-  development: aragenNetwork,
-  localhost: aragenNetwork,
-  aragen: aragenNetwork,
-  rpc: aragenNetwork,
-  devnet: aragenNetwork,
-
-  // External networks
+  rpc: {
+    chainId: 15,
+    url: localRpc,
+    gas: 6.9e6,
+    gasPrice: 15000000001
+  },
+  devnet: {
+    chainId: 16,
+    url: localRpc,
+    gas: 6.9e6,
+    gasPrice: 15000000001
+  },
   mainnet: {
     chainId: 1,
     url: aragonRpc('mainnet'),
@@ -55,6 +47,11 @@ const defaultNetworks: Networks = {
     url: coverageRpc,
     gas: 0xffffffffff,
     gasPrice: 0x01
+  },
+  development: {
+    url: localRpc,
+    gas: 6.9e6,
+    gasPrice: 15000000001
   },
   frame: {
     url: frameRpc

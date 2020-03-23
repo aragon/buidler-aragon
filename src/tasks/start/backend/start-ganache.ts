@@ -14,7 +14,7 @@ let server
 
 export async function startGanache(
   bre: BuidlerRuntimeEnvironment
-): Promise<{ networkId: number; close?: () => void }> {
+): Promise<number> {
   if (bre.network.name === 'buidlerevm') {
     throw new BuidlerPluginError(
       'Cannot use buidlerevm network for this task until a JSON RPC is exposed'
@@ -30,7 +30,7 @@ export async function startGanache(
   // If port is in use, assume that a local chain is already running.
   const portInUse = await tcpPortUsed.check(testnetPort)
   if (portInUse) {
-    return { networkId: 0 }
+    return 0
   }
 
   // Start a new ganache server.
@@ -42,12 +42,7 @@ export async function startGanache(
   })
   const blockchain = await promisify(server.listen)(testnetPort)
 
-  return {
-    networkId: blockchain.options.network_id,
-    close: (): void => {
-      server.close()
-    }
-  }
+  return blockchain.options.network_id
 }
 
 export function stopGanache(): void {
