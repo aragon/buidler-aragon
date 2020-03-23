@@ -3,6 +3,16 @@ import semver from 'semver'
 import { ApmVersion, ApmVersionReturn } from './types'
 
 /**
+ * Parses hex string if it's a hex string, otherwise returns it
+ * @param hex "0xaa6161" | "hello"
+ */
+export function toUtf8IfHex(hex: string): string {
+  return ethers.utils.isHexString(hex)
+    ? ethers.utils.toUtf8String(hex, true)
+    : hex
+}
+
+/**
  * Parse a raw version response from an APM repo
  */
 export function parseApmVersionReturn(res: ApmVersionReturn): ApmVersion {

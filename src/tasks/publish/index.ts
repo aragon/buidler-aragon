@@ -9,7 +9,7 @@ import execa from 'execa'
 import { TASK_COMPILE, TASK_VERIFY_CONTRACT, TASK_PUBLISH } from '../task-names'
 import { logMain } from '../../ui/logger'
 import { AragonConfig } from '~/src/types'
-import uploadReleaseToIpfs from './uploadDistToIpfs'
+import { uploadDirToIpfs, readIgnoreFiles } from '~/src/utils/ipfs'
 import parseAndValidateBumpOrVersion from './parseAndValidateBumpOrVersion'
 import { getMainContractName } from '../../utils/arappUtils'
 import * as apm from '~/src/utils/apm'
@@ -37,8 +37,8 @@ task(TASK_PUBLISH, 'Publish a new app version')
     types.string
   )
   .addOptionalParam(
-    'ipfsProvider',
-    'Provider URL to connect to an ipfs daemon API server',
+    'ipfsApiUrl',
+    'IPFS API URL to connect to an ipfs daemon API server',
     'http://localhost:5001',
     types.string
   )
@@ -49,12 +49,12 @@ task(TASK_PUBLISH, 'Publish a new app version')
   .addFlag('noVerify', 'Prevents etherscan verification.')
   .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
     // Do param type verification here and call publishTask with clean params
-    await publishTask(
+    return await publishTask(
       {
         bumpOrVersion: params.bump,
         existingContractAddress: params.contract,
         managerAddress: params.managerAddress,
-        ipfsProvider: params.ipfsProvider,
+        ipfsApiUrl: params.ipfsApiUrl,
         onlyContent: params.onlyContent,
         noVerify: params.noVerify
       },
@@ -67,23 +67,23 @@ async function publishTask(
     bumpOrVersion,
     existingContractAddress,
     managerAddress,
-    ipfsProvider,
+    ipfsApiUrl: ipfsApiUrl,
     onlyContent,
     noVerify
   }: {
     bumpOrVersion: string
     existingContractAddress: string
     managerAddress: string
-    ipfsProvider: string
+    ipfsApiUrl: string
     onlyContent: boolean
     noVerify: boolean
   },
   bre: BuidlerRuntimeEnvironment
-): Promise<void> {
+): Promise<apm.PublishVersionTxData> {
   const aragonConfig = bre.config.aragon as AragonConfig
   const appSrcPath = aragonConfig.appSrcPath as string
   const distPath = aragonConfig.appBuildOutputPath as string
-  const ipfsIgnore = ['subfolder/to/ignore/**'] // Hardcoded until a better way to deal with dynamic ENS address is found
+  const rootPath = '.' // ### Todo: path from which to look from .ipfsignore
   const selectedNetwork = bre.network.name
   // ### Todo: Add logic to guess app name from file?
   const appName =
@@ -145,9 +145,9 @@ async function publishTask(
 
   // Upload release directory to IPFS
   logMain('Uploading release assets to IPFS...')
-  const contentHash = await uploadReleaseToIpfs(distPath, {
-    ipfsProvider,
-    ignorePatterns: ipfsIgnore
+  const contentHash = await uploadDirToIpfs(distPath, {
+    ipfsApiUrl,
+    ignore: readIgnoreFiles(rootPath)
   })
   logMain(`Release assets uploaded to IPFS: ${contentHash}`)
 
@@ -169,6 +169,7 @@ to: ${txData.to}
 data: ${apm.encodePublishVersionTxData(txData)}
 `
   )
+  return txData
 }
 
 /**

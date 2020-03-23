@@ -37,7 +37,7 @@ function _parseAppName(
  *  - managerAddress: Must be provided to deploy a new repo
  */
 export async function publishVersion(
-  appId: string,
+  appName: string,
   versionInfo: ApmVersion,
   provider: ethers.providers.Provider,
   options?: { managerAddress: string }
@@ -47,7 +47,7 @@ export async function publishVersion(
     throw new Error(`${version} is not a valid semantic version`)
   }
 
-  const repoAddress = await provider.resolveName(appId)
+  const repoAddress = await provider.resolveName(appName)
   const versionArray = toApmVersionArray(version)
 
   if (repoAddress) {
@@ -59,7 +59,7 @@ export async function publishVersion(
     }
   } else {
     // If the repo does not exist yet, create a repo with the first version
-    const { shortName, registryName } = _parseAppName(appId)
+    const { shortName, registryName } = _parseAppName(appName)
     const registryAddress = await provider.resolveName(registryName)
     const managerAddress = options && options.managerAddress
     if (!registryAddress) throw Error(`Registry ${registryName} does not exist`)
