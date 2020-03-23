@@ -4,4 +4,5 @@
  * is not run first it will break because the this.env is not configured ok
  */
 
+import './src/tasks/publish-task.test'
 import './src/tasks/start-task.test'

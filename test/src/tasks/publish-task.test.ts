@@ -12,10 +12,11 @@ import {
 import { infuraIpfsApiUrl, infuraIpfsGateway } from '~/test/testParams'
 import { defaultLocalAragonBases } from '~/src/params'
 
-describe('Run publish task - token-wrapper', function() {
-  const testAppDir = 'test-app'
-  const testAppContract = 'TestContract'
-  const testNetwork = 'localhost'
+const testAppDir = 'test-app'
+const testAppContract = 'TestContract'
+const testNetwork = 'localhost'
+
+describe(`Run publish task - ${testAppDir}`, function() {
   const ipfsApiUrl = infuraIpfsApiUrl
   const ipfsGateway = infuraIpfsGateway
   const managerAddress = '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B'
