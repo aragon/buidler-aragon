@@ -220,7 +220,7 @@ async function _deployMainContract(
   const MainContract = bre.artifacts.require(contractName)
   const mainContract = await MainContract.new()
   logMain('Implementation contract deployed')
-  const chainId = await bre.web3.eth.getChainId()
+  const chainId = await _getChainId(bre)
   if (!noVerify && etherscanSupportedChainIds.has(chainId)) {
     logMain('Verifying on Etherscan')
     await bre.run(TASK_VERIFY_CONTRACT, {
@@ -231,4 +231,15 @@ async function _deployMainContract(
     logMain(`Successfully verified contract on Etherscan`)
   }
   return mainContract.address
+}
+
+/**
+ * Isolates logic to fix buidler issue that swaps web3 version when running the tests
+ * It potentially loads version 1.2.1 instead of 1.2.6 where web3.eth.getChainId
+ * is not a function and causes an error
+ */
+async function _getChainId(bre: BuidlerRuntimeEnvironment): Promise<number> {
+  const provider = new ethers.providers.Web3Provider(bre.web3.currentProvider)
+  const net = await provider.getNetwork()
+  return net.chainId
 }
