@@ -17,50 +17,57 @@ import { generateArtifacts, validateArtifacts } from '~/src/utils/artifact'
 import { getFullAppName } from '~/src/utils/appName'
 import { ethers } from 'ethers'
 
-task(TASK_PUBLISH, 'Publish a new app version')
-  .addPositionalParam(
-    'bump',
-    'Type of bump (major, minor or patch) or semantic version',
-    undefined,
-    types.string
-  )
-  .addOptionalParam(
-    'contract',
-    'Contract address previously deployed.',
-    undefined,
-    types.string
-  )
-  .addOptionalParam(
-    'managerAddress',
-    'Owner of the APM repo. Must be provided in the initial release',
-    undefined,
-    types.string
-  )
-  .addOptionalParam(
-    'ipfsApiUrl',
-    'IPFS API URL to connect to an ipfs daemon API server',
-    'http://localhost:5001',
-    types.string
-  )
-  .addFlag(
-    'onlyContent',
-    'Prevents contract compilation, deployment and artifact generation.'
-  )
-  .addFlag('noVerify', 'Prevents etherscan verification.')
-  .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
-    // Do param type verification here and call publishTask with clean params
-    return await publishTask(
-      {
-        bumpOrVersion: params.bump,
-        existingContractAddress: params.contract,
-        managerAddress: params.managerAddress,
-        ipfsApiUrl: params.ipfsApiUrl,
-        onlyContent: params.onlyContent,
-        noVerify: params.noVerify
-      },
-      bre
+/**
+ * Sets up the publish task
+ * Note: Tasks must be setup in a function. If task() is run in the
+ * module body on test teardown the they will not be setup again
+ */
+export function setupPublishTask(): void {
+  task(TASK_PUBLISH, 'Publish a new app version')
+    .addPositionalParam(
+      'bump',
+      'Type of bump (major, minor or patch) or semantic version',
+      undefined,
+      types.string
     )
-  })
+    .addOptionalParam(
+      'contract',
+      'Contract address previously deployed.',
+      undefined,
+      types.string
+    )
+    .addOptionalParam(
+      'managerAddress',
+      'Owner of the APM repo. Must be provided in the initial release',
+      undefined,
+      types.string
+    )
+    .addOptionalParam(
+      'ipfsApiUrl',
+      'IPFS API URL to connect to an ipfs daemon API server',
+      'http://localhost:5001',
+      types.string
+    )
+    .addFlag(
+      'onlyContent',
+      'Prevents contract compilation, deployment and artifact generation.'
+    )
+    .addFlag('noVerify', 'Prevents etherscan verification.')
+    .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
+      // Do param type verification here and call publishTask with clean params
+      return await publishTask(
+        {
+          bumpOrVersion: params.bump,
+          existingContractAddress: params.contract,
+          managerAddress: params.managerAddress,
+          ipfsApiUrl: params.ipfsApiUrl,
+          onlyContent: params.onlyContent,
+          noVerify: params.noVerify
+        },
+        bre
+      )
+    })
+}
 
 async function publishTask(
   {

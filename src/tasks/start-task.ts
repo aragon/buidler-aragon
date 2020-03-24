@@ -16,81 +16,86 @@ import { getAppId } from '../utils/appName'
 import onExit from '../utils/onExit'
 
 /**
+ * Sets up the start task
  * Main, composite, task. Calls startBackend, then startFrontend,
  * and then returns an unresolving promise to keep the task open.
+ *
+ * Note: Tasks must be setup in a function. If task() is run in the
+ * module body on test teardown the they will not be setup again
  */
-task(TASK_START, 'Starts Aragon app development')
-  .addFlag(
-    'noBrowser',
-    'Prevents opening of a browser tab with the Aragon client once the app is built.'
-  )
-  .addFlag('silent', 'Silences all console output')
-  .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
-    if (params.silent) {
-      // eslint-disable-next-line
-      console.log = () => {}
-    }
+export function setupStartTask(): void {
+  task(TASK_START, 'Starts Aragon app development')
+    .addFlag(
+      'noBrowser',
+      'Prevents opening of a browser tab with the Aragon client once the app is built.'
+    )
+    .addFlag('silent', 'Silences all console output')
+    .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
+      if (params.silent) {
+        // eslint-disable-next-line
+        console.log = () => {}
+      }
 
-    logMain(`Starting Aragon app development...`)
+      logMain(`Starting Aragon app development...`)
 
-    const appEnsName = await getAppEnsName()
-    const appName = await getAppName()
-    const appId: string = getAppId(appEnsName)
-    logMain(`App name: ${appName}
+      const appEnsName = await getAppEnsName()
+      const appName = await getAppName()
+      const appId: string = getAppId(appEnsName)
+      logMain(`App name: ${appName}
 App ens name: ${appEnsName}
 App id: ${appId}`)
 
-    let accountsStr = ''
-    for (let i = 0; i < aragenAccounts.length; i++) {
-      const account = aragenAccounts[i]
-      accountsStr += `Account ${i} private key ${account.privateKey}\n`
-      accountsStr += `           public key ${account.publicKey}\n`
-    }
-    logMain(`Accounts mnemonic "${aragenMnemonic}"
+      let accountsStr = ''
+      for (let i = 0; i < aragenAccounts.length; i++) {
+        const account = aragenAccounts[i]
+        accountsStr += `Account ${i} private key ${account.privateKey}\n`
+        accountsStr += `           public key ${account.publicKey}\n`
+      }
+      logMain(`Accounts mnemonic "${aragenMnemonic}"
 ${accountsStr}`)
 
-    if (!validateEnsName(appEnsName)) {
-      throw new BuidlerPluginError(
-        `Invalid ENS name "${appEnsName}" found in arapp.json (environments.default.appName). Only ENS names in the form "<name>.aragonpm.eth" are supported in development. Please change the value in environments.default.appName, in your project's arapp.json file. Note: Non-development environments are ignored in development and don't have this restriction.`
-      )
-    }
+      if (!validateEnsName(appEnsName)) {
+        throw new BuidlerPluginError(
+          `Invalid ENS name "${appEnsName}" found in arapp.json (environments.default.appName). Only ENS names in the form "<name>.aragonpm.eth" are supported in development. Please change the value in environments.default.appName, in your project's arapp.json file. Note: Non-development environments are ignored in development and don't have this restriction.`
+        )
+      }
 
-    const { daoAddress, appAddress, close: closeBackend } = await startBackend(
-      bre,
-      appName,
-      appId,
-      params.silent
-    )
-
-    const closeHandlers: (() => void)[] = []
-    closeHandlers.push(closeBackend)
-
-    const config: AragonConfig = bre.config.aragon as AragonConfig
-    const appExists = await _checkApp(config.appSrcPath as string)
-    if (appExists) {
-      await _checkPorts(config)
-      await _checkScripts(config.appSrcPath as string)
-
-      // #### Here the app closes after 10 seconds
-      // The delay is caused by buidler artifact instances that may be doing polling
-      const { close: closeFrontend } = await startFrontend(
-        bre,
+      const {
         daoAddress,
         appAddress,
-        !params.noBrowser
-      )
-      closeHandlers.push(closeFrontend)
-    }
+        close: closeBackend
+      } = await startBackend(bre, appName, appId, params.silent)
 
-    function close(): void {
-      for (const closeHandler of closeHandlers) closeHandler()
-    }
+      const closeHandlers: (() => void)[] = []
+      closeHandlers.push(closeBackend)
 
-    onExit(close)
+      const config: AragonConfig = bre.config.aragon as AragonConfig
+      const appExists = await _checkApp(config.appSrcPath as string)
+      if (appExists) {
+        await _checkPorts(config)
+        await _checkScripts(config.appSrcPath as string)
 
-    if (params.noBlocking) return { close }
-    else await new Promise(() => {})
-  })
+        // #### Here the app closes after 10 seconds
+        // The delay is caused by buidler artifact instances that may be doing polling
+        const { close: closeFrontend } = await startFrontend(
+          bre,
+          daoAddress,
+          appAddress,
+          !params.noBrowser
+        )
+        closeHandlers.push(closeFrontend)
+      }
+
+      function close(): void {
+        for (const closeHandler of closeHandlers) closeHandler()
+      }
+
+      onExit(close)
+
+      if (params.noBlocking) return { close }
+      else await new Promise(() => {})
+    })
+}
 
 async function _checkPorts(config: AragonConfig): Promise<void> {
   if (await tcpPortUsed.check(config.clientServePort)) {
