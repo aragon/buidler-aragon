@@ -52,6 +52,21 @@ export interface AragonConfigHooks {
   ) => Promise<void> | void
 }
 
+export interface IpfsConfig {
+  /**
+   * To query files such as the artifact of your app's latest version
+   * - http://localhost:8080
+   * - https://ipfs.io
+   */
+  ipfsGateway?: string
+  /**
+   * To add and pin version data
+   * - http://localhost:5001
+   * - http://ipfs.infura.io
+   */
+  ipfsApi?: string
+}
+
 /**
  * arapp.json
  */

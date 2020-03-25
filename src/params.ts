@@ -75,3 +75,19 @@ export const defaultLocalAragonBases = {
   daoFactoryAddress: '0x8EEaea23686c319133a7cC110b840d1591d9AeE0',
   apmAddress: '0xA53dE0b8e08b798f975D57f48384C177D410d170'
 }
+
+/**
+ * Chain ids of networks that support Etherscan contract verification
+ */
+export const etherscanSupportedChainIds = new Set([
+  // Mainnet
+  1,
+  // Ropsten
+  3,
+  // Rinkeby
+  4,
+  // Goerli
+  5,
+  // Kovan
+  42
+])
