@@ -38,8 +38,8 @@
     "node-fetch": "^2.6.0",
     "open": "^7.0.0",
     "source-map-support": "^0.5.16",
-    "tsconfig-paths": "^3.9.0",
-    "tcp-port-used": "^1.0.1"
+    "tcp-port-used": "^1.0.1",
+    "tsconfig-paths": "^3.9.0"
   },
   "devDependencies": {
     "@aragon/abis": "^1.1.0",
@@ -51,6 +51,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "12.7.5",
     "@types/semver": "^7.1.0",
+    "@types/sinon": "^7.5.2",
     "@types/web3": "^1.2.2",
     "@typescript-eslint/eslint-plugin": "^2.16.0",
     "@typescript-eslint/parser": "^2.16.0",
@@ -60,7 +61,9 @@
     "eslint-config-prettier": "^6.9.0",
     "eslint-plugin-prettier": "^3.1.2",
     "ethers": "^4.0.46",
+    "kill-port": "^1.6.0",
     "prettier": "^1.19.1",
+    "sinon": "^9.0.1",
     "truffle-typings": "1.0.4",
     "ts-node": "^8.5.4",
     "typechain": "^1.0.3",

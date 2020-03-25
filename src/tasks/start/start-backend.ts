@@ -13,12 +13,7 @@ import { startGanache } from './backend/start-ganache'
 import { createApp } from './backend/create-app'
 import { updateApp } from './backend/update-app'
 import onExit from '~/src/utils/onExit'
-import {
-  BACKEND_BUILD_STARTED,
-  BACKEND_PROXY_UPDATED,
-  emitEvent
-} from '~/src/ui/events'
-import { generateUriArtifacts } from './frontend/generate-artifacts'
+import { generateArtifacts } from '~/src/utils/artifact'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -33,9 +28,14 @@ export async function startBackend(
   appName: string,
   appId: string,
   silent: boolean
-): Promise<{ daoAddress: string; appAddress: string }> {
-  emitEvent(BACKEND_BUILD_STARTED)
-
+): Promise<{
+  daoAddress: string
+  appAddress: string
+  /**
+   * Closes open file watchers
+   */
+  close: () => void
+}> {
   const config: AragonConfig = bre.config.aragon as AragonConfig
   const hooks: AragonConfigHooks = config.hooks as AragonConfigHooks
 
@@ -45,7 +45,8 @@ export async function startBackend(
    * Until BuidlerEVM JSON RPC is ready, a ganache server will be started
    * on the appropiate conditions.
    */
-  const networkId = await startGanache(bre)
+  const { networkId, close: closeGanache } = await startGanache(bre)
+
   if (networkId !== 0) {
     logBack(`Started a ganache testnet instance with id ${networkId}.`)
   }
@@ -157,7 +158,7 @@ export async function startBackend(
       // Update artifacts.
       logBack('Updating artifacts...')
       const appBuildOutputPath = config.appBuildOutputPath as string
-      await generateUriArtifacts(appBuildOutputPath, bre.artifacts)
+      await generateArtifacts(appBuildOutputPath, bre)
 
       // Update app.
       logBack('Updating app...')
@@ -175,15 +176,20 @@ export async function startBackend(
       if (hooks && hooks.postUpdate) {
         await hooks.postUpdate({ proxy }, bre)
       }
-
-      emitEvent(BACKEND_PROXY_UPDATED)
     })
 
   onExit(() => {
     contractsWatcher.close()
   })
 
-  return { daoAddress: dao.address, appAddress: proxy.address }
+  return {
+    daoAddress: dao.address,
+    appAddress: proxy.address,
+    close: (): void => {
+      contractsWatcher.close()
+      if (closeGanache) closeGanache()
+    }
+  }
 }
 
 /**
