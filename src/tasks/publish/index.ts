@@ -17,50 +17,57 @@ import { generateArtifacts, validateArtifacts } from '~/src/utils/artifact'
 import { getFullAppName } from '~/src/utils/appName'
 import { ethers } from 'ethers'
 
-task(TASK_PUBLISH, 'Publish a new app version')
-  .addPositionalParam(
-    'bump',
-    'Type of bump (major, minor or patch) or semantic version',
-    undefined,
-    types.string
-  )
-  .addOptionalParam(
-    'contract',
-    'Contract address previously deployed.',
-    undefined,
-    types.string
-  )
-  .addOptionalParam(
-    'managerAddress',
-    'Owner of the APM repo. Must be provided in the initial release',
-    undefined,
-    types.string
-  )
-  .addOptionalParam(
-    'ipfsProvider',
-    'Provider URL to connect to an ipfs daemon API server',
-    'http://localhost:5001',
-    types.string
-  )
-  .addFlag(
-    'onlyContent',
-    'Prevents contract compilation, deployment and artifact generation.'
-  )
-  .addFlag('noVerify', 'Prevents etherscan verification.')
-  .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
-    // Do param type verification here and call publishTask with clean params
-    await publishTask(
-      {
-        bumpOrVersion: params.bump,
-        existingContractAddress: params.contract,
-        managerAddress: params.managerAddress,
-        ipfsProvider: params.ipfsProvider,
-        onlyContent: params.onlyContent,
-        noVerify: params.noVerify
-      },
-      bre
+/**
+ * Sets up the publish task
+ * Note: Tasks must be setup in a function. If task() is run in the
+ * module body on test teardown the they will not be setup again
+ */
+export function setupPublishTask(): void {
+  task(TASK_PUBLISH, 'Publish a new app version')
+    .addPositionalParam(
+      'bump',
+      'Type of bump (major, minor or patch) or semantic version',
+      undefined,
+      types.string
     )
-  })
+    .addOptionalParam(
+      'contract',
+      'Contract address previously deployed.',
+      undefined,
+      types.string
+    )
+    .addOptionalParam(
+      'managerAddress',
+      'Owner of the APM repo. Must be provided in the initial release',
+      undefined,
+      types.string
+    )
+    .addOptionalParam(
+      'ipfsProvider',
+      'Provider URL to connect to an ipfs daemon API server',
+      'http://localhost:5001',
+      types.string
+    )
+    .addFlag(
+      'onlyContent',
+      'Prevents contract compilation, deployment and artifact generation.'
+    )
+    .addFlag('noVerify', 'Prevents etherscan verification.')
+    .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
+      // Do param type verification here and call publishTask with clean params
+      await publishTask(
+        {
+          bumpOrVersion: params.bump,
+          existingContractAddress: params.contract,
+          managerAddress: params.managerAddress,
+          ipfsProvider: params.ipfsProvider,
+          onlyContent: params.onlyContent,
+          noVerify: params.noVerify
+        },
+        bre
+      )
+    })
+}
 
 async function publishTask(
   {
@@ -85,7 +92,9 @@ async function publishTask(
   const distPath = aragonConfig.appBuildOutputPath as string
   const ipfsIgnore = ['subfolder/to/ignore/**'] // Hardcoded until a better way to deal with dynamic ENS address is found
   const selectedNetwork = bre.network.name
-  // ### Todo: Add logic to guess app name from file?
+
+  // TODO: Warn the user their metadata files (e.g. appName) are not correct.
+
   const appName =
     typeof aragonConfig.appName === 'string'
       ? aragonConfig.appName
@@ -122,16 +131,16 @@ async function publishTask(
     logMain('No contract used for this version')
     contractAddress = zeroAddress
   } else if (existingContractAddress) {
-    logMain('Using provided contract address')
     contractAddress = existingContractAddress
+    logMain(`Using provided contract address: ${contractAddress}`)
   } else if (!prevVersion || bump === 'major') {
     logMain('Deploying new implementation contract')
     contractAddress = await _deployMainContract(contractName, noVerify, bre)
+    logMain(`New implementation contract address: ${contractAddress}`)
   } else {
-    logMain('Reusing contract from previous version')
     contractAddress = prevVersion.contractAddress
+    logMain(`Reusing previous version contract address: ${contractAddress}`)
   }
-  logMain(`contractAddress: ${contractAddress}`)
 
   // Prepare release directory
   // npm run build must create: index.html, src.js, script.js
@@ -190,7 +199,6 @@ async function _getLastestVersionIfExists(
   try {
     return await apm.getRepoVersion(repoAddress, 'latest', provider)
   } catch (e) {
-    if (e.message.includes('ENS name not configured')) return
     throw e
   }
 }
@@ -218,7 +226,6 @@ async function _deployMainContract(
     await bre.run(TASK_VERIFY_CONTRACT, {
       contractName,
       address: mainContract.address
-      // TODO: constructorArguments
     })
     logMain(`Successfully verified contract on Etherscan`)
   }
