@@ -34,6 +34,8 @@
     "execa": "^4.0.0",
     "fs-extra": "^8.1.0",
     "ganache-core": "^2.10.1",
+    "ipfs-http-client": "^42.0.0",
+    "it-all": "^1.0.1",
     "live-server": "^1.2.1",
     "node-fetch": "^2.6.0",
     "open": "^7.0.0",
@@ -44,6 +46,7 @@
   "devDependencies": {
     "@aragon/abis": "^1.1.0",
     "@nomiclabs/buidler": "^1.0.2",
+    "@nomiclabs/buidler-etherscan": "^1.0.2",
     "@nomiclabs/buidler-truffle5": "^1.0.2",
     "@nomiclabs/buidler-web3": "^1.0.2",
     "@types/chai": "^4.2.5",
@@ -73,9 +76,12 @@
   },
   "peerDependencies": {
     "@nomiclabs/buidler": "^1.0.2",
+    "@nomiclabs/buidler-etherscan": "^1.0.2",
     "@nomiclabs/buidler-truffle5": "^1.0.2",
     "@nomiclabs/buidler-web3": "^1.0.2",
     "@types/chai": "^4.2.5",
+    "@types/node": "12.7.5",
+    "@types/web3": "^1.2.2",
     "bignumber.js": "^9.0.0",
     "web3": "^1.2.4"
   }

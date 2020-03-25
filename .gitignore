@@ -3,4 +3,5 @@ artifacts/
 typechain/
 cache/
 .cache/
+.debug/
 dist/
