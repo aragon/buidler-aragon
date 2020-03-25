@@ -16,14 +16,7 @@ import { writeJson, writeFile } from '~/src/utils/fsUtils'
 import { artifactName, flatCodeName } from '~/src/params'
 
 const ipfsGateway = 'https://ipfs.eth.aragon.network/ipfs/'
-const appsToFetch = [
-  'agent',
-  'finance',
-  'survey',
-  'token-manager',
-  'vault',
-  'voting'
-]
+const appsToFetch = ['agent', 'finance', 'token-manager', 'vault', 'voting']
 
 /* eslint-disable no-console */
 

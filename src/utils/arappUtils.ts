@@ -45,10 +45,6 @@ export function getAppId(ensName: string): string {
   return namehash.hash(ensName)
 }
 
-export function getAppId(ensName: string): string {
-  return namehash.hash(ensName)
-}
-
 /**
  * Returns app name.
  * @return "voting"
