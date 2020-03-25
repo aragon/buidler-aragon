@@ -15,6 +15,8 @@ import { validateEnsName } from '~/src/utils/validateEnsName'
 import { getAppId } from '../utils/appName'
 import onExit from '../utils/onExit'
 
+type CallbackClose = () => void
+
 /**
  * Sets up the start task
  * Main, composite, task. Calls startBackend, then startFrontend,
@@ -66,7 +68,7 @@ ${accountsStr}`)
         close: closeBackend
       } = await startBackend(bre, appName, appId, params.silent)
 
-      const closeHandlers: (() => void)[] = []
+      const closeHandlers: CallbackClose[] = []
       closeHandlers.push(closeBackend)
 
       const config: AragonConfig = bre.config.aragon as AragonConfig

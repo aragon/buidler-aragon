@@ -36,9 +36,13 @@ export async function uploadDirToIpfs(
   const { ipfsApiUrl, ignore, progress } = options || {}
   const ipfs = IpfsHttpClient(ipfsApiUrl || defaultIpfsApiUrl)
 
-  const results: IpfsAddResult[] = await all(
-    ipfs.add(globSource(dirPath, { recursive: true, ignore }), { progress })
-  )
+  const results: IpfsAddResult[] = []
+  for await (const entry of ipfs.add(
+    globSource(dirPath, { recursive: true, ignore }),
+    { progress }
+  )) {
+    results.push(entry)
+  }
 
   // Warning! Infura does not allow uploading files with many files
   // - directory with 80 files of 10 bytes fails
