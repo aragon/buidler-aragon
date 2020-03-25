@@ -2,7 +2,6 @@
 --require ts-node/register
 --require tsconfig-paths/register
 --require source-map-support/register
---recursive test/*.ts test/**/*.ts
+--recursive test/**/*.ts
 --exclude test/projects/**/*.ts
 --timeout 300000
---exit

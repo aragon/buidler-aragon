@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import namehash from 'eth-ens-namehash'
 import { AragonAppJson } from '~/src/types'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 
@@ -34,10 +35,11 @@ export function getAppEnsName(): string {
     throw new BuidlerPluginError('Default environemnt not found in arapp.json')
   }
 
-  const appName = defaultEnvironment.appName
-  if (!appName) throw Error('No appName found in environment')
+  return defaultEnvironment.appName
+}
 
-  return appName
+export function getAppId(ensName: string): string {
+  return namehash.hash(ensName)
 }
 
 /**
@@ -47,7 +49,7 @@ export function getAppEnsName(): string {
 export function getAppName(): string {
   const ensName = getAppEnsName()
 
-  return (ensName || '').split('.')[0]
+  return ensName.split('.')[0]
 }
 
 /**

@@ -2,13 +2,13 @@ import { homedir } from 'os'
 import path from 'path'
 import fs from 'fs'
 import { ConfigExtender, HttpNetworkConfig } from '@nomiclabs/buidler/types'
-import { aragenMnemonic } from '../params'
 
 // Standard Aragon test paths
 const aragonConfig = '.aragon'
 const genericName = 'mnemonic.json'
 const byNetworkName = (network: string): string => `${network}_key.json`
-const defaultMnemonic = aragenMnemonic
+const defaultMnemonic =
+  'explain tackle mirror kit van hammer degree position ginger unfair soup bonus'
 
 interface GenericMnemonic {
   mnemonic: string

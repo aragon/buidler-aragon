@@ -2,10 +2,12 @@ import chokidar from 'chokidar'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { logFront } from '~/src/ui/logger'
 import { AragonConfig } from '~/src/types'
+import { emitEvent, FRONTEND_STARTED_SERVING } from '~/src/ui/events'
 import { serveAppAndResolveWhenBuilt } from './frontend/serve-app'
+import { generateAppArtifacts } from './frontend/generate-artifacts'
 import { copyAppUiAssets } from './frontend/copy-assets'
 import { startAppWatcher } from './frontend/watch-app'
-import { generateArtifacts } from '~/src/utils/artifact'
+import onExit from '~/src/utils/onExit'
 import {
   installAragonClientIfNeeded,
   startAragonClient,
@@ -23,33 +25,24 @@ export async function startFrontend(
   daoAddress: string,
   appAddress: string,
   openBrowser: boolean
-): Promise<{
-  /**
-   * Closes open file watchers and file servers
-   */
-  close: () => void
-}> {
+): Promise<void> {
   const config: AragonConfig = bre.config.aragon as AragonConfig
 
   logFront('Checking Aragon client...')
   await installAragonClientIfNeeded()
 
-  logFront('Generating app artifacts...')
   const appBuildOutputPath = config.appBuildOutputPath as string
-  await generateArtifacts(appBuildOutputPath, bre)
+  await generateAppArtifacts(appBuildOutputPath, bre.artifacts)
 
   logFront('Building front end (takes a minute)...')
   const appSrcPath = config.appSrcPath as string
   const appServePort = config.appServePort as number
   await copyAppUiAssets(appSrcPath)
-  const { close: closeServerApp } = await serveAppAndResolveWhenBuilt(
-    appSrcPath,
-    appServePort
-  )
+  await serveAppAndResolveWhenBuilt(appSrcPath, appServePort)
 
   // Start Aragon client at the deployed address.
   const appURL = `http://localhost:${appServePort}`
-  const { url: clientURL, close: closeStaticServer } = await startAragonClient(
+  const clientURL: string = await startAragonClient(
     config.clientServePort as number,
     `${daoAddress}/${appAddress}`,
     openBrowser
@@ -80,16 +73,13 @@ Client:  ${clientURL}`)
       )
     })
 
-  logFront('Watching changes on front end...')
-  const { close: closeWatchScript } = await startAppWatcher(appSrcPath)
+  onExit(() => {
+    srcWatcher.close()
+    artifactWatcher.close()
+  })
 
-  return {
-    close: (): void => {
-      srcWatcher.close()
-      artifactWatcher.close()
-      closeStaticServer()
-      closeServerApp()
-      closeWatchScript()
-    }
-  }
+  emitEvent(FRONTEND_STARTED_SERVING, 1000)
+
+  logFront('Watching changes on front end...')
+  await startAppWatcher(appSrcPath)
 }

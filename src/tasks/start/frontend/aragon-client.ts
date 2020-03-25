@@ -26,24 +26,28 @@ export async function installAragonClientIfNeeded(
     )
     const opts = { cwd: clientPath }
 
-    try {
-      logFront('  cloning...')
-      await execa('git', ['clone', '--', repo, clientPath])
+    let result
 
-      logFront('  checking out version...')
-      await execa('git', ['checkout', version], opts)
+    logFront('  cloning...')
+    result = await execa('git', [
+      'clone',
+      '--',
+      repo,
+      clientPath
+    ]).catch(() => {})
+    await _abortClientInstallationOnFailure(clientPath, result)
 
-      logFront('  installing...')
-      await execa('npm', ['install'], opts)
+    logFront('  checking out version...')
+    result = await execa('git', ['checkout', version], opts).catch(() => {})
+    await _abortClientInstallationOnFailure(clientPath, result)
 
-      logFront('  building...')
-      await execa('npm', ['run', 'build:local'], opts)
-    } catch (e) {
-      if (fs.existsSync(clientPath)) await fsExtra.remove(clientPath)
-      throw new BuidlerPluginError(
-        `There was an error while installing the Aragon client in ${clientPath}. Please make sure that this folder is deleted and try again. \n ${e.stack}`
-      )
-    }
+    logFront('  installing...')
+    result = await execa('npm', ['install'], opts).catch(() => {})
+    await _abortClientInstallationOnFailure(clientPath, result)
+
+    logFront('  building...')
+    result = await execa('npm', ['run', 'build:local'], opts).catch(() => {})
+    await _abortClientInstallationOnFailure(clientPath, result)
 
     logFront('Client installed.')
   }
@@ -68,6 +72,23 @@ async function _checkClientInstallationNeeded(
   return false
 }
 
+async function _abortClientInstallationOnFailure(
+  clientPath: string,
+  result: any
+): Promise<void> {
+  if (result && result.exitCode === 0) {
+    return
+  }
+
+  if (fs.existsSync(clientPath)) {
+    await fsExtra.remove(clientPath)
+  }
+
+  throw new BuidlerPluginError(
+    `There was an error while installing the Aragon client in ${clientPath}. Please make sure that this folder is deleted and try again.`
+  )
+}
+
 /**
  * Prepares and starts the aragon client
  * @return The URL at which the client is available
@@ -76,13 +97,13 @@ export async function startAragonClient(
   clientServePort: number,
   subPath?: string,
   autoOpen = true
-): Promise<{ url: string; close: () => void }> {
+): Promise<string> {
   const port: number = clientServePort
   const clientPath: string = _getClientPath(defaultVersion)
 
   const buildPath = path.join(clientPath, 'build')
   logFront(`Serving client files at ${clientPath} at port ${port}...`)
-  const closeStaticServer = _createStaticWebserver(port, buildPath)
+  await _createStaticWebserver(port, buildPath)
 
   const url = `http://localhost:${port}/#/${subPath}`
 
@@ -90,7 +111,7 @@ export async function startAragonClient(
     await open(url)
   }
 
-  return { url, close: closeStaticServer }
+  return url
 }
 
 /**
@@ -123,14 +144,11 @@ function _getClientPath(version: string): string {
  * @param port 3000
  * @param rootPath Dir to serve files from
  */
-export function _createStaticWebserver(port: number, root = '.'): () => void {
+export function _createStaticWebserver(port: number, root = '.'): void {
   liveServer.start({
     open: false,
     cors: true,
     root,
     port
   })
-  return function close(): void {
-    liveServer.shutdown()
-  }
 }
