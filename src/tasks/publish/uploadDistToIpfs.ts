@@ -4,14 +4,18 @@ const { globSource } = IpfsHttpClient
 
 const defaultIpfsProvider = 'http://localhost:5001'
 
-const all = async iterator => {
-  const arr: any[] = []
+interface Cid {
+  version: number
+  codec: string
+  multihash: Buffer
+  multibaseName: string
+  toString: () => string
+}
 
-  for await (const entry of iterator) {
-    arr.push(entry)
-  }
-
-  return arr
+interface IpfsAddResult {
+  path: string
+  size: number
+  cid: Cid
 }
 
 /**
@@ -36,9 +40,13 @@ export default async function uploadReleaseToIpfs(
   if (Array.isArray(ignorePatterns)) ignore.push(...ignorePatterns)
   if (rootPath) ignore.push(...readIgnoreFiles(rootPath))
 
-  const results = await all(
-    ipfs.add(globSource(distPath, { recursive: true, ignore }), { progress })
-  )
+  const results: IpfsAddResult[] = []
+  for await (const entry of ipfs.add(
+    globSource(distPath, { recursive: true, ignore }),
+    { progress }
+  )) {
+    results.push(entry)
+  }
   const rootDir = results[results.length - 1]
   return rootDir.cid.toString()
 }
