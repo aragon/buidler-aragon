@@ -31,7 +31,8 @@ function _parseAppName(
  * Return tx data to publish a new version of an APM repo
  * If the repo does not exist yet, it will return a tx to create
  * a new repo and publish first version to its registry
- * @param appId 'finance.aragonpm.eth'
+ * @param appName "finance.aragonpm.eth"
+ * @param provider Initialized ethers provider
  * @param versionInfo Object with required version info
  * @param options Additional options
  *  - managerAddress: Must be provided to deploy a new repo
@@ -81,18 +82,19 @@ export async function publishVersion(
 
 /**
  * Wrapps publishVersion to return the tx data formated as an aragon.js intent
- * @param appId 'finance.aragonpm.eth'
+ * @param appName "finance.aragonpm.eth"
+ * @param provider Initialized ethers provider
  * @param versionInfo Object with required version info
  * @param options Additional options
  *  - managerAddress: Must be provided to deploy a new repo
  */
 export async function publishVersionIntent(
-  appId: string,
+  appName: string,
   versionInfo: ApmVersion,
   provider: ethers.providers.Provider,
   options?: { managerAddress: string }
 ): Promise<AragonJsIntent> {
-  const txData = await publishVersion(appId, versionInfo, provider, options)
+  const txData = await publishVersion(appName, versionInfo, provider, options)
   const { to, methodName, params } = txData
   return {
     dao: await _getKernel(to, provider),

@@ -1,12 +1,14 @@
 import path from 'path'
-import { readFileIfExists } from '../fsUtils'
+import { readFileIfExists } from '../../utils/fsUtils'
 
 /**
  * Reads ignore files from disk and aggregates their glob patterns
  * into a single array
  * @param rootPath Dir to find ignore files
  */
-export function readIgnoreFiles(rootPath: string): string[] {
+export default function createIgnorePatternFromFiles(
+  rootPath: string
+): string[] {
   const ignorePatterns: string[] = []
   for (const filename of ['.ipfsignore', '.gitignore']) {
     const data = readFileIfExists(path.join(rootPath, filename))
