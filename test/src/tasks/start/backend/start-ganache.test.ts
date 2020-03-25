@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import http from 'http'
-import { testnetPort } from '~/src/params'
 import tcpPortUsed from 'tcp-port-used'
+import { testnetPort } from '~/test/test-helpers/params'
 import {
   useDefaultEnvironment,
   useEnvironment
