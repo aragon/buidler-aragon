@@ -35,7 +35,6 @@
     "fs-extra": "^8.1.0",
     "ganache-core": "^2.10.1",
     "ipfs-http-client": "^42.0.0",
-    "it-all": "^1.0.1",
     "live-server": "^1.2.1",
     "node-fetch": "^2.6.0",
     "open": "^7.0.0",

@@ -92,7 +92,9 @@ async function publishTask(
   const distPath = aragonConfig.appBuildOutputPath as string
   const ipfsIgnore = ['subfolder/to/ignore/**'] // Hardcoded until a better way to deal with dynamic ENS address is found
   const selectedNetwork = bre.network.name
-  // ### Todo: Add logic to guess app name from file?
+
+  // TODO: Warn the user their metadata files (e.g. appName) are not correct.
+
   const appName =
     typeof aragonConfig.appName === 'string'
       ? aragonConfig.appName
@@ -129,16 +131,16 @@ async function publishTask(
     logMain('No contract used for this version')
     contractAddress = zeroAddress
   } else if (existingContractAddress) {
-    logMain('Using provided contract address')
     contractAddress = existingContractAddress
+    logMain(`Using provided contract address: ${contractAddress}`)
   } else if (!prevVersion || bump === 'major') {
     logMain('Deploying new implementation contract')
     contractAddress = await _deployMainContract(contractName, noVerify, bre)
+    logMain(`New implementation contract address: ${contractAddress}`)
   } else {
-    logMain('Reusing contract from previous version')
     contractAddress = prevVersion.contractAddress
+    logMain(`Reusing previous version contract address: ${contractAddress}`)
   }
-  logMain(`contractAddress: ${contractAddress}`)
 
   // Prepare release directory
   // npm run build must create: index.html, src.js, script.js
@@ -197,7 +199,6 @@ async function _getLastestVersionIfExists(
   try {
     return await apm.getRepoVersion(repoAddress, 'latest', provider)
   } catch (e) {
-    if (e.message.includes('ENS name not configured')) return
     throw e
   }
 }
@@ -225,7 +226,6 @@ async function _deployMainContract(
     await bre.run(TASK_VERIFY_CONTRACT, {
       contractName,
       address: mainContract.address
-      // TODO: constructorArguments
     })
     logMain(`Successfully verified contract on Etherscan`)
   }

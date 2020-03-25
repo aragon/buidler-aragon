@@ -1,9 +1,18 @@
 import IpfsHttpClient from 'ipfs-http-client'
-import all from 'it-all'
 import readIgnoreFiles from './readIgnoreFiles'
 const { globSource } = IpfsHttpClient
 
 const defaultIpfsProvider = 'http://localhost:5001'
+
+const all = async iterator => {
+  const arr: any[] = []
+
+  for await (const entry of iterator) {
+    arr.push(entry)
+  }
+
+  return arr
+}
 
 /**
  * Uploads dist folder to IPFS
