@@ -1,5 +1,4 @@
 import IpfsHttpClient from 'ipfs-http-client'
-import all from 'it-all'
 import path from 'path'
 const { globSource } = IpfsHttpClient
 
