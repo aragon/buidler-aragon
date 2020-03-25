@@ -1,3 +1,9 @@
+// Standard expected Aragon file paths
+export const artifactName = 'artifact.json'
+export const manifestName = 'manifest.json'
+export const flatCodeName = 'code.sol'
+export const arappName = 'arapp.json'
+
 // The Aragon web client expects certain parameters to work locally:
 // - Local testnet node to connect to (testnetPort)
 // - ENS address to resolve names (aragenMnemonic)

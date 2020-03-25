@@ -35,7 +35,10 @@ export function getAppEnsName(): string {
     throw new BuidlerPluginError('Default environemnt not found in arapp.json')
   }
 
-  return defaultEnvironment.appName
+  const appName = defaultEnvironment.appName
+  if (!appName) throw Error('No appName found in environment')
+
+  return appName
 }
 
 export function getAppId(ensName: string): string {
