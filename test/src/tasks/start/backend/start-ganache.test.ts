@@ -64,8 +64,8 @@ describe('start-ganache.ts', async function() {
     })
 
     it('does nothing and returns zero when attempting to start ganache', async function() {
-      const res = await startGanache(this.env)
-      assert.equal(res, 0, 'Ganache started when it wasnt supposed to')
+      const { networkId } = await startGanache(this.env)
+      assert.equal(networkId, 0, 'Ganache started when it wasnt supposed to')
     })
   })
 
@@ -73,10 +73,11 @@ describe('start-ganache.ts', async function() {
     describe('when ganache is started', async function() {
       useEnvironment('counter', 'localhost')
 
-      let networkId
+      let networkId: number
 
       before('start ganache', async function() {
-        networkId = await startGanache(this.env)
+        const res = await startGanache(this.env)
+        networkId = res.networkId
       })
 
       it('returns a non-zero network id', async function() {

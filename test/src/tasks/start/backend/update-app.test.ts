@@ -11,12 +11,8 @@ import {
   startGanache,
   stopGanache
 } from '~/src/tasks/start/backend/start-ganache'
-import {
-  getAppEnsName,
-  getAppId,
-  getAppName,
-  readArapp
-} from '~/src/utils/arappUtils'
+import { getAppEnsName, getAppName, readArapp } from '~/src/utils/arappUtils'
+import { getAppId } from '~/src/utils/appName'
 
 describe('update-app.ts', function() {
   // Note: These particular tests use localhost instead of buidlerevm.
