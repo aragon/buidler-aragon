@@ -6,6 +6,7 @@ import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
 import * as fs from 'fs-extra'
 import path from 'path'
+import EventEmitter from 'events'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
 import {
   FRONTEND_STARTED_SERVING,
