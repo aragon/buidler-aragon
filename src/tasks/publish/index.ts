@@ -9,7 +9,8 @@ import execa from 'execa'
 import { TASK_COMPILE, TASK_VERIFY_CONTRACT, TASK_PUBLISH } from '../task-names'
 import { logMain } from '../../ui/logger'
 import { AragonConfig } from '~/src/types'
-import uploadReleaseToIpfs from './uploadDistToIpfs'
+import { uploadDirToIpfs } from '~/src/utils/ipfs'
+import createIgnorePatternFromFiles from './createIgnorePatternFromFiles'
 import parseAndValidateBumpOrVersion from './parseAndValidateBumpOrVersion'
 import { getMainContractName } from '../../utils/arappUtils'
 import * as apm from '~/src/utils/apm'
@@ -20,7 +21,7 @@ import { ethers } from 'ethers'
 /**
  * Sets up the publish task
  * Note: Tasks must be setup in a function. If task() is run in the
- * module body on test teardown the they will not be setup again
+ * module body on test teardown, they will not be setup again
  */
 export function setupPublishTask(): void {
   task(TASK_PUBLISH, 'Publish a new app version')
@@ -43,8 +44,8 @@ export function setupPublishTask(): void {
       types.string
     )
     .addOptionalParam(
-      'ipfsProvider',
-      'Provider URL to connect to an ipfs daemon API server',
+      'ipfsApiUrl',
+      'IPFS API URL to connect to an ipfs daemon API server',
       'http://localhost:5001',
       types.string
     )
@@ -53,20 +54,25 @@ export function setupPublishTask(): void {
       'Prevents contract compilation, deployment and artifact generation.'
     )
     .addFlag('noVerify', 'Prevents etherscan verification.')
-    .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
-      // Do param type verification here and call publishTask with clean params
-      await publishTask(
-        {
-          bumpOrVersion: params.bump,
-          existingContractAddress: params.contract,
-          managerAddress: params.managerAddress,
-          ipfsProvider: params.ipfsProvider,
-          onlyContent: params.onlyContent,
-          noVerify: params.noVerify
-        },
-        bre
-      )
-    })
+    .setAction(
+      async (
+        params,
+        bre: BuidlerRuntimeEnvironment
+      ): Promise<apm.PublishVersionTxData> => {
+        // Do param type verification here and call publishTask with clean params
+        return await publishTask(
+          {
+            bumpOrVersion: params.bump,
+            existingContractAddress: params.contract,
+            managerAddress: params.managerAddress,
+            ipfsApiUrl: params.ipfsApiUrl,
+            onlyContent: params.onlyContent,
+            noVerify: params.noVerify
+          },
+          bre
+        )
+      }
+    )
 }
 
 async function publishTask(
@@ -74,23 +80,23 @@ async function publishTask(
     bumpOrVersion,
     existingContractAddress,
     managerAddress,
-    ipfsProvider,
+    ipfsApiUrl: ipfsApiUrl,
     onlyContent,
     noVerify
   }: {
     bumpOrVersion: string
     existingContractAddress: string
     managerAddress: string
-    ipfsProvider: string
+    ipfsApiUrl: string
     onlyContent: boolean
     noVerify: boolean
   },
   bre: BuidlerRuntimeEnvironment
-): Promise<void> {
+): Promise<apm.PublishVersionTxData> {
   const aragonConfig = bre.config.aragon as AragonConfig
   const appSrcPath = aragonConfig.appSrcPath as string
   const distPath = aragonConfig.appBuildOutputPath as string
-  const ipfsIgnore = ['subfolder/to/ignore/**'] // Hardcoded until a better way to deal with dynamic ENS address is found
+  const rootPath = '.' // ### Todo: path from which to look from .ipfsignore
   const selectedNetwork = bre.network.name
 
   // TODO: Warn the user their metadata files (e.g. appName) are not correct.
@@ -154,9 +160,9 @@ async function publishTask(
 
   // Upload release directory to IPFS
   logMain('Uploading release assets to IPFS...')
-  const contentHash = await uploadReleaseToIpfs(distPath, {
-    ipfsProvider,
-    ignorePatterns: ipfsIgnore
+  const contentHash = await uploadDirToIpfs(distPath, {
+    ipfsApiUrl,
+    ignore: createIgnorePatternFromFiles(rootPath)
   })
   logMain(`Release assets uploaded to IPFS: ${contentHash}`)
 
@@ -178,6 +184,7 @@ to: ${txData.to}
 data: ${apm.encodePublishVersionTxData(txData)}
 `
   )
+  return txData
 }
 
 /**
@@ -220,7 +227,7 @@ async function _deployMainContract(
   const MainContract = bre.artifacts.require(contractName)
   const mainContract = await MainContract.new()
   logMain('Implementation contract deployed')
-  const chainId = await bre.web3.eth.getChainId()
+  const chainId = await _getChainId(bre)
   if (!noVerify && etherscanSupportedChainIds.has(chainId)) {
     logMain('Verifying on Etherscan')
     await bre.run(TASK_VERIFY_CONTRACT, {
@@ -230,4 +237,15 @@ async function _deployMainContract(
     logMain(`Successfully verified contract on Etherscan`)
   }
   return mainContract.address
+}
+
+/**
+ * Isolates logic to fix buidler issue that swaps web3 version when running the tests
+ * It potentially loads version 1.2.1 instead of 1.2.6 where web3.eth.getChainId
+ * is not a function and causes an error
+ */
+async function _getChainId(bre: BuidlerRuntimeEnvironment): Promise<number> {
+  const provider = new ethers.providers.Web3Provider(bre.web3.currentProvider)
+  const net = await provider.getNetwork()
+  return net.chainId
 }

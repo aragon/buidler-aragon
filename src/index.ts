@@ -15,8 +15,7 @@ export default function(): void {
   usePlugin('@nomiclabs/buidler-etherscan')
 
   // Task definitions.
-  // Note: Tasks must be setup in a function. If task() is run in the
-  // module body on test teardown the they will not be setup again
+  // Note: buidler sets up the environment by appending tasks to it. This happens when a task() function is called. Therefore, task() must be called on every test run, not only for the first time. However, when node imports a file with require the module body will only be run once on the first time and then use the cached result.
   /* eslint-disable @typescript-eslint/no-var-requires */
   const { setupPublishTask } = require('./tasks/publish')
   const { setupStartTask } = require('./tasks/start-task')

@@ -23,7 +23,7 @@ type CallbackClose = () => void
  * and then returns an unresolving promise to keep the task open.
  *
  * Note: Tasks must be setup in a function. If task() is run in the
- * module body on test teardown the they will not be setup again
+ * module body on test teardown, they will not be setup again
  */
 export function setupStartTask(): void {
   task(TASK_START, 'Starts Aragon app development')
@@ -35,7 +35,7 @@ export function setupStartTask(): void {
     .setAction(async (params, bre: BuidlerRuntimeEnvironment) => {
       if (params.silent) {
         // eslint-disable-next-line
-      console.log = () => {}
+        console.log = () => {}
       }
 
       logMain(`Starting Aragon app development...`)

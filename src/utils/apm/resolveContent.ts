@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { contentUriToFetchUrl } from './utils'
+import { contentUriToFetchUrl, toUtf8IfHex } from './utils'
 import { AragonManifest, AragonArtifact } from '~/src/types'
 
 /**
@@ -12,7 +12,7 @@ export async function resolveRepoContentUri(
   contentUri: string,
   options?: { ipfsGateway?: string }
 ): Promise<{ artifact: AragonArtifact; manifest: AragonManifest }> {
-  const url = contentUriToFetchUrl(contentUri, options)
+  const url = contentUriToFetchUrl(toUtf8IfHex(contentUri), options)
 
   const [manifest, artifact] = await Promise.all([
     _fetchJson<AragonManifest>(`${url}/manifest.json`),
@@ -34,7 +34,7 @@ export async function resolveRepoContentUriFile<T>(
   filepath: string,
   options?: { ipfsGateway?: string }
 ): Promise<string> {
-  const url = contentUriToFetchUrl(contentUri, options)
+  const url = contentUriToFetchUrl(toUtf8IfHex(contentUri), options)
   return await _fetchText(`${url}/${filepath}`)
 }
 

@@ -7,9 +7,9 @@ import { sortBy, keyBy } from 'lodash'
 import { writeJson } from '~/src/utils/fsUtils'
 import { artifactName } from '~/src/params'
 import { AragonArtifact } from '~/src/types'
+import { debugDir } from '~/test/testParams'
 
 const writeToDebug = false
-const debugDir = '.debug'
 
 describe('ast > generateAragonArtifact', () => {
   for (const testCase of listTestCases()) {
