@@ -1,4 +1,3 @@
-import path from 'path'
 import { readFileIfExists } from '../../utils/fsUtils'
 
 /**
@@ -11,7 +10,7 @@ export default function createIgnorePatternFromFiles(
 ): string[] {
   const ignorePatterns: string[] = []
   for (const filename of ['.ipfsignore', '.gitignore']) {
-    const data = readFileIfExists(path.join(rootPath, filename))
+    const data = readFileIfExists(rootPath, filename)
     if (data) {
       const ignoreLines = data
         .trim()

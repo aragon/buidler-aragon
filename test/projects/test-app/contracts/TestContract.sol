@@ -11,3 +11,4 @@ contract TestContract is AragonApp {
         initialized();
     }
 }
+
