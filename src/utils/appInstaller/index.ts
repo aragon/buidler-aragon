@@ -23,7 +23,7 @@ import assertEnsDomain from './assertEnsDomain'
 const ANY_ENTITY = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'
 
 /**
- * Get an initialized instance of of appInstaller
+ * Get an initialized instance of appInstaller
  * @param installerOptions
  * @param bre
  */

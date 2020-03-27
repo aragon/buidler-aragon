@@ -30,7 +30,7 @@ export interface AragonConfig {
 }
 
 type AragonHook<T, R> = (
-  params: T & { log: (message: string) => void },
+  params: T,
   bre: BuidlerRuntimeEnvironment
 ) => Promise<R> | R
 
@@ -213,10 +213,12 @@ export type NetworkType =
   | 'kovan'
   | 'goerli'
 
-export type AppInstaller = (
-  name: string,
-  appOptions?: AppOptions
-) => Promise<AppInstalled>
+export interface AppOptions {
+  version?: string
+  network?: NetworkType
+  initializeArgs?: any[]
+  skipInitialize?: boolean
+}
 
 export interface AppInstalled {
   initialize: (_initializeArgs: any[]) => Promise<void>
@@ -224,12 +226,10 @@ export interface AppInstalled {
   address: string
 }
 
-export interface AppOptions {
-  version?: string
-  initializeArgs?: any[]
-  skipInitialize?: boolean
-  network?: NetworkType
-}
+export type AppInstaller = (
+  name: string,
+  appOptions?: AppOptions
+) => Promise<AppInstalled>
 
 export interface AppInstallerOptions {
   apmAddress: string
