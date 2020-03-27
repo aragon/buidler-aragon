@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import semver from 'semver'
 import { ApmVersion, AragonJsIntent, PublishVersionTxData } from './types'
 import { toApmVersionArray } from './utils'
-import { appStorageAbi, apmRegistryAbi } from './abis'
+import { appStorageAbi, apmRegistryAbi, repoAbi } from './abis'
 
 /**
  * Return the kernel address of an aragon app contract
@@ -112,9 +112,19 @@ export function encodePublishVersionTxData({
   methodName,
   params
 }: {
-  methodName: string
+  methodName: 'newVersion' | 'newRepoWithVersion'
   params: any[]
 }): string {
-  const apmRegistry = new ethers.utils.Interface(apmRegistryAbi)
-  return apmRegistry.functions[methodName].encode(params)
+  switch (methodName) {
+    case 'newRepoWithVersion':
+      const apmRegistry = new ethers.utils.Interface(apmRegistryAbi)
+      return apmRegistry.functions.newRepoWithVersion.encode(params)
+
+    case 'newVersion':
+      const apmRepo = new ethers.utils.Interface(repoAbi)
+      return apmRepo.functions.newVersion.encode(params)
+
+    default:
+      throw Error(`Unsupported publish version method name: ${methodName}`)
+  }
 }

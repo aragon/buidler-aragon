@@ -61,10 +61,12 @@ export function contentUriToFetchUrl(
   contentUri: string,
   options?: { ipfsGateway?: string }
 ): string {
+  if (!contentUri) throw Error(`contentUri is empty`)
   const [protocol, location] = contentUri.split(/[/:](.+)/)
   switch (protocol) {
     case 'http':
     case 'https':
+      if (!location) throw Error(`contentUri location not set: ${contentUri}`)
       return location.includes('://') ? location : contentUri
     case 'ipfs':
       if (!options || !options.ipfsGateway)

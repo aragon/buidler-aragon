@@ -101,12 +101,7 @@ async function publishTask(
 
   // TODO: Warn the user their metadata files (e.g. appName) are not correct.
 
-  const appName =
-    typeof aragonConfig.appName === 'string'
-      ? aragonConfig.appName
-      : typeof aragonConfig.appName === 'object'
-      ? aragonConfig.appName[selectedNetwork]
-      : undefined
+  const appName = _parseAppName(aragonConfig.appName, selectedNetwork)
   if (!appName)
     throw new BuidlerPluginError(`appName must be defined in buidler.config`)
   const contractName = getMainContractName()
@@ -248,4 +243,36 @@ async function _getChainId(bre: BuidlerRuntimeEnvironment): Promise<number> {
   const provider = new ethers.providers.Web3Provider(bre.web3.currentProvider)
   const net = await provider.getNetwork()
   return net.chainId
+}
+
+/**
+ * Utility to parse appName from the aragon config
+ * @param appNameOrObj
+ * @param network
+ */
+function _parseAppName(
+  appNameOrObj: string | { [network: string]: string } | undefined,
+  network: string
+): string {
+  switch (typeof appNameOrObj) {
+    case 'string':
+      if (!appNameOrObj)
+        throw new BuidlerPluginError(
+          `appName must not be empty in buidler.config`
+        )
+      return appNameOrObj
+
+    case 'object':
+      if (!appNameOrObj[network])
+        throw new BuidlerPluginError(
+          `No appName defined for network '${network}' in buidler.config`
+        )
+      else return appNameOrObj[network]
+
+    default:
+      throw new BuidlerPluginError(
+        `appName is buidler.config is of type ${typeof appNameOrObj}
+It must a string or an object { [network]: appName}`
+      )
+  }
 }
