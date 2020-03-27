@@ -11,13 +11,13 @@ async function postDao(params, bre) {
   console.log(`postDao hook called`, params.dao.address)
 }
 
-async function preInit({ appInstaller }, bre) {
+async function preInit({ _experimentalAppInstaller }, bre) {
   console.log(`preInit hook called`)
   
   // Demo installing external apps
   console.log(`Installing dependant apps from mainnet...`)
-  const vault = await appInstaller("vault");
-  const finance = await appInstaller("finance", {
+  const vault = await _experimentalAppInstaller("vault");
+  const finance = await _experimentalAppInstaller("finance", {
     initializeArgs: [vault.address, 60 * 60 * 24 * 31]
   });
   console.log(`Installed vault: ${vault.address}`)
@@ -59,7 +59,7 @@ async function postInit({ proxy }, bre) {
   console.log(`postInit hook called`)
 
   console.log(`ERC20 token:`, token.address)
-  console.log(`Proxy:`, params.proxy.address)
+  console.log(`Proxy:`, proxy.address)
   console.log(`Account 1 token balance`, (await token.balanceOf(accounts[0])).toString())
   console.log(`Account 2 token balance`, (await token.balanceOf(accounts[1])).toString())
 }

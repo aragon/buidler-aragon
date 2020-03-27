@@ -28,6 +28,7 @@ module.exports = {
     clientServePort: 3042, // Intentionally not using default value (3000).
     appSrcPath: 'app/',
     appBuildOutputPath: 'dist/',
+    ipfsGateway: 'https://ipfs.eth.aragon.network/ipfs/',
     hooks
   }
 }

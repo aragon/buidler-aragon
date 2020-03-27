@@ -36,13 +36,22 @@ type AragonHook<T, R> = (
 
 export interface AragonConfigHooks {
   preDao?: AragonHook<{}, void>
-  postDao?: AragonHook<{ dao: KernelInstance }, void>
+  postDao?: AragonHook<
+    { dao: KernelInstance; _experimentalAppInstaller: AppInstaller },
+    void
+  >
   preInit?: AragonHook<
-    { proxy: Truffle.ContractInstance; appInstaller: AppInstaller },
+    {
+      proxy: Truffle.ContractInstance
+      _experimentalAppInstaller: AppInstaller
+    },
     void
   >
   postInit?: AragonHook<
-    { proxy: Truffle.ContractInstance; appInstaller: AppInstaller },
+    {
+      proxy: Truffle.ContractInstance
+      _experimentalAppInstaller: AppInstaller
+    },
     void
   >
   getInitParams?: AragonHook<{}, any[]>

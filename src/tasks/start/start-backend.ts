@@ -76,10 +76,14 @@ export async function startBackend(
     daoFactoryAddress
   )
   logBack(`DAO deployed: ${dao.address}`)
+  const _experimentalAppInstaller = AppInstaller(
+    { apmAddress, dao, ipfsGateway },
+    bre
+  )
 
   // Call postDao hook.
   if (hooks && hooks.postDao) {
-    await hooks.postDao({ dao }, bre)
+    await hooks.postDao({ dao, _experimentalAppInstaller }, bre)
   }
 
   // Create app.
@@ -96,11 +100,10 @@ export async function startBackend(
   )
   logBack(`Proxy address: ${proxy.address}`)
   logBack(`Repo address: ${repo.address}`)
-  const appInstaller = AppInstaller({ apmAddress, dao, ipfsGateway }, bre)
 
   // Call preInit hook.
   if (hooks && hooks.preInit) {
-    await hooks.preInit({ proxy, appInstaller }, bre)
+    await hooks.preInit({ proxy, _experimentalAppInstaller }, bre)
   }
 
   // Call getInitParams hook.
@@ -131,7 +134,7 @@ export async function startBackend(
 
   // Call postInit hook.
   if (hooks && hooks.postInit) {
-    await hooks.postInit({ proxy, appInstaller }, bre)
+    await hooks.postInit({ proxy, _experimentalAppInstaller }, bre)
   }
 
   // TODO: What if user wants to set custom permissions?
