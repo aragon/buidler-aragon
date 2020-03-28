@@ -7,7 +7,8 @@ import {
 import {
   zeroAddress,
   etherscanSupportedChainIds,
-  defaultIpfsGateway
+  defaultIpfsGateway,
+  etherscanChainUrls
 } from '../../params'
 import execa from 'execa'
 import { TASK_COMPILE, TASK_VERIFY_CONTRACT, TASK_PUBLISH } from '../task-names'
@@ -21,7 +22,7 @@ import * as apm from '~/src/utils/apm'
 import { generateArtifacts, validateArtifacts } from '~/src/utils/artifact'
 import { getFullAppName } from '~/src/utils/appName'
 import { ethers } from 'ethers'
-import { getDryRunOutput } from './getDryRunOutput'
+import { getPrettyPublishTxPreview, getPublishTxOutput } from './prettyOutput'
 import { encodePublishVersionTxData } from '~/src/utils/apm'
 import { getRootAccount } from '~/src/utils/accounts'
 
@@ -186,25 +187,33 @@ async function publishTask(
     managerAddress
   })
 
-  if (dryRun) {
-    logMain(
-      getDryRunOutput({
-        txData,
-        appName,
-        nextVersion,
-        bump,
-        contractAddress,
-        contentHash,
-        ipfsGateway,
-        rootAccount
-      })
-    )
-  } else {
-    await bre.web3.eth.sendTransaction({
-      from: rootAccount,
-      to: txData.to,
-      data: encodePublishVersionTxData(txData)
+  logMain(
+    getPrettyPublishTxPreview({
+      txData,
+      appName,
+      nextVersion,
+      bump,
+      contractAddress,
+      contentHash,
+      ipfsGateway
     })
+  )
+
+  if (dryRun) {
+    logMain(getPublishTxOutput.dryRun({ txData, rootAccount }))
+  } else {
+    const etherscanTxUrl = etherscanChainUrls[network.chainId]
+
+    const receipt = await bre.web3.eth
+      .sendTransaction({
+        from: rootAccount,
+        to: txData.to,
+        data: encodePublishVersionTxData(txData)
+      })
+      .on('transactionHash', (hash: string) => {
+        logMain(getPublishTxOutput.txHash(hash, etherscanTxUrl))
+      })
+    logMain(getPublishTxOutput.receipt(receipt))
   }
 
   // For testing

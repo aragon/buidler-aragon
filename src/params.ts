@@ -96,10 +96,14 @@ export const etherscanSupportedChainIds = new Set([
   42
 ])
 
-export const defaultAragonConfig: AragonConfig = {
-  appServePort: 8001,
-  clientServePort: 3000,
-  appSrcPath: 'app/',
-  appBuildOutputPath: 'dist/',
-  ipfsGateway: 'https://ipfs.eth.aragon.network/ipfs/'
+/**
+ * Root etherscan URLs per chainId
+ * Note: All URLs are expected to have the same sub paths, /tx, etc
+ */
+export const etherscanChainUrls = {
+  1: 'https://etherscan.io/',
+  3: 'https://ropsten.etherscan.io/',
+  4: 'https://rinkeby.etherscan.io/',
+  5: 'https://goerli.etherscan.io/',
+  42: 'https://kovan.etherscan.io/'
 }
