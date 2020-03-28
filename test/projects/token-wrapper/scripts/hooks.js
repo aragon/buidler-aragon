@@ -11,8 +11,24 @@ async function postDao(params, bre) {
   console.log(`postDao hook called`, params.dao.address)
 }
 
-async function preInit(params, bre) {
+async function preInit({ _experimentalAppInstaller }, bre) {
   console.log(`preInit hook called`)
+  
+  // Demo installing external apps
+  console.log(`Installing dependant apps from mainnet...`)
+  const vault = await _experimentalAppInstaller("vault");
+  const vault2 = await _experimentalAppInstaller("vault");
+  const finance = await _experimentalAppInstaller("finance", {
+    initializeArgs: [vault.address, 60 * 60 * 24 * 31]
+  });
+  console.log(`Installed vault: ${vault.address}`)
+  console.log(`Second instance of vault installed: ${vault2.address}`)
+  console.log(`Installed finance: ${finance.address}`)
+
+  await vault.createPermission("TRANSFER_ROLE", finance.address);
+  await vault2.createPermission("TRANSFER_ROLE", finance.address);
+  await finance.createPermission("CREATE_PAYMENTS_ROLE");
+  console.log(`Granted permissions to installed apps`)
 
   // Retrieve accounts.
   accounts = await bre.web3.eth.getAccounts()
@@ -42,11 +58,11 @@ async function getInitParams(params, bre) {
   return [tokenAddress, 'Wrapped token', 'wORG']
 }
 
-async function postInit(params, bre) {
+async function postInit({ proxy }, bre) {
   console.log(`postInit hook called`)
 
   console.log(`ERC20 token:`, token.address)
-  console.log(`Proxy:`, params.proxy.address)
+  console.log(`Proxy:`, proxy.address)
   console.log(`Account 1 token balance`, (await token.balanceOf(accounts[0])).toString())
   console.log(`Account 2 token balance`, (await token.balanceOf(accounts[1])).toString())
 }

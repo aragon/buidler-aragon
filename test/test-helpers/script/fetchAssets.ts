@@ -28,7 +28,7 @@ async function fetchAppPublishedAssets(
   const options = { ipfsGateway }
   const { contentUri } = await getRepoVersion(appName, 'latest', provider)
   const { artifact } = await resolveRepoContentUri(contentUri, options)
-  const flatCode = await resolveRepoContentUriFile<string>(
+  const flatCode = await resolveRepoContentUriFile(
     contentUri,
     flatCodeName,
     options

@@ -1,3 +1,5 @@
+import { AragonConfig } from './types'
+
 // Standard expected Aragon file paths
 export const artifactName = 'artifact.json'
 export const manifestName = 'manifest.json'
@@ -91,3 +93,11 @@ export const etherscanSupportedChainIds = new Set([
   // Kovan
   42
 ])
+
+export const defaultAragonConfig: AragonConfig = {
+  appServePort: 8001,
+  clientServePort: 3000,
+  appSrcPath: 'app/',
+  appBuildOutputPath: 'dist/',
+  ipfsGateway: 'https://ipfs.eth.aragon.network/ipfs/'
+}

@@ -25,7 +25,7 @@ const config: BuidlerAragonConfig = {
   },
   solc: {
     version: '0.4.24'
-  }
+  },
   // Note: Intentionally not specifying aragon: AragonConfig.
 }
 
