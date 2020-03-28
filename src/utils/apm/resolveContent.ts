@@ -29,7 +29,7 @@ export async function resolveRepoContentUri(
  * @param options
  * - ipfsGateway: 'http://localhost:8080' | 'https://my-remote-ipfs.io'
  */
-export async function resolveRepoContentUriFile<T>(
+export async function resolveRepoContentUriFile(
   contentUri: string,
   filepath: string,
   options?: { ipfsGateway?: string }
