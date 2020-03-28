@@ -7,6 +7,7 @@ import { APMRegistryInstance, KernelInstance } from '~/typechain'
 import { getLog } from '~/src/utils/getLog'
 import { getFullAppName } from '~/src/utils/appName'
 import { toApmVersionArray, getRepoVersion } from '~/src/utils/apm'
+import { anyEntity } from '~/src/params'
 import {
   AppInstallerOptions,
   AppInstaller,
@@ -18,8 +19,6 @@ import { namehash, getContentHash, utf8ToHex } from './utils'
 import getAbiFromContentUri from './getAbiFromContentUri'
 import getExternalRepoVersion from './getRepoVersion'
 import assertEnsDomain from './assertEnsDomain'
-
-const ANY_ENTITY = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'
 
 /**
  * Get an initialized instance of appInstaller
@@ -83,16 +82,10 @@ async function _installExternalApp(
   // We try to resolve ENS name in case of more than one app installation
   const repoAddress: string = await ethersWeb3Provider.resolveName(fullName)
 
-  let repoInfo
-  if (!repoAddress) {
-    // If no repo for the app we publish first version
-    repoInfo = await _publishApp(network, fullName, rootAccount, version)
-  } else {
-    // Fetch repo version
-    repoInfo = await getRepoVersion(fullName, 'latest', ethersWeb3Provider)
-  }
-
-  const { contractAddress, contentUri } = repoInfo
+  // If no repo for the app we publish first version otherwise we fetch previous version
+  const { contractAddress, contentUri } = repoAddress
+    ? await getRepoVersion(fullName, 'latest', ethersWeb3Provider)
+    : await _publishApp(network, fullName, rootAccount, version)
 
   // Install app instance and retrieve proxy address
   const proxyAddress = await dao
@@ -209,11 +202,11 @@ async function _installExternalApp(
   /**
    * Assign a permission of this app to an entity
    * @param roleName 'TRANSFER_ROLE'
-   * @param entity "0x615..." if unspecified defaults to ANY_ENTITY
+   * @param entity "0x615..." if unspecified defaults to anyEntity
    */
   async function createPermission(
     roleName: string,
-    entity = ANY_ENTITY
+    entity = anyEntity
   ): Promise<void> {
     const _proxy = await _getProxyInstance()
     const _acl = await _getAclInstance()
