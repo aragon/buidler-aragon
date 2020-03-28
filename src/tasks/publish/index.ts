@@ -101,7 +101,7 @@ async function publishTask(
 
   // TODO: Warn the user their metadata files (e.g. appName) are not correct.
 
-  const appName = _parseAppName(aragonConfig.appName, selectedNetwork)
+  const appName = _parseAppNameFromConfig(aragonConfig.appName, selectedNetwork)
   if (!appName)
     throw new BuidlerPluginError(`appName must be defined in buidler.config`)
   const contractName = getMainContractName()
@@ -250,7 +250,7 @@ async function _getChainId(bre: BuidlerRuntimeEnvironment): Promise<number> {
  * @param appNameOrObj
  * @param network
  */
-function _parseAppName(
+function _parseAppNameFromConfig(
   appNameOrObj: string | { [network: string]: string } | undefined,
   network: string
 ): string {
