@@ -27,6 +27,10 @@ module.exports = {
     clientServePort: 3042, // Intentionally not using default value (3000).
     appSrcPath: 'app/',
     appBuildOutputPath: 'dist/',
+    appName: {
+      localhost: "test.aragonpm.eth",
+      mainnet: "finance.aragonpm.eth"
+    },
     hooks: require("./aragon-hooks")
   }
 }
