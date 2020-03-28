@@ -25,3 +25,4 @@ module.exports = {
   },
   postInit: async (params, bre) =>  console.log(`postInit hook called`),
   postUpdate: (params, bre) =>   console.log(`postUpdate hook called`)
+}
