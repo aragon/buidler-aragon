@@ -23,6 +23,7 @@ import {
   BuidlerRuntimeEnvironment,
   HttpNetworkConfig
 } from '@nomiclabs/buidler/types'
+import { getRootAccount } from '~/src/utils/accounts'
 
 interface RepoState {
   repoAddress: string
@@ -117,16 +118,6 @@ describe('Publish task', function() {
       { path: 'contracts/TestContract.sol' },
       'artifact.json does not include expected data'
     )
-  }
-
-  /**
-   * Test util to fetch the root account
-   * @param bre
-   */
-  async function getRootAccount(
-    bre: BuidlerRuntimeEnvironment
-  ): Promise<string> {
-    return (await bre.web3.eth.getAccounts())[0]
   }
 
   /**
