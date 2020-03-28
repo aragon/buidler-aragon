@@ -181,8 +181,7 @@ async function publishTask(
 
   const rootAccount = await getRootAccount(bre)
   const network = await provider.getNetwork()
-  const isTestNetwork = network.chainId > 100
-  if (!managerAddress && isTestNetwork) managerAddress = rootAccount
+  if (!managerAddress) managerAddress = rootAccount
   const txData = await apm.publishVersion(appName, versionInfo, provider, {
     managerAddress
   })
