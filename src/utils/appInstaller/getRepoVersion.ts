@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
-import { getFullName, toVersionArray } from './utils'
+import { getFullAppName } from '~/src/utils/appName'
+import { toApmVersionArray } from '~/src/utils/apm'
 
 const ApmRepoAbi = [
   'function getLatest() public view returns (uint16[3] semanticVersion, address contractAddress, bytes contentURI)',
@@ -17,9 +18,13 @@ export default async function getExternalRepoVersion(
   version: string | undefined,
   provider: ethers.providers.Provider
 ): Promise<{ contentURI: string; contractAddress: string }> {
-  const contract = new ethers.Contract(getFullName(name), ApmRepoAbi, provider)
+  const contract = new ethers.Contract(
+    getFullAppName(name),
+    ApmRepoAbi,
+    provider
+  )
   const { contentURI, contractAddress } = version
-    ? await contract.getBySemanticVersion(toVersionArray(version))
+    ? await contract.getBySemanticVersion(toApmVersionArray(version))
     : await contract.getLatest()
 
   // throws an error in the event it is not an address

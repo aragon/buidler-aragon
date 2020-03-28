@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import fetch from 'node-fetch'
 import { AbiItem } from '~/src/types'
 import { getContentHash } from './utils'
@@ -12,7 +13,11 @@ export default async function getAbiFromContentUri(
   options: { ipfsGateway: string }
 ): Promise<AbiItem[]> {
   const { ipfsGateway } = options
-  const contentHash = getContentHash(contentURI)
+
+  const contentHash = ethers.utils.isHexString(contentURI)
+    ? getContentHash(contentURI)
+    : contentURI.split('/ipfs/')[1]
+
   if (!ipfsGateway) throw Error('ipfsGateway must be defined')
   if (!contentHash) throw Error('contentHash must be defined')
 

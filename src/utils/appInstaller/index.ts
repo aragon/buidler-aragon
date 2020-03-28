@@ -1,7 +1,12 @@
-import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
+import {
+  BuidlerRuntimeEnvironment,
+  HttpNetworkConfig
+} from '@nomiclabs/buidler/types'
 import { ethers } from 'ethers'
 import { APMRegistryInstance, KernelInstance } from '~/typechain'
 import { getLog } from '~/src/utils/getLog'
+import { getFullAppName } from '~/src/utils/appName'
+import { toApmVersionArray, getRepoVersion } from '~/src/utils/apm'
 import {
   AppInstallerOptions,
   AppInstaller,
@@ -9,13 +14,7 @@ import {
   AppInstalled,
   NetworkType
 } from '~/src/types'
-import {
-  toVersionArray,
-  getFullName,
-  namehash,
-  getContentHash,
-  utf8ToHex
-} from './utils'
+import { namehash, getContentHash, utf8ToHex } from './utils'
 import getAbiFromContentUri from './getAbiFromContentUri'
 import getExternalRepoVersion from './getRepoVersion'
 import assertEnsDomain from './assertEnsDomain'
@@ -60,65 +59,44 @@ async function _installExternalApp(
   }: {
     name: string
     version?: string
+    network?: NetworkType
     initializeArgs?: any[]
     skipInitialize?: boolean
-    network?: NetworkType
     apmAddress: string
     dao: KernelInstance
     ipfsGateway: string
   },
   bre: BuidlerRuntimeEnvironment
 ) {
-  const provider = new ethers.providers.InfuraProvider(network)
-  const etherscanProvider = new ethers.providers.EtherscanProvider(network)
-  const rootAccount: string = (await bre.web3.eth.getAccounts())[0]
-  const fullName = getFullName(name)
-
-  // Fetch version from external network
-  const versionData = await getExternalRepoVersion(fullName, version, provider)
-  const { contractAddress, contentURI } = versionData
-
-  // Fetch the deploy transaction from etherscan
-  const history = await etherscanProvider.getHistory(contractAddress, 0)
-  const deployTx = history[0]
-
-  const newDeployTx = await bre.web3.eth.sendTransaction({
-    from: rootAccount,
-    data: deployTx.data
-  })
-  const newContractAddress: string = newDeployTx.contractAddress
-
-  // Todo: construct valid deploy TX from the source code
-  // Make sure the contract code is correct before continuing
-  const codeNew = await bre.web3.eth.getCode(newContractAddress)
-  const codeReal = await provider.getCode(contractAddress)
-  if (codeNew !== codeReal)
-    throw Error('Error re-deploying contract code, it is not equal')
-
-  // Create new repo and publish its version
-  // Force the client to fetch from this specific ipfsGateway instead of localhost:8080
-  const shortName = name.split('.')[0]
-  const initialVersionArray = toVersionArray('1.0.0')
-  const contentUriHttpFromPublicGateway = utf8ToHex(
-    `http:${ipfsGateway}${getContentHash(contentURI)}`
+  const networkConfig = bre.network.config as HttpNetworkConfig
+  const ethersWeb3Provider = new ethers.providers.Web3Provider(
+    bre.web3.currentProvider,
+    networkConfig.ensAddress && {
+      name: bre.network.name,
+      chainId: networkConfig.chainId || 8545,
+      ensAddress: networkConfig.ensAddress
+    }
   )
-  const APMRegistry = bre.artifacts.require('APMRegistry')
-  const apmRegistry: APMRegistryInstance = await APMRegistry.at(apmAddress)
-  const repoAddress: string = await apmRegistry
-    .newRepoWithVersion(
-      shortName,
-      rootAccount,
-      initialVersionArray,
-      newContractAddress,
-      contentUriHttpFromPublicGateway
-    )
-    .then(txResponse => getLog(txResponse, 'NewRepo', 'repo'))
-  // Make sure the resulting repoAddress is accessible from the client
-  await assertEnsDomain(fullName, repoAddress)
+  const rootAccount: string = (await bre.web3.eth.getAccounts())[0]
+  const fullName = getFullAppName(name)
+
+  // We try to resolve ENS name in case of more than one app installation
+  const repoAddress: string = await ethersWeb3Provider.resolveName(fullName)
+
+  let repoInfo
+  if (!repoAddress) {
+    // If no repo for the app we publish first version
+    repoInfo = await _publishApp(network, fullName, rootAccount, version)
+  } else {
+    // Fetch repo version
+    repoInfo = await getRepoVersion(fullName, 'latest', ethersWeb3Provider)
+  }
+
+  const { contractAddress, contentUri } = repoInfo
 
   // Install app instance and retrieve proxy address
   const proxyAddress = await dao
-    .newAppInstance(namehash(fullName), newContractAddress, '0x', false)
+    .newAppInstance(namehash(fullName), contractAddress, '0x', false)
     .then(txResponse => getLog(txResponse, 'NewAppProxy', 'proxy'))
 
   /*
@@ -140,7 +118,7 @@ async function _installExternalApp(
 
   async function _getProxyInstance(): Promise<Proxy> {
     if (!proxy) {
-      const appAbi = await getAbiFromContentUri(contentURI, { ipfsGateway })
+      const appAbi = await getAbiFromContentUri(contentUri, { ipfsGateway })
       proxy = new bre.web3.eth.Contract(appAbi, proxyAddress)
     }
     return proxy
@@ -153,6 +131,69 @@ async function _installExternalApp(
       acl = await ACL.at(aclAddress)
     }
     return acl
+  }
+
+  async function _publishApp(
+    network: string,
+    fullName: string,
+    rootAccount: string,
+    version?: string
+  ): Promise<{ contractAddress: string; contentUri: string }> {
+    const infuraProvider = new ethers.providers.InfuraProvider(network)
+    const etherscanProvider = new ethers.providers.EtherscanProvider(network)
+
+    // Fetch version from external network
+    const versionData = await getExternalRepoVersion(
+      fullName,
+      version,
+      infuraProvider
+    )
+    const { contractAddress, contentURI } = versionData
+
+    // Fetch the deploy transaction from etherscan
+    const history = await etherscanProvider.getHistory(contractAddress, 0)
+    const deployTx = history[0]
+
+    const newDeployTx = await bre.web3.eth.sendTransaction({
+      from: rootAccount,
+      data: deployTx.data
+    })
+
+    const newContractAddress: string = newDeployTx.contractAddress
+
+    // Todo: construct valid deploy TX from the source code
+    // Make sure the contract code is correct before continuing
+    const codeNew = await bre.web3.eth.getCode(newContractAddress)
+    const codeReal = await infuraProvider.getCode(contractAddress)
+    if (codeNew !== codeReal)
+      throw Error('Error re-deploying contract code, it is not equal')
+
+    // Create new repo and publish its version
+    // Force the client to fetch from this specific ipfsGateway instead of localhost:8080
+    const shortName = name.split('.')[0]
+    const initialVersionArray = toApmVersionArray('1.0.0')
+    const contentUriHttpFromPublicGateway = utf8ToHex(
+      `http:${ipfsGateway}${getContentHash(contentURI)}`
+    )
+    const APMRegistry = bre.artifacts.require('APMRegistry')
+    const apmRegistry: APMRegistryInstance = await APMRegistry.at(apmAddress)
+    const repoAddress: string = await apmRegistry
+      .newRepoWithVersion(
+        shortName,
+        rootAccount,
+        initialVersionArray,
+        newContractAddress,
+        contentUriHttpFromPublicGateway
+      )
+      .then(txResponse => getLog(txResponse, 'NewRepo', 'repo'))
+
+    // Make sure the resulting repoAddress is accessible from the client
+    await assertEnsDomain(fullName, repoAddress)
+
+    return {
+      contractAddress: newContractAddress,
+      contentUri: contentURI
+    }
   }
 
   /**

@@ -6,7 +6,7 @@ let intialCount;
 module.exports = {
   preDao: (params, bre) => console.log(`preDao hook called`),
   postDao: (params, bre) => console.log('postDao hook called'),
-  preInit: async (params, bre) => {
+  preInit: async ({ _experimentalAppInstaller }, bre) => {
     console.log(`preInit hook called`)
   
     // Do actions required before initializing the contract
@@ -25,4 +25,3 @@ module.exports = {
   },
   postInit: async (params, bre) =>  console.log(`postInit hook called`),
   postUpdate: (params, bre) =>   console.log(`postUpdate hook called`)
-}
