@@ -78,6 +78,8 @@ export const defaultLocalAragonBases = {
   apmAddress: '0xA53dE0b8e08b798f975D57f48384C177D410d170'
 }
 
+export const defaultIpfsGateway = 'https://ipfs.eth.aragon.network'
+
 /**
  * Chain ids of networks that support Etherscan contract verification
  */
