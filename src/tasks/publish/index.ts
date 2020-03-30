@@ -108,7 +108,7 @@ async function publishTask(
   const aragonConfig = bre.config.aragon as AragonConfig
   const appSrcPath = aragonConfig.appSrcPath as string
   const distPath = aragonConfig.appBuildOutputPath as string
-  const rootPath = '.' // ### Todo: path from which to look from .ipfsignore
+  const ignoreFilesPath = aragonConfig.ignoreFilesPath as string
   const selectedNetwork = bre.network.name
   const ipfsGateway = (bre.config.ipfs || {}).ipfsGateway || defaultIpfsGateway
 
@@ -168,7 +168,7 @@ async function publishTask(
   logMain('Uploading release assets to IPFS...')
   const contentHash = await uploadDirToIpfs(distPath, {
     ipfsApiUrl,
-    ignore: createIgnorePatternFromFiles(rootPath)
+    ignore: createIgnorePatternFromFiles(ignoreFilesPath)
   })
   logMain(`Release assets uploaded to IPFS: ${contentHash}`)
 
