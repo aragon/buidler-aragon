@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { namehash } from '~/src/utils/namehash'
 
 const DEFAULT_APM_REGISTRY = 'aragonpm.eth'
 
@@ -21,7 +21,7 @@ export function getAppId(appNameOrId: string, registry?: string): string {
     return appNameOrId
   } else {
     const fullAppName = getFullAppName(appNameOrId, registry)
-    return ethers.utils.namehash(fullAppName)
+    return namehash(fullAppName)
   }
 }
 
