@@ -3,7 +3,6 @@ import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { TASK_START } from '~/src/tasks/task-names'
 import { AragonConfig } from '~/src/types'
 import tcpPortUsed from 'tcp-port-used'
-import * as fs from 'fs-extra'
 import path from 'path'
 import EventEmitter from 'events'
 import { isNonZeroAddress } from '~/test/test-helpers/isNonZeroAddress'
@@ -11,6 +10,7 @@ import sinon from 'sinon'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import killPort from 'kill-port'
 import { mapValues } from 'lodash'
+import { readFile, writeFile } from '~/src/utils/fsUtils'
 
 const testAppDir = 'test-app'
 const testAppContract = 'TestContract'
@@ -141,15 +141,15 @@ describe(`Run start-task - ${testAppDir}`, function() {
      * which we use to assert that the update event happened
      */
     before('modify the contract source', async function() {
-      contractSource = fs.readFileSync(contractPathToModify, 'utf8')
-      fs.writeFileSync(contractPathToModify, `${contractSource}\n`)
+      contractSource = readFile(contractPathToModify)
+      writeFile(contractPathToModify, `${contractSource}\n`)
       // Wait for the postUpdate to be called once
       await new Promise(resolve => hooksEmitter.on('postUpdate', resolve))
     })
 
     after('restore the contract source', function() {
       if (!contractSource) throw new Error('No contract source cached.')
-      fs.writeFileSync(contractPathToModify, contractSource)
+      writeFile(contractPathToModify, contractSource)
     })
 
     it('calls the postUpdate hook with the bre and log contains additional data', async function() {
