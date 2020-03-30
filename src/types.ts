@@ -141,8 +141,8 @@ export interface AragonArtifact extends AragonAppJson {
    * any type of release at this path
    */
   flattenedCode: string // "./code.sol"
-  appId: string
-  appName: string
+  // appId: string // DEPRECATED
+  // appName: string // DEPRECATED
 
   // env: AragonEnvironment // DEPRECATED
   // deployment: any // DEPRECATED

@@ -1,6 +1,5 @@
-import { AragonAppJson, AragonArtifact, AragonEnvironment } from '~/src/types'
+import { AragonAppJson, AragonArtifact } from '~/src/types'
 import { keccak256, AbiItem } from 'web3-utils'
-import { getAppId } from '../appName'
 import { parseContractFunctions, AragonContractFunction } from '../ast'
 import { keyBy } from 'lodash'
 import { ethers } from 'ethers'
@@ -19,11 +18,6 @@ function _generateAragonArtifact(
   const abiFunctions = abi.filter(abiElem => abiElem.type === 'function')
   const abiBySignature = keyBy(abiFunctions, ethers.utils.formatSignature)
 
-  // Get mainnet env
-  const mainnetEnv: AragonEnvironment | undefined =
-    arapp.environments['mainnet']
-  const appName = (mainnetEnv || {}).appName || ''
-
   return {
     ...arapp,
 
@@ -34,8 +28,6 @@ function _generateAragonArtifact(
       abi:
         abiBySignature[parsedFn.sig] ||
         (parsedFn.sig === 'fallback' ? abiFallback : null),
-      // #### Todo: Is the signature actually necessary?
-      // > Will keep them for know just in case, they are found in current release
       sig: parsedFn.sig
     })),
 
@@ -49,9 +41,7 @@ function _generateAragonArtifact(
 
     abi,
     // Additional metadata
-    flattenedCode: './code.sol',
-    appName,
-    appId: appName ? getAppId(appName) : ''
+    flattenedCode: './code.sol'
   }
 }
 
