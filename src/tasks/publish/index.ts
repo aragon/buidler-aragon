@@ -4,7 +4,12 @@ import {
   BuidlerRuntimeEnvironment,
   HttpNetworkConfig
 } from '@nomiclabs/buidler/types'
-import { zeroAddress, etherscanSupportedChainIds } from '../../params'
+import {
+  zeroAddress,
+  etherscanSupportedChainIds,
+  defaultIpfsGateway,
+  etherscanChainUrls
+} from '../../params'
 import execa from 'execa'
 import { TASK_COMPILE, TASK_VERIFY_CONTRACT, TASK_PUBLISH } from '../task-names'
 import { logMain } from '../../ui/logger'
@@ -17,6 +22,9 @@ import * as apm from '~/src/utils/apm'
 import { generateArtifacts, validateArtifacts } from '~/src/utils/artifact'
 import { getFullAppName } from '~/src/utils/appName'
 import { ethers } from 'ethers'
+import { getPrettyPublishTxPreview, getPublishTxOutput } from './prettyOutput'
+import { encodePublishVersionTxData } from '~/src/utils/apm'
+import { getRootAccount } from '~/src/utils/accounts'
 
 /**
  * Sets up the publish task
@@ -54,6 +62,7 @@ export function setupPublishTask(): void {
       'Prevents contract compilation, deployment and artifact generation.'
     )
     .addFlag('noVerify', 'Prevents etherscan verification.')
+    .addFlag('dryRun', 'Output tx data without broadcasting')
     .setAction(
       async (
         params,
@@ -67,7 +76,8 @@ export function setupPublishTask(): void {
             managerAddress: params.managerAddress,
             ipfsApiUrl: params.ipfsApiUrl,
             onlyContent: params.onlyContent,
-            noVerify: params.noVerify
+            noVerify: params.noVerify,
+            dryRun: params.dryRun
           },
           bre
         )
@@ -82,7 +92,8 @@ async function publishTask(
     managerAddress,
     ipfsApiUrl: ipfsApiUrl,
     onlyContent,
-    noVerify
+    noVerify,
+    dryRun
   }: {
     bumpOrVersion: string
     existingContractAddress: string
@@ -90,6 +101,7 @@ async function publishTask(
     ipfsApiUrl: string
     onlyContent: boolean
     noVerify: boolean
+    dryRun: boolean
   },
   bre: BuidlerRuntimeEnvironment
 ): Promise<apm.PublishVersionTxData> {
@@ -98,12 +110,11 @@ async function publishTask(
   const distPath = aragonConfig.appBuildOutputPath as string
   const rootPath = '.' // ### Todo: path from which to look from .ipfsignore
   const selectedNetwork = bre.network.name
+  const ipfsGateway = (bre.config.ipfs || {}).ipfsGateway || defaultIpfsGateway
 
   // TODO: Warn the user their metadata files (e.g. appName) are not correct.
 
   const appName = _parseAppNameFromConfig(aragonConfig.appName, selectedNetwork)
-  if (!appName)
-    throw new BuidlerPluginError(`appName must be defined in buidler.config`)
   const contractName = getMainContractName()
 
   // Initialize clients
@@ -129,8 +140,8 @@ async function publishTask(
   // to assign value and log status to console
   let contractAddress: string
   if (onlyContent) {
-    logMain('No contract used for this version')
     contractAddress = zeroAddress
+    logMain('No contract used for this version')
   } else if (existingContractAddress) {
     contractAddress = existingContractAddress
     logMain(`Using provided contract address: ${contractAddress}`)
@@ -168,17 +179,43 @@ async function publishTask(
     contentUri: apm.toContentUri('ipfs', contentHash)
   }
 
+  const rootAccount = await getRootAccount(bre)
+  const network = await provider.getNetwork()
+  if (!managerAddress) managerAddress = rootAccount
   const txData = await apm.publishVersion(appName, versionInfo, provider, {
     managerAddress
   })
 
   logMain(
-    `Successfully generated TX data for publishing ${appName} version ${nextVersion}
-
-to: ${txData.to}
-data: ${apm.encodePublishVersionTxData(txData)}
-`
+    getPrettyPublishTxPreview({
+      txData,
+      appName,
+      nextVersion,
+      bump,
+      contractAddress,
+      contentHash,
+      ipfsGateway
+    })
   )
+
+  if (dryRun) {
+    logMain(getPublishTxOutput.dryRun({ txData, rootAccount }))
+  } else {
+    const etherscanTxUrl = etherscanChainUrls[network.chainId]
+
+    const receipt = await bre.web3.eth
+      .sendTransaction({
+        from: rootAccount,
+        to: txData.to,
+        data: encodePublishVersionTxData(txData)
+      })
+      .on('transactionHash', (hash: string) => {
+        logMain(getPublishTxOutput.txHash(hash, etherscanTxUrl))
+      })
+    logMain(getPublishTxOutput.receipt(receipt))
+  }
+
+  // For testing
   return txData
 }
 

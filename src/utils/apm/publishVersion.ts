@@ -3,6 +3,7 @@ import semver from 'semver'
 import { ApmVersion, AragonJsIntent, PublishVersionTxData } from './types'
 import { toApmVersionArray } from './utils'
 import { appStorageAbi, apmRegistryAbi, repoAbi } from './abis'
+import { getAppNameParts } from '../appName'
 
 /**
  * Return the kernel address of an aragon app contract
@@ -15,16 +16,6 @@ function _getKernel(
 ): Promise<string> {
   const app = new ethers.Contract(appId, appStorageAbi, provider)
   return app.kernel()
-}
-
-function _parseAppName(
-  appName: string
-): { shortName: string; registryName: string } {
-  const nameParts = appName.split('.')
-  return {
-    shortName: nameParts[0],
-    registryName: nameParts.slice(1).join('.')
-  }
 }
 
 /**
@@ -60,7 +51,7 @@ export async function publishVersion(
     }
   } else {
     // If the repo does not exist yet, create a repo with the first version
-    const { shortName, registryName } = _parseAppName(appName)
+    const { shortName, registryName } = getAppNameParts(appName)
     const registryAddress = await provider.resolveName(registryName)
     const managerAddress = options && options.managerAddress
     if (!registryAddress) throw Error(`Registry ${registryName} does not exist`)

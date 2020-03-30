@@ -1,5 +1,3 @@
-import { AragonConfig } from './types'
-
 // Standard expected Aragon file paths
 export const artifactName = 'artifact.json'
 export const manifestName = 'manifest.json'
@@ -78,6 +76,8 @@ export const defaultLocalAragonBases = {
   apmAddress: '0xA53dE0b8e08b798f975D57f48384C177D410d170'
 }
 
+export const defaultIpfsGateway = 'https://ipfs.eth.aragon.network'
+
 /**
  * Chain ids of networks that support Etherscan contract verification
  */
@@ -94,10 +94,14 @@ export const etherscanSupportedChainIds = new Set([
   42
 ])
 
-export const defaultAragonConfig: AragonConfig = {
-  appServePort: 8001,
-  clientServePort: 3000,
-  appSrcPath: 'app/',
-  appBuildOutputPath: 'dist/',
-  ipfsGateway: 'https://ipfs.eth.aragon.network/ipfs/'
+/**
+ * Root etherscan URLs per chainId
+ * Note: All URLs are expected to have the same sub paths, /tx, etc
+ */
+export const etherscanChainUrls = {
+  1: 'https://etherscan.io/',
+  3: 'https://ropsten.etherscan.io/',
+  4: 'https://rinkeby.etherscan.io/',
+  5: 'https://goerli.etherscan.io/',
+  42: 'https://kovan.etherscan.io/'
 }

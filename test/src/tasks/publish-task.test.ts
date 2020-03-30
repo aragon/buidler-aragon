@@ -7,8 +7,7 @@ import deployBases from '~/src/tasks/start/backend/bases/deploy-bases'
 import {
   resolveRepoContentUri,
   isAddress,
-  PublishVersionTxData,
-  encodePublishVersionTxData
+  PublishVersionTxData
 } from '~/src/utils/apm'
 import { infuraIpfsApiUrl, infuraIpfsGateway } from '~/test/testParams'
 import { defaultLocalAragonBases } from '~/src/params'
@@ -120,33 +119,11 @@ describe('Publish task', function() {
     )
   }
 
-  /**
-   * Test util to broadcast a resulting txData
-   * @param txData
-   * @param bre
-   */
-  async function broadcastTxData(
-    txData: PublishVersionTxData,
-    bre: BuidlerRuntimeEnvironment
-  ): Promise<void> {
-    await bre.web3.eth.sendTransaction({
-      from: await getRootAccount(bre),
-      to: txData.to,
-      data: encodePublishVersionTxData(txData)
-    })
-  }
-
   describe('On a local network', function() {
-    let rootAccount: string
-
     useEnvironment(testAppDir, 'localhost')
 
     before('Environment is loaded', function() {
       if (!this.env) throw Error('No .env in this, is useEnvironment run?')
-    })
-
-    before('Fetch rootAccount', async function() {
-      rootAccount = await getRootAccount(this.env)
     })
 
     let closeGanache: (() => void) | undefined
@@ -160,13 +137,8 @@ describe('Publish task', function() {
       const bump: ReleaseType = 'major'
 
       it('Run publish task', async function() {
-        const txData = await this.env.run(TASK_PUBLISH, {
-          bump,
-          // Manager must be the root account, to publish more test versions
-          managerAddress: rootAccount,
-          ipfsApiUrl
-        })
-
+        const txData = await this.env.run(TASK_PUBLISH, { bump, ipfsApiUrl })
+        const rootAccount = await getRootAccount(this.env)
         const {
           to,
           shortName,
@@ -197,9 +169,6 @@ describe('Publish task', function() {
         )
 
         await assertContentUri(contentUri)
-
-        // Apply TX so it can be consumed by tests below
-        await broadcastTxData(txData, this.env)
       })
     })
 
@@ -217,9 +186,6 @@ describe('Publish task', function() {
           ipfsApiUrl
         })
         await assertPublishTxData(repoState, bump, txData)
-
-        // Apply TX so it can be consumed by tests below
-        await broadcastTxData(txData, this.env)
       })
     })
 
@@ -237,9 +203,6 @@ describe('Publish task', function() {
           ipfsApiUrl
         })
         await assertPublishTxData(repoState, bump, txData)
-
-        // Apply TX to check is valid
-        await broadcastTxData(txData, this.env)
       })
     })
 
