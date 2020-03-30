@@ -1,12 +1,11 @@
 import path from 'path'
-import fs from 'fs'
-import fsExtra from 'fs-extra'
 import os from 'os'
 import execa from 'execa'
 import { logFront } from '~/src/ui/logger'
 import liveServer from 'live-server'
 import open from 'open'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
+import { ensureDir, writeJson, pathExists, remove } from '~/src/utils/fsUtils'
 
 const defaultRepo = 'https://github.com/aragon/aragon'
 const defaultVersion = '775edd606333a111eb2693df53900039722a95dc'
@@ -19,7 +18,7 @@ export async function installAragonClientIfNeeded(
   const clientPath: string = _getClientPath(version)
 
   if (await _checkClientInstallationNeeded(clientPath)) {
-    fsExtra.ensureDirSync(clientPath)
+    ensureDir(clientPath)
 
     logFront(
       `Installing client version ${version} locally (takes a couple of minutes)...`
@@ -39,7 +38,7 @@ export async function installAragonClientIfNeeded(
       logFront('  building...')
       await execa('npm', ['run', 'build:local'], opts)
     } catch (e) {
-      if (fs.existsSync(clientPath)) await fsExtra.remove(clientPath)
+      remove(clientPath)
       throw new BuidlerPluginError(
         `There was an error while installing the Aragon client in ${clientPath}. Please make sure that this folder is deleted and try again. \n ${e.stack}`
       )
@@ -54,13 +53,13 @@ export async function installAragonClientIfNeeded(
 async function _checkClientInstallationNeeded(
   clientPath: string
 ): Promise<boolean> {
-  if (!fs.existsSync(path.resolve(clientPath))) {
+  if (!pathExists(clientPath)) {
     return true
   }
 
-  if (!fs.existsSync(path.resolve(clientPath, 'build/index.html'))) {
+  if (!pathExists(path.resolve(clientPath, 'build/index.html'))) {
     logFront('Malformed client detected, removing it for re-installation.')
-    await fsExtra.remove(clientPath)
+    remove(clientPath)
     return true
   }
 
@@ -105,12 +104,8 @@ export async function refreshClient(
 ): Promise<void> {
   const clientPath = _getClientPath(version)
 
-  const filename = 'bump.json'
-  const filepath = path.join(clientPath, 'build', filename)
-
-  await fsExtra.writeJson(filepath, {
-    time: new Date().getTime()
-  })
+  const data = { time: new Date().getTime() }
+  writeJson(path.join(clientPath, 'build', 'bump.json'), data)
 }
 
 function _getClientPath(version: string): string {

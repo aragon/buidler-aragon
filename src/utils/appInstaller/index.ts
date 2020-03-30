@@ -7,6 +7,7 @@ import { APMRegistryInstance, KernelInstance } from '~/typechain'
 import { getLog } from '~/src/utils/getLog'
 import { getFullAppName } from '~/src/utils/appName'
 import { toApmVersionArray, getRepoVersion } from '~/src/utils/apm'
+import { namehash } from '~/src/utils/namehash'
 import { anyEntity } from '~/src/params'
 import {
   AppInstallerOptions,
@@ -15,7 +16,7 @@ import {
   AppInstalled,
   NetworkType
 } from '~/src/types'
-import { namehash, getContentHash, utf8ToHex } from './utils'
+import { getContentHash, utf8ToHex } from './utils'
 import getAbiFromContentUri from './getAbiFromContentUri'
 import getExternalRepoVersion from './getRepoVersion'
 import assertEnsDomain from './assertEnsDomain'

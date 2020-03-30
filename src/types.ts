@@ -16,6 +16,7 @@ export interface AragonConfig {
   clientServePort?: number
   appSrcPath?: string
   appBuildOutputPath?: string
+  ignoreFilesPath?: string
   /**
    * If the appName is different per network use object form
    * ```ts
@@ -30,7 +31,7 @@ export interface AragonConfig {
 }
 
 type AragonHook<T, R> = (
-  params: T,
+  params: T & { log: (message: string) => void },
   bre: BuidlerRuntimeEnvironment
 ) => Promise<R> | R
 

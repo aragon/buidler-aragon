@@ -3,7 +3,7 @@ import chokidar from 'chokidar'
 import { Writable } from 'stream'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { KernelInstance } from '~/typechain'
-import { logBack } from '~/src/ui/logger'
+import { logBack, logHook } from '~/src/ui/logger'
 import { readArapp } from '~/src/utils/arappUtils'
 import { TASK_COMPILE } from '~/src/tasks/task-names'
 import deployBases from './backend/bases/deploy-bases'
@@ -65,7 +65,7 @@ export async function startBackend(
 
   // Call preDao hook.
   if (hooks && hooks.preDao) {
-    await hooks.preDao({}, bre)
+    await hooks.preDao({ log: logHook('preDao') }, bre)
   }
 
   // Create a DAO.
@@ -83,7 +83,10 @@ export async function startBackend(
 
   // Call postDao hook.
   if (hooks && hooks.postDao) {
-    await hooks.postDao({ dao, _experimentalAppInstaller }, bre)
+    await hooks.postDao(
+      { dao, _experimentalAppInstaller, log: logHook('postDao') },
+      bre
+    )
   }
 
   // Create app.
@@ -103,13 +106,16 @@ export async function startBackend(
 
   // Call preInit hook.
   if (hooks && hooks.preInit) {
-    await hooks.preInit({ proxy, _experimentalAppInstaller }, bre)
+    await hooks.preInit(
+      { proxy, _experimentalAppInstaller, log: logHook('preInit') },
+      bre
+    )
   }
 
   // Call getInitParams hook.
   let proxyInitParams: any[] = []
   if (hooks && hooks.getInitParams) {
-    const params = await hooks.getInitParams({}, bre)
+    const params = await hooks.getInitParams({ log: logHook('initP') }, bre)
     proxyInitParams = params ? params : proxyInitParams
   }
   if (proxyInitParams && proxyInitParams.length > 0) {
@@ -134,7 +140,10 @@ export async function startBackend(
 
   // Call postInit hook.
   if (hooks && hooks.postInit) {
-    await hooks.postInit({ proxy, _experimentalAppInstaller }, bre)
+    await hooks.postInit(
+      { proxy, _experimentalAppInstaller, log: logHook('postInit') },
+      bre
+    )
   }
 
   // TODO: What if user wants to set custom permissions?
@@ -180,7 +189,7 @@ export async function startBackend(
 
       // Call postUpdate hook.
       if (hooks && hooks.postUpdate) {
-        await hooks.postUpdate({ proxy }, bre)
+        await hooks.postUpdate({ proxy, log: logHook('postUpdate') }, bre)
       }
     })
 

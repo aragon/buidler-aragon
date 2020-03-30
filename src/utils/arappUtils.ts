@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { AragonAppJson } from '~/src/types'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
+import { readJson, readJsonIfExists } from './fsUtils'
 
 const arappPath = 'arapp.json'
 const contractsPath = './contracts'
@@ -11,7 +12,7 @@ const contractsPath = './contracts'
  * @return AragonAppJson
  */
 export function readArapp(): AragonAppJson {
-  return JSON.parse(fs.readFileSync(arappPath, 'utf-8'))
+  return readJson(arappPath)
 }
 
 /**
@@ -19,7 +20,7 @@ export function readArapp(): AragonAppJson {
  * otherwise returns undefined
  */
 export function readArappIfExists(): AragonAppJson | undefined {
-  if (fs.existsSync(arappPath)) return readArapp()
+  return readJsonIfExists(arappPath)
 }
 
 /**
@@ -56,11 +57,8 @@ export function getAppName(): string {
  */
 export function getMainContractPath(): string {
   // Read the path from arapp.json.
-  if (fs.existsSync(arappPath)) {
-    const arapp = readArapp()
-
-    return arapp.path
-  }
+  const arapp = readArappIfExists()
+  if (arapp) return arapp.path
 
   // Try to guess contract path.
   if (fs.existsSync(contractsPath)) {
