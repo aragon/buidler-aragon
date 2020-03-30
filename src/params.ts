@@ -1,5 +1,3 @@
-import { AragonConfig } from './types'
-
 // Standard expected Aragon file paths
 export const artifactName = 'artifact.json'
 export const manifestName = 'manifest.json'
