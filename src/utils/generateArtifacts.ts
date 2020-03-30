@@ -1,5 +1,5 @@
-import namehash from 'eth-ens-namehash'
 import web3EthAbi, { AbiCoder } from 'web3-eth-abi'
+import { namehash } from '~/src/utils/namehash'
 import { extractContractInfo } from './solidityExtractor'
 import { AragonAppJson, Role, AragonEnvironments, AbiItem } from '../types'
 
@@ -37,7 +37,7 @@ function decorateEnvrionmentsWithAppId(
   for (const [key, value] of Object.entries(environments)) {
     decoratedEnvrionment[key] = {
       ...value,
-      appId: namehash.hash(value.appName)
+      appId: value.appName && namehash(value.appName)
     }
   }
   return decoratedEnvrionment

@@ -1,6 +1,6 @@
-import { hash as namehash } from 'eth-ens-namehash'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
+import { namehash } from '~/src/utils/namehash'
 import { getLog } from '~/src/utils/getLog'
 import {
   DAOFactoryInstance,

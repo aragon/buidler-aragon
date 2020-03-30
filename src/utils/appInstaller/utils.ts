@@ -14,9 +14,3 @@ export const getContentHash = (contentURI: string): string =>
  * @param utf8
  */
 export const utf8ToHex = (utf8: string): string => web3Utils.asciiToHex(utf8)
-
-/**
- * Returns the ENS namehash of a domain
- * @param name
- */
-export const namehash = (name: string): string => ethers.utils.namehash(name)
