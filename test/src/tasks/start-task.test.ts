@@ -143,6 +143,8 @@ describe(`Run start-task - ${testAppDir}`, function() {
     before('modify the contract source', async function() {
       contractSource = readFile(contractPathToModify)
       writeFile(contractPathToModify, `${contractSource}\n`)
+      // Wait for the postUpdate to be called once
+      await new Promise(resolve => hooksEmitter.on('postUpdate', resolve))
     })
 
     after('restore the contract source', function() {
