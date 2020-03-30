@@ -4,10 +4,10 @@
 let intialCount;
 
 module.exports = {
-  preDao: (params, bre) => console.log(`preDao hook called`),
-  postDao: (params, bre) => console.log('postDao hook called'),
-  preInit: async ( params, bre) => {
-    console.log(`preInit hook called`)
+  preDao: ({ log }, bre) => log(`preDao hook called`),
+  postDao: ({ log }, bre) => log('postDao hook called'),
+  preInit: async ( { log }, bre) => {
+    log(`preInit hook called`)
   
     // Do actions required before initializing the contract
     const accounts = await bre.web3.eth.getAccounts()
@@ -19,10 +19,10 @@ module.exports = {
       intialCount
     }
   },
-  getInitParams: (params, bre) => {
-    console.log(`getInitParams hook called`)
+  getInitParams: ({ log }, bre) => {
+    log(`getInitParams hook called`)
     return [intialCount]
   },
-  postInit: async (params, bre) =>  console.log(`postInit hook called`),
-  postUpdate: (params, bre) =>   console.log(`postUpdate hook called`)
+  postInit: async ({ log }, bre) =>  log(`postInit hook called`),
+  postUpdate: ({ log }, bre) =>   log(`postUpdate hook called`)
 }

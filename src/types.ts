@@ -30,7 +30,7 @@ export interface AragonConfig {
 }
 
 type AragonHook<T, R> = (
-  params: T,
+  params: T & { log: (message: string) => void },
   bre: BuidlerRuntimeEnvironment
 ) => Promise<R> | R
 

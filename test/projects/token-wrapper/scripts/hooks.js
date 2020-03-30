@@ -3,32 +3,32 @@
 let token
 let accounts
 
-async function preDao(params, bre) {
-  console.log(`preDao hook called`)
+async function preDao({ log }, bre) {
+  log(`preDao hook called`)
 }
 
-async function postDao(params, bre) {
-  console.log(`postDao hook called`, params.dao.address)
+async function postDao({ log }, bre) {
+  log(`postDao hook called`, params.dao.address)
 }
 
-async function preInit({ _experimentalAppInstaller }, bre) {
-  console.log(`preInit hook called`)
+async function preInit({ _experimentalAppInstaller, log }, bre) {
+  log(`preInit hook called`)
   
   // Demo installing external apps
-  console.log(`Installing dependant apps from mainnet...`)
+  log(`Installing dependant apps from mainnet...`)
   const vault = await _experimentalAppInstaller("vault");
   const vault2 = await _experimentalAppInstaller("vault");
   const finance = await _experimentalAppInstaller("finance", {
     initializeArgs: [vault.address, 60 * 60 * 24 * 31]
   });
-  console.log(`Installed vault: ${vault.address}`)
-  console.log(`Second instance of vault installed: ${vault2.address}`)
-  console.log(`Installed finance: ${finance.address}`)
+  log(`Installed vault: ${vault.address}`)
+  log(`Second instance of vault installed: ${vault2.address}`)
+  log(`Installed finance: ${finance.address}`)
 
   await vault.createPermission("TRANSFER_ROLE", finance.address);
   await vault2.createPermission("TRANSFER_ROLE", finance.address);
   await finance.createPermission("CREATE_PAYMENTS_ROLE");
-  console.log(`Granted permissions to installed apps`)
+  log(`Granted permissions to installed apps`)
 
   // Retrieve accounts.
   accounts = await bre.web3.eth.getAccounts()
@@ -50,25 +50,25 @@ async function preInit({ _experimentalAppInstaller }, bre) {
   }
 }
 
-async function getInitParams(params, bre) {
-  console.log(`getInitParams hook called`)
+async function getInitParams({ log }, bre) {
+  log(`getInitParams hook called`)
 
   const tokenAddress = token ? token.address : undefined
 
   return [tokenAddress, 'Wrapped token', 'wORG']
 }
 
-async function postInit({ proxy }, bre) {
-  console.log(`postInit hook called`)
+async function postInit({ proxy, log }, bre) {
+  log(`postInit hook called`)
 
-  console.log(`ERC20 token:`, token.address)
-  console.log(`Proxy:`, proxy.address)
-  console.log(`Account 1 token balance`, (await token.balanceOf(accounts[0])).toString())
-  console.log(`Account 2 token balance`, (await token.balanceOf(accounts[1])).toString())
+  log(`ERC20 token:`, token.address)
+  log(`Proxy:`, proxy.address)
+  log(`Account 1 token balance`, (await token.balanceOf(accounts[0])).toString())
+  log(`Account 2 token balance`, (await token.balanceOf(accounts[1])).toString())
 }
 
-async function postUpdate(params, bre) {
-  console.log(`postUpdate hook called`)
+async function postUpdate({ log }, bre) {
+  log(`postUpdate hook called`)
 }
 
 
