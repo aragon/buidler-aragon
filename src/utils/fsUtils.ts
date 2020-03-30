@@ -1,38 +1,24 @@
-import fs from 'fs'
-import path from 'path'
-
-const joinPaths = (filepaths: string[]): string =>
-  path.join(...filepaths.filter(Boolean))
+import fs from 'fs-extra'
 
 /**
  * tests whether or not the given path exists by checking with the file system.
- * @param filepaths Joins all arguments as file paths
- * ```js
- * pathExists("dir", "file.ext")
- * ```
+ * @param filepath path
  */
-export const pathExists = (...filepaths: string[]): boolean =>
-  fs.existsSync(joinPaths(filepaths))
+export const pathExists = (filepath: string): boolean => fs.existsSync(filepath)
 
 /**
  * Read file contents as a string (UTF-8)
- * @param filepaths Joins all arguments as file paths
- * ```js
- * readFile("dir", "file.ext")
- * ```
+ * @param filepath path
  */
-export const readFile = (...filepaths: string[]): string =>
-  fs.readFileSync(joinPaths(filepaths), 'utf8')
+export const readFile = (filepath: string): string =>
+  fs.readFileSync(filepath, 'utf8')
 
 /**
  * Read file contents as string or if the path doesn't exists returns undefined
- * @param filepaths Joins all arguments as file paths
- * ```js
- * readFileIfExists("dir", "file.ext")
- * ```
+ * @param filepath path
  */
-export const readFileIfExists = (...filepaths: string[]): string | undefined =>
-  pathExists(...filepaths) ? readFile(...filepaths) : undefined
+export const readFileIfExists = (filepath: string): string | undefined =>
+  pathExists(filepath) ? readFile(filepath) : undefined
 
 /**
  * Write string data to file
@@ -43,40 +29,34 @@ export const writeFile = (filepath: string, data: string): void =>
 
 /**
  * Read file contents as JSON
- * @param filepaths Joins all arguments as file paths
- * ```js
- * readJson("dir", "file.ext")
- * ```
+ * @param filepath path
  */
-export const readJson = <T>(...filepaths: string[]): T =>
-  JSON.parse(readFile(...filepaths))
+export const readJson = <T>(filepath: string): T => fs.readJsonSync(filepath)
 
 /**
  * Read file contents as JSON or if the path doesn't exists returns undefined
- * @param filepaths Joins all arguments as file paths
- * ```js
- * readJsonIfExists("dir", "file.ext")
- * ```
+ * @param filepath path
  */
-export const readJsonIfExists = <T>(...filepaths: string[]): T | undefined =>
-  pathExists(...filepaths) ? readJson<T>(...filepaths) : undefined
+export const readJsonIfExists = <T>(filepath: string): T | undefined =>
+  pathExists(filepath) ? readJson<T>(filepath) : undefined
 
 /**
  * Write JSON data to file
- * @param filepath
+ * @param filepath path
  * @param data
  */
 export const writeJson = <T>(filepath: string, data: T): void =>
-  writeFile(filepath, JSON.stringify(data, null, 2))
+  fs.writeJsonSync(filepath, data)
 
 /**
  * If given path does not exists, creates a directory recursively
- * @param filepaths Joins all arguments as file paths
- * ```js
- * ensureDir("parent-dir", "dir")
- * ```
+ * @param filepath path
  */
-export const ensureDir = (...filepaths: string[]): void => {
-  const fullpath = joinPaths(filepaths)
-  if (!pathExists(fullpath)) fs.mkdirSync(fullpath, { recursive: true })
-}
+export const ensureDir = (filepath: string): void => fs.ensureDirSync(filepath)
+
+/**
+ * Removes a file or directory. The directory can have contents.
+ * If the path does not exist, silently does nothing. Like rm -rf
+ * @param filepath path
+ */
+export const remove = (filepath: string): void => fs.removeSync(filepath)

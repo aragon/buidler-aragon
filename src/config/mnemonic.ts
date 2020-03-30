@@ -1,8 +1,8 @@
 import { homedir } from 'os'
 import path from 'path'
-import fs from 'fs'
 import { ConfigExtender, HttpNetworkConfig } from '@nomiclabs/buidler/types'
 import { aragenMnemonic } from '../params'
+import { readJsonIfExists } from '../utils/fsUtils'
 
 // Standard Aragon test paths
 const aragonConfig = '.aragon'
@@ -58,8 +58,5 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
  * @param filename 'mnemonic.json'
  */
 function readAragonConfig<T>(filename: string): T | undefined {
-  const filepath = path.join(homedir(), aragonConfig, filename)
-  return fs.existsSync(filepath)
-    ? JSON.parse(fs.readFileSync(filepath, 'utf8'))
-    : undefined
+  return readJsonIfExists(path.join(homedir(), aragonConfig, filename))
 }

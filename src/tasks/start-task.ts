@@ -1,3 +1,5 @@
+import path from 'path'
+import tcpPortUsed from 'tcp-port-used'
 import { task } from '@nomiclabs/buidler/config'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
@@ -6,14 +8,12 @@ import { logMain } from '../ui/logger'
 import { startBackend } from './start/start-backend'
 import { startFrontend } from './start/start-frontend'
 import { AragonConfig } from '~/src/types'
-import tcpPortUsed from 'tcp-port-used'
-import fsExtra from 'fs-extra'
-import path from 'path'
 import { aragenMnemonic, aragenAccounts } from '~/src/params'
 import { getAppName, getAppEnsName } from '~/src/utils/arappUtils'
 import { validateEnsName } from '~/src/utils/validateEnsName'
 import { getAppId } from '../utils/appName'
 import onExit from '../utils/onExit'
+import { readJson, pathExists } from '../utils/fsUtils'
 
 type CallbackClose = () => void
 
@@ -72,8 +72,15 @@ ${accountsStr}`)
       closeHandlers.push(closeBackend)
 
       const config: AragonConfig = bre.config.aragon as AragonConfig
-      const appExists = await _checkApp(config.appSrcPath as string)
-      if (appExists) {
+      if (!config.appSrcPath) {
+        logMain(
+          'Warning: appSrcPath is not defined, will continue development without building any front end.'
+        )
+      } else if (!pathExists(config.appSrcPath)) {
+        logMain(
+          `Warning: No front end found at ${config.appSrcPath}, will continue development without building any front end.`
+        )
+      } else {
         await _checkPorts(config)
         await _checkScripts(config.appSrcPath as string)
 
@@ -113,23 +120,8 @@ async function _checkPorts(config: AragonConfig): Promise<void> {
   }
 }
 
-async function _checkApp(appSrcPath: string): Promise<boolean> {
-  const appExists = await fsExtra.pathExists(appSrcPath)
-
-  if (!appExists) {
-    logMain(
-      'Warning: No front end found at app/, will continue development without building any front end.'
-    )
-  }
-
-  return appExists
-}
-
 async function _checkScripts(appSrcPath: string): Promise<void> {
-  const appPackageJson = await fsExtra.readJson(
-    path.join(appSrcPath, 'package.json')
-  )
-
+  const appPackageJson = readJson(path.join(appSrcPath, 'package.json'))
   _checkScript(appPackageJson, 'sync-assets')
   _checkScript(appPackageJson, 'watch')
   _checkScript(appPackageJson, 'serve')

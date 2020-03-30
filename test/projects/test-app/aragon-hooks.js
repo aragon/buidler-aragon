@@ -23,6 +23,6 @@ module.exports = {
     log(`getInitParams hook called`)
     return [intialCount]
   },
-  postInit: async ({ log }, bre) =>  log(`postInit hook called`),
-  postUpdate: ({ log }, bre) =>   log(`postUpdate hook called`)
+  postInit: async ({ log }, bre) => log(`postInit hook called`),
+  postUpdate: ({ log }, bre) => log(`postUpdate hook called`)
 }
