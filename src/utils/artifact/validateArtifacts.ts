@@ -1,3 +1,4 @@
+import path from 'path'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import {
   artifactName,
@@ -18,9 +19,9 @@ import { parseContractFunctions } from '~/src/utils/ast'
  */
 export function validateArtifacts(distPath: string): void {
   // Load files straight from the dist directory
-  const artifact = readJson<AragonArtifact>([distPath, artifactName])
-  const manifest = readJson<AragonManifest>([distPath, manifestName])
-  const flatCode = readFile([distPath, flatCodeName])
+  const artifact = readJson<AragonArtifact>(path.join(distPath, artifactName))
+  const manifest = readJson<AragonManifest>(path.join(distPath, manifestName))
+  const flatCode = readFile(path.join(distPath, flatCodeName))
   const functions = parseContractFunctions(flatCode, artifact.path)
 
   // Make sure all declared files in the manifest are there

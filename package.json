@@ -27,7 +27,6 @@
     "postbuild": "cp ./tsconfig.json ./dist/tsconfig.json"
   },
   "dependencies": {
-    "@types/fs-extra": "^8.1.0",
     "chalk": "^3.0.0",
     "chokidar": "^3.3.1",
     "eth-ens-namehash": "^2.0.8",
@@ -52,6 +51,7 @@
     "@nomiclabs/buidler-truffle5": "^1.0.2",
     "@nomiclabs/buidler-web3": "^1.0.2",
     "@types/chai": "^4.2.5",
+    "@types/fs-extra": "^8.1.0",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^5.2.7",
     "@types/node": "12.7.5",

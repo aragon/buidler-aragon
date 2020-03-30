@@ -1,3 +1,4 @@
+import path from 'path'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { readJson, writeJson, writeFile, ensureDir } from '../fsUtils'
 import { TASK_FLATTEN_GET_FLATTENED_SOURCE } from '@nomiclabs/buidler/builtin-tasks/task-names'
@@ -30,9 +31,9 @@ export async function generateArtifacts(
 
   const artifact = generateAragonArtifact(arapp, abi, flatCode, contractName)
   ensureDir(outPath)
-  writeJson([outPath, artifactName], artifact)
-  writeJson([outPath, manifestName], manifest)
-  writeFile([outPath, flatCodeName], flatCode)
+  writeJson(path.join(outPath, artifactName), artifact)
+  writeJson(path.join(outPath, manifestName), manifest)
+  writeFile(path.join(outPath, flatCodeName), flatCode)
 }
 
 interface BuidlerArtifact {

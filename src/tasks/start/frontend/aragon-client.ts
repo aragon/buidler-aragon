@@ -57,7 +57,7 @@ async function _checkClientInstallationNeeded(
     return true
   }
 
-  if (!pathExists([clientPath, 'build/index.html'])) {
+  if (!pathExists(path.resolve(clientPath, 'build/index.html'))) {
     logFront('Malformed client detected, removing it for re-installation.')
     remove(clientPath)
     return true
@@ -105,7 +105,7 @@ export async function refreshClient(
   const clientPath = _getClientPath(version)
 
   const data = { time: new Date().getTime() }
-  writeJson([clientPath, 'build', 'bump.json'], data)
+  writeJson(path.join(clientPath, 'build', 'bump.json'), data)
 }
 
 function _getClientPath(version: string): string {

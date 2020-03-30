@@ -34,8 +34,8 @@ async function fetchAppPublishedAssets(
   )
   const appPath = path.join(outDir, appName)
   ensureDir(appPath)
-  writeJson([appPath, artifactName], artifact)
-  writeFile([appPath, flatCodeName], flatCode)
+  writeJson(path.join(appPath, artifactName), artifact)
+  writeFile(path.join(appPath, flatCodeName), flatCode)
 }
 
 export async function fetchPublishedAssets(outDir): Promise<void> {

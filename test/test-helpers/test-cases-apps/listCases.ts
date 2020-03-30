@@ -28,10 +28,10 @@ export function listTestCases(): TestCase[] {
       const testCase: TestCase = {
         appName,
         appPath,
-        arapp: readJsonIfExists([appPath, arappName]),
-        artifact: readJsonIfExists([appPath, artifactName]),
-        manifest: readJsonIfExists([appPath, manifestName]),
-        flatCode: readFileIfExists([appPath, flatCodeName])
+        arapp: readJsonIfExists(path.join(appPath, arappName)),
+        artifact: readJsonIfExists(path.join(appPath, artifactName)),
+        manifest: readJsonIfExists(path.join(appPath, manifestName)),
+        flatCode: readFileIfExists(path.join(appPath, flatCodeName))
       }
       testCases.push(testCase)
     }

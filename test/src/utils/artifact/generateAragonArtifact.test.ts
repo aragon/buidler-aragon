@@ -1,4 +1,5 @@
 import { assert } from 'chai'
+import path from 'path'
 import { generateAragonArtifact } from '~/src/utils/artifact'
 import { listTestCases } from '~/test/test-helpers/test-cases-apps/listCases'
 import { sortBy, keyBy } from 'lodash'
@@ -24,7 +25,10 @@ describe('ast > generateAragonArtifact', () => {
         // Store the created files for easier debugging
         if (writeToDebug) {
           ensureDir(debugDir)
-          writeJson([debugDir, `${appName}_${artifactName}`], newArtifact)
+          writeJson(
+            path.join(debugDir, `${appName}_${artifactName}`),
+            newArtifact
+          )
         }
 
         // Compare the functions array as an object before

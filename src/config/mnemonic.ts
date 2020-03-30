@@ -1,4 +1,5 @@
 import { homedir } from 'os'
+import path from 'path'
 import { ConfigExtender, HttpNetworkConfig } from '@nomiclabs/buidler/types'
 import { aragenMnemonic } from '../params'
 import { readJsonIfExists } from '../utils/fsUtils'
@@ -57,5 +58,5 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
  * @param filename 'mnemonic.json'
  */
 function readAragonConfig<T>(filename: string): T | undefined {
-  return readJsonIfExists([homedir(), aragonConfig, filename])
+  return readJsonIfExists(path.join(homedir(), aragonConfig, filename))
 }
