@@ -10,6 +10,7 @@ import {
   startGanache,
   stopGanache
 } from '~/src/tasks/start/backend/start-ganache'
+import { HttpNetworkConfig } from '@nomiclabs/buidler/types'
 
 describe('start-ganache.ts', async function() {
   describe('when using the buidlerevm network', async function() {
@@ -98,6 +99,42 @@ describe('start-ganache.ts', async function() {
           const portInUse = await tcpPortUsed.check(testnetPort)
           assert(!portInUse, 'Target port is still in use')
         })
+      })
+    })
+  })
+
+  describe('Starts ganache in a non-default port by parsing the network url', function() {
+    useEnvironment('counter', 'localhost')
+
+    let networkId: number
+
+    const testnetPortNotDefault = 48545
+
+    before('start ganache', async function() {
+      // Inject a different port into the environment to test support for non-default ports
+      const currentNetwork = this.env.network.config as HttpNetworkConfig
+      currentNetwork.url = `http://localhost:${testnetPortNotDefault}`
+      const res = await startGanache(this.env)
+      networkId = res.networkId
+    })
+
+    it('returns a non-zero network id', async function() {
+      assert.isAbove(networkId, 0, 'Ganache returned an invalid network id')
+    })
+
+    it('uses the target port', async function() {
+      const portInUse = await tcpPortUsed.check(testnetPortNotDefault)
+      assert(portInUse, 'Target port is not in use')
+    })
+
+    describe('when ganache is stopped', async function() {
+      before('stop ganache', function() {
+        stopGanache()
+      })
+
+      it('releases the target port', async function() {
+        const portInUse = await tcpPortUsed.check(testnetPortNotDefault)
+        assert(!portInUse, 'Target port is still in use')
       })
     })
   })

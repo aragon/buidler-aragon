@@ -1,6 +1,9 @@
 import tcpPortUsed from 'tcp-port-used'
 import { promisify } from 'util'
-import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
+import {
+  BuidlerRuntimeEnvironment,
+  HttpNetworkConfig
+} from '@nomiclabs/buidler/types'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { aragenGasLimit, aragenMnemonic, testnetPort } from '~/src/params'
 
@@ -27,8 +30,11 @@ export async function startGanache(
     )
   }
 
+  const nodeUrl = (bre.network.config as HttpNetworkConfig).url
+  const port = nodeUrl ? parsePort(nodeUrl) || testnetPort : testnetPort
+
   // If port is in use, assume that a local chain is already running.
-  const portInUse = await tcpPortUsed.check(testnetPort)
+  const portInUse = await tcpPortUsed.check(port)
   if (portInUse) {
     return { networkId: 0 }
   }
@@ -40,7 +46,7 @@ export async function startGanache(
     /* eslint-disable @typescript-eslint/camelcase */
     default_balance_ether: 100
   })
-  const blockchain = await promisify(server.listen)(testnetPort)
+  const blockchain = await promisify(server.listen)(port)
 
   return {
     networkId: blockchain.options.network_id,
@@ -58,4 +64,10 @@ export function stopGanache(): void {
   }
 
   server.close()
+}
+
+function parsePort(urlString: string): number | null {
+  const url = new URL(urlString)
+  if (!url || !url.port) return null
+  return parseInt(url.port)
 }
