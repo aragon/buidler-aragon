@@ -3,6 +3,7 @@ import path from 'path'
 import { ConfigExtender, HttpNetworkConfig } from '@nomiclabs/buidler/types'
 import { aragenMnemonic } from '../params'
 import { readJsonIfExists } from '../utils/fsUtils'
+import { isHexString } from 'ethers/utils'
 
 // Standard Aragon test paths
 const aragonConfig = '.aragon'
@@ -37,7 +38,8 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
     if (byNetworkMnemonic) {
       const { rpc, keys } = byNetworkMnemonic
       if (!finalNetwork.url && rpc) finalNetwork.url = rpc
-      if (!finalNetwork.accounts && keys) finalNetwork.accounts = keys
+      if (!finalNetwork.accounts && keys)
+        finalNetwork.accounts = ensureHexEncoding(keys)
     }
     // Generic mnemonic
     if (genericMnemonic && !finalNetwork.accounts) {
@@ -64,3 +66,11 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
 function readAragonConfig<T>(filename: string): T | undefined {
   return readJsonIfExists(path.join(homedir(), aragonConfig, filename))
 }
+
+/**
+ * Utility to read JSON files from aragonConfig dirs
+ * Returns undefined if the file does not exist
+ * @param filename 'mnemonic.json'
+ */
+const ensureHexEncoding = (keys: string[]): string[] =>
+  keys.map(key => (isHexString(key) ? key : `0x${key}`))
