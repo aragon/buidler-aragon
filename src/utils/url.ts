@@ -8,3 +8,19 @@
 export function urlJoin(...args: string[]): string {
   return args.join('/').replace(/([^:]\/)\/+/g, '$1')
 }
+
+/**
+ * Wrapps the URL module and accepts urls without a protocol
+ * assumes HTTP
+ * @param url
+ */
+export function parseUrlSafe(url: string): URL {
+  try {
+    return new URL(url)
+  } catch (e) {
+    if (!url.includes('://')) {
+      return new URL('http://' + url)
+    }
+    throw e
+  }
+}

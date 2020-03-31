@@ -2,8 +2,6 @@ import IpfsHttpClient from 'ipfs-http-client'
 import path from 'path'
 const { globSource } = IpfsHttpClient
 
-const defaultIpfsApiUrl = 'http://localhost:5001'
-
 interface Cid {
   version: number
   codec: string
@@ -24,16 +22,18 @@ interface IpfsAddResult {
  * - .ipfsignore
  * - .gitignore
  */
-export async function uploadDirToIpfs(
-  dirPath: string,
-  options?: {
-    ipfsApiUrl?: string
-    ignore?: string[]
-    progress?: (totalBytes: number) => void
-  }
-): Promise<string> {
-  const { ipfsApiUrl, ignore, progress } = options || {}
-  const ipfs = IpfsHttpClient(ipfsApiUrl || defaultIpfsApiUrl)
+export async function uploadDirToIpfs({
+  dirPath,
+  ipfsApiUrl,
+  ignore,
+  progress
+}: {
+  dirPath: string
+  ipfsApiUrl: string
+  ignore?: string[]
+  progress?: (totalBytes: number) => void
+}): Promise<string> {
+  const ipfs = IpfsHttpClient(ipfsApiUrl)
 
   const results: IpfsAddResult[] = []
   for await (const entry of ipfs.add(
