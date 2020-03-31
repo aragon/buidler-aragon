@@ -31,7 +31,7 @@ export async function startGanache(
   }
 
   const nodeUrl = (bre.network.config as HttpNetworkConfig).url
-  const port = nodeUrl ? parseInt(new URL(nodeUrl).port) : testnetPort
+  const port = nodeUrl ? parsePort(nodeUrl) || testnetPort : testnetPort
 
   // If port is in use, assume that a local chain is already running.
   const portInUse = await tcpPortUsed.check(port)
@@ -64,4 +64,10 @@ export function stopGanache(): void {
   }
 
   server.close()
+}
+
+function parsePort(urlString: string): number | null {
+  const url = new URL(urlString)
+  if (!url || !url.port) return null
+  return parseInt(url.port)
 }
