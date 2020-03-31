@@ -49,6 +49,10 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
         mnemonic: defaultMnemonic
       }
     }
+
+    // Since finalNetwork is new reference (due to { ... }) re-assign to finalConfig
+    if (!finalConfig.networks) finalConfig.networks = {}
+    finalConfig.networks[networkName] = finalNetwork
   }
 }
 
