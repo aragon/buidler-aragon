@@ -1,10 +1,10 @@
-import path from 'path'
 import chalk from 'chalk'
 import {
   PublishVersionTxData,
   encodePublishVersionTxData
 } from '~/src/utils/apm'
 import { getAppNameParts } from '~/src/utils/appName'
+import { urlJoin } from '~/src/utils/url'
 
 /**
  * Returns a preview sumary of the publish tx with escape codes
@@ -55,7 +55,7 @@ export function getPrettyPublishTxPreview({
 
 ${list.print(2)}
 
-  ${chalk.cyan(path.join(ipfsGateway, 'ipfs', contentHash))}
+  ${chalk.cyan(urlJoin(ipfsGateway, 'ipfs', contentHash))}
 `
 }
 
@@ -95,7 +95,7 @@ ${list.print(2)}
   ${
     etherscanUrl
       ? `
-  ${chalk.cyan(path.join(etherscanUrl, 'tx', txHash))}
+  ${chalk.cyan(urlJoin(etherscanUrl, 'tx', txHash))}
   `
       : ''
   }`
