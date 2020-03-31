@@ -1,6 +1,6 @@
 {
   "name": "@aragon/buidler-aragon",
-  "version": "0.1.0",
+  "version": "0.2.0-beta.1",
   "description": "Aragon Buidler plugin",
   "main": "dist/src/index.js",
   "author": "Aragon Association <legal@aragon.org>",
@@ -81,9 +81,6 @@
     "@nomiclabs/buidler-etherscan": "^1.0.2",
     "@nomiclabs/buidler-truffle5": "^1.0.2",
     "@nomiclabs/buidler-web3": "^1.0.2",
-    "@types/chai": "^4.2.5",
-    "@types/node": "12.7.5",
-    "@types/web3": "^1.2.2",
     "bignumber.js": "^9.0.0",
     "web3": "^1.2.4"
   }
