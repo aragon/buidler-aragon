@@ -66,7 +66,7 @@ export function setupPublishTask(): void {
       'onlyContent',
       'Prevents contract compilation, deployment and artifact generation.'
     )
-    .addFlag('noVerify', 'Prevents etherscan verification.')
+    .addFlag('verify', 'Force Etherscan verification.')
     .addFlag('dryRun', 'Output tx data without broadcasting')
     .setAction(
       async (
@@ -81,7 +81,7 @@ export function setupPublishTask(): void {
             managerAddress: params.managerAddress,
             ipfsApiUrl: params.ipfsApiUrl,
             onlyContent: params.onlyContent,
-            noVerify: params.noVerify,
+            verify: params.verify,
             dryRun: params.dryRun
           },
           bre
@@ -97,7 +97,7 @@ async function publishTask(
     managerAddress,
     ipfsApiUrl: ipfsApiUrlArg,
     onlyContent,
-    noVerify,
+    verify,
     dryRun
   }: {
     bumpOrVersion: string
@@ -105,7 +105,7 @@ async function publishTask(
     managerAddress: string
     ipfsApiUrl: string
     onlyContent: boolean
-    noVerify: boolean
+    verify: boolean
     dryRun: boolean
   },
   bre: BuidlerRuntimeEnvironment
@@ -117,6 +117,9 @@ async function publishTask(
   const selectedNetwork = bre.network.name
   const ipfsApiUrl =
     ipfsApiUrlArg || (bre.config.ipfs || {}).ipfsApi || defaultIpfsApiUrl
+  const verifyContract =
+    (bre.config.etherscan && bre.config.etherscan.apiKey) || verify
+
   // TODO: Warn the user their metadata files (e.g. appName) are not correct.
 
   const appName = _parseAppNameFromConfig(aragonConfig.appName, selectedNetwork)
@@ -159,7 +162,11 @@ async function publishTask(
     logMain(`Using provided contract address: ${contractAddress}`)
   } else if (!prevVersion || bump === 'major') {
     logMain('Deploying new implementation contract')
-    contractAddress = await _deployMainContract(contractName, noVerify, bre)
+    contractAddress = await _deployMainContract(
+      contractName,
+      verifyContract,
+      bre
+    )
     logMain(`New implementation contract address: ${contractAddress}`)
   } else {
     contractAddress = prevVersion.contractAddress
@@ -264,12 +271,12 @@ async function _getLastestVersionIfExists(
 /**
  * Deploys a new implementation contract and returns its address
  * @param contractName
- * @param noVerify
+ * @param verify
  * @param bre
  */
 async function _deployMainContract(
   contractName: string,
-  noVerify: boolean,
+  verify: boolean,
   bre: BuidlerRuntimeEnvironment
 ): Promise<string> {
   // Compile contracts
@@ -279,7 +286,7 @@ async function _deployMainContract(
   const mainContract = await MainContract.new()
   logMain('Implementation contract deployed')
   const chainId = await _getChainId(bre)
-  if (!noVerify && etherscanSupportedChainIds.has(chainId)) {
+  if (verify && etherscanSupportedChainIds.has(chainId)) {
     try {
       logMain('Verifying on Etherscan')
       await bre.run(TASK_VERIFY_CONTRACT, {
