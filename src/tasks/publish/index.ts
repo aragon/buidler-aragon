@@ -14,7 +14,7 @@ import execa from 'execa'
 import { TASK_COMPILE, TASK_VERIFY_CONTRACT, TASK_PUBLISH } from '../task-names'
 import { logMain } from '../../ui/logger'
 import { AragonConfig } from '~/src/types'
-import { uploadDirToIpfs } from '~/src/utils/ipfs'
+import { uploadDirToIpfs, assertIpfsApiIsAvailable } from '~/src/utils/ipfs'
 import createIgnorePatternFromFiles from './createIgnorePatternFromFiles'
 import parseAndValidateBumpOrVersion from './parseAndValidateBumpOrVersion'
 import { getMainContractName } from '../../utils/arappUtils'
@@ -135,6 +135,10 @@ async function publishTask(
     prevVersion ? prevVersion.version : undefined
   )
   logMain(`Applying version bump ${bump}, next version: ${nextVersion}`)
+
+  // Do sanity checks before compiling the contract or uploading files
+  // So users do not have to wait a long time before seeing the config is not okay
+  await assertIpfsApiIsAvailable(ipfsApiUrl)
 
   // Using let + if {} block instead of a ternary operator
   // to assign value and log status to console
