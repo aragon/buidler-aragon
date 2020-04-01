@@ -6,23 +6,14 @@ import { serveAppAndResolveWhenBuilt } from './frontend/serve-app'
 import { copyAppUiAssets } from './frontend/copy-assets'
 import { startAppWatcher } from './frontend/watch-app'
 import { generateArtifacts } from '~/src/utils/artifact'
-import {
-  installAragonClientIfNeeded,
-  startAragonClient,
-  refreshClient
-} from './frontend/aragon-client'
+import { refreshClient } from './client/aragon-client'
 
 /**
  * Starts the task's frontend sub-tasks. Logic is contained in ./tasks/start/utils/frontend/.
- * Retrieves the Aragon client using git, builds it, builds the app's frontend and serves the build.
- * Starts the Aragon client pointed at a Dao and an app, and watches for changes on the app's sources.
  * If changes are detected, the app's frontend is rebuilt.
  */
 export async function startFrontend(
-  bre: BuidlerRuntimeEnvironment,
-  daoAddress: string,
-  appAddress: string,
-  openBrowser: boolean
+  bre: BuidlerRuntimeEnvironment
 ): Promise<{
   /**
    * Closes open file watchers and file servers
@@ -30,9 +21,6 @@ export async function startFrontend(
   close: () => void
 }> {
   const config: AragonConfig = bre.config.aragon as AragonConfig
-
-  logFront('Checking Aragon client...')
-  await installAragonClientIfNeeded()
 
   logFront('Generating app artifacts...')
   const appBuildOutputPath = config.appBuildOutputPath as string
@@ -46,17 +34,6 @@ export async function startFrontend(
     appSrcPath,
     appServePort
   )
-
-  // Start Aragon client at the deployed address.
-  const appURL = `http://localhost:${appServePort}`
-  const { url: clientURL, close: closeStaticServer } = await startAragonClient(
-    config.clientServePort as number,
-    `${daoAddress}/${appAddress}`,
-    openBrowser
-  )
-  logFront(`You can now view the Aragon client in the browser.
-App content: ${appURL}
-Client:  ${clientURL}`)
 
   // Watch changes to app/src/script.js.
   const srcWatcher = chokidar
@@ -87,7 +64,6 @@ Client:  ${clientURL}`)
     close: (): void => {
       srcWatcher.close()
       artifactWatcher.close()
-      closeStaticServer()
       closeServerApp()
       closeWatchScript()
     }
