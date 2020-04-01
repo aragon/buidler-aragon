@@ -1,6 +1,7 @@
 const { usePlugin } = require('@nomiclabs/buidler/config')
 const hooks = require('./scripts/hooks')
 
+usePlugin('@nomiclabs/buidler-etherscan')
 usePlugin('@nomiclabs/buidler-truffle5')
 usePlugin('@nomiclabs/buidler-web3')
 
@@ -19,6 +20,10 @@ module.exports = {
         '0xce8e3bda3b44269c147747a373646393b1504bfcbb73fc9564f5d753d8116608'
       ]
     }
+  },
+  etherscan: {
+    url: "http://api.etherscan.io/api",
+    apiKey: ""
   },
   solc: {
     version: '0.4.24'
