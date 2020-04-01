@@ -118,7 +118,7 @@ async function publishTask(
   const ipfsApiUrl =
     ipfsApiUrlArg || (bre.config.ipfs || {}).ipfsApi || defaultIpfsApiUrl
   const verifyContract =
-    (bre.config.etherscan && bre.config.etherscan.apiKey) || verify
+    (bre.config.etherscan && Boolean(bre.config.etherscan.apiKey)) || verify
 
   // TODO: Warn the user their metadata files (e.g. appName) are not correct.
 
