@@ -46,11 +46,6 @@ const defaultNetworks: Networks = {
     gas: 6.9e6,
     gasPrice: 15000000001
   },
-  kovan: {
-    chainId: 42,
-    url: aragonRpc('kovan'),
-    gas: 6.9e6
-  },
   coverage: {
     url: coverageRpc,
     gas: 0xffffffffff,
