@@ -1,4 +1,5 @@
 export * from './abis'
+export * from './assertCanPublish'
 export * from './publishVersion'
 export * from './repo'
 export * from './resolveContent'

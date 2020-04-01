@@ -53,3 +53,19 @@ export function getRepoVersion(
   const repo = _getRepoInstance(repoNameOrAddress, provider)
   return _getRepoVersion(repo, version)
 }
+
+/**
+ * Returns true if the address can publish a new version to this repo
+ * @param repoNameOrAddress "finance", "finance.aragonpm.eth", "0xa600c17..."
+ * @param sender Account attempting to publish "0xE04cAbcB24e11620Dd62bB99c396E76cEB578914"
+ * @param provider Initialized ethers provider
+ */
+export async function canPublishVersion(
+  repoNameOrAddress: string,
+  sender: string,
+  provider: ethers.providers.Provider
+): Promise<boolean> {
+  const repo = _getRepoInstance(repoNameOrAddress, provider)
+  const CREATE_VERSION_ROLE = await repo.CREATE_VERSION_ROLE()
+  return await repo.canPerform(sender, CREATE_VERSION_ROLE, [])
+}
