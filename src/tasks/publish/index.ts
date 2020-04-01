@@ -261,12 +261,16 @@ async function _deployMainContract(
   logMain('Implementation contract deployed')
   const chainId = await _getChainId(bre)
   if (!noVerify && etherscanSupportedChainIds.has(chainId)) {
-    logMain('Verifying on Etherscan')
-    await bre.run(TASK_VERIFY_CONTRACT, {
-      contractName,
-      address: mainContract.address
-    })
-    logMain(`Successfully verified contract on Etherscan`)
+    try {
+      logMain('Verifying on Etherscan')
+      await bre.run(TASK_VERIFY_CONTRACT, {
+        contractName,
+        address: mainContract.address
+      })
+      logMain(`Successfully verified contract on Etherscan`)
+    } catch (e) {
+      logMain(`Etherscan verification failed. ${e} `)
+    }
   }
   return mainContract.address
 }
