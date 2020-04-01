@@ -8,13 +8,18 @@ import {
   zeroAddress,
   etherscanSupportedChainIds,
   defaultIpfsGateway,
-  etherscanChainUrls
+  etherscanChainUrls,
+  defaultIpfsApiUrl
 } from '../../params'
 import execa from 'execa'
 import { TASK_COMPILE, TASK_VERIFY_CONTRACT, TASK_PUBLISH } from '../task-names'
 import { logMain } from '../../ui/logger'
 import { AragonConfig } from '~/src/types'
-import { uploadDirToIpfs, assertIpfsApiIsAvailable } from '~/src/utils/ipfs'
+import {
+  uploadDirToIpfs,
+  assertIpfsApiIsAvailable,
+  guessGatewayUrl
+} from '~/src/utils/ipfs'
 import createIgnorePatternFromFiles from './createIgnorePatternFromFiles'
 import parseAndValidateBumpOrVersion from './parseAndValidateBumpOrVersion'
 import { getMainContractName } from '../../utils/arappUtils'
@@ -90,7 +95,7 @@ async function publishTask(
     bumpOrVersion,
     existingContractAddress,
     managerAddress,
-    ipfsApiUrl: ipfsApiUrl,
+    ipfsApiUrl: ipfsApiUrlArg,
     onlyContent,
     noVerify,
     dryRun
@@ -110,8 +115,8 @@ async function publishTask(
   const distPath = aragonConfig.appBuildOutputPath as string
   const ignoreFilesPath = aragonConfig.ignoreFilesPath as string
   const selectedNetwork = bre.network.name
-  const ipfsGateway = (bre.config.ipfs || {}).ipfsGateway || defaultIpfsGateway
-
+  const ipfsApiUrl =
+    ipfsApiUrlArg || (bre.config.ipfs || {}).ipfsApi || defaultIpfsApiUrl
   // TODO: Warn the user their metadata files (e.g. appName) are not correct.
 
   const appName = _parseAppNameFromConfig(aragonConfig.appName, selectedNetwork)
@@ -173,7 +178,8 @@ async function publishTask(
 
   // Upload release directory to IPFS
   logMain('Uploading release assets to IPFS...')
-  const contentHash = await uploadDirToIpfs(distPath, {
+  const contentHash = await uploadDirToIpfs({
+    dirPath: distPath,
     ipfsApiUrl,
     ignore: createIgnorePatternFromFiles(ignoreFilesPath)
   })
@@ -192,6 +198,13 @@ async function publishTask(
     managerAddress
   })
 
+  const ipfsGateway = (bre.config.ipfs || {}).ipfsGateway || defaultIpfsGateway
+  const activeIpfsGateway = await guessGatewayUrl({
+    ipfsApiUrl,
+    ipfsGateway,
+    contentHash
+  })
+
   logMain(
     getPrettyPublishTxPreview({
       txData,
@@ -200,7 +213,7 @@ async function publishTask(
       bump,
       contractAddress,
       contentHash,
-      ipfsGateway
+      ipfsGateway: activeIpfsGateway || ipfsGateway
     })
   )
 

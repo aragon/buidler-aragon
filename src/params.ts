@@ -77,6 +77,7 @@ export const defaultLocalAragonBases = {
 }
 
 export const defaultIpfsGateway = 'https://ipfs.eth.aragon.network'
+export const defaultIpfsApiUrl = 'http://localhost:5001'
 
 /**
  * Chain ids of networks that support Etherscan contract verification

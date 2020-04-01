@@ -29,7 +29,7 @@ describe('uploadDirToIpfs', function() {
   })
 
   it('Should upload a test dir to IPFS and get the expected hash', async function() {
-    const res = await uploadDirToIpfs(testDir, { ipfsApiUrl })
+    const res = await uploadDirToIpfs({ dirPath: testDir, ipfsApiUrl })
     assert.equal(res, contentHash, 'hash of uploaded test dir has changed')
   })
 })
