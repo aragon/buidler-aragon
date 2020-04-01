@@ -8,7 +8,8 @@ import {
   zeroAddress,
   etherscanSupportedChainIds,
   defaultIpfsGateway,
-  etherscanChainUrls
+  etherscanChainUrls,
+  defaultIpfsApiUrl
 } from '../../params'
 import execa from 'execa'
 import { TASK_COMPILE, TASK_VERIFY_CONTRACT, TASK_PUBLISH } from '../task-names'
@@ -114,10 +115,9 @@ async function publishTask(
   const distPath = aragonConfig.appBuildOutputPath as string
   const ignoreFilesPath = aragonConfig.ignoreFilesPath as string
   const selectedNetwork = bre.network.name
-  const ipfsApiUrl = ipfsApiUrlArg || (bre.config.ipfs || {}).ipfsApi
+  const ipfsApiUrl =
+    ipfsApiUrlArg || (bre.config.ipfs || {}).ipfsApi || defaultIpfsApiUrl
   // TODO: Warn the user their metadata files (e.g. appName) are not correct.
-
-  if (!ipfsApiUrl) throw new BuidlerPluginError(`ipfsApiUrl must be defined`)
 
   const appName = _parseAppNameFromConfig(aragonConfig.appName, selectedNetwork)
   const contractName = getMainContractName()
