@@ -144,9 +144,12 @@ async function publishTask(
 
   // Do sanity checks before compiling the contract or uploading files
   // So users do not have to wait a long time before seeing the config is not okay
-  await assertIpfsApiIsAvailable(ipfsApiUrl)
-
+  if (!rootAccount)
+    throw new BuidlerPluginError(
+      `No account configured. Provide a mnemonic or private key for ${selectedNetwork} in `
+    )
   await apm.assertCanPublish(appName, rootAccount, provider)
+  await assertIpfsApiIsAvailable(ipfsApiUrl)
 
   // Using let + if {} block instead of a ternary operator
   // to assign value and log status to console
