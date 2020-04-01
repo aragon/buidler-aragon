@@ -116,6 +116,7 @@ async function publishTask(
 
   const appName = _parseAppNameFromConfig(aragonConfig.appName, selectedNetwork)
   const contractName = getMainContractName()
+  const rootAccount = await getRootAccount(bre)
 
   // Initialize clients
   const networkConfig = bre.network.config as HttpNetworkConfig
@@ -139,6 +140,8 @@ async function publishTask(
   // Do sanity checks before compiling the contract or uploading files
   // So users do not have to wait a long time before seeing the config is not okay
   await assertIpfsApiIsAvailable(ipfsApiUrl)
+
+  await apm.assertCanPublish(appName, rootAccount, provider)
 
   // Using let + if {} block instead of a ternary operator
   // to assign value and log status to console
@@ -183,7 +186,6 @@ async function publishTask(
     contentUri: apm.toContentUri('ipfs', contentHash)
   }
 
-  const rootAccount = await getRootAccount(bre)
   const network = await provider.getNetwork()
   if (!managerAddress) managerAddress = rootAccount
   const txData = await apm.publishVersion(appName, versionInfo, provider, {
