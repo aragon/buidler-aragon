@@ -15,8 +15,6 @@ import { updateApp } from './backend/update-app'
 import onExit from '~/src/utils/onExit'
 import { generateArtifacts } from '~/src/utils/artifact'
 import AppInstaller from '~/src/utils/appInstaller'
-import { externalArtifactPaths } from '~/src/params'
-import { copyExternalArtifacts } from '~/src/utils/copyExternalArtifacts'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -57,14 +55,6 @@ export async function startBackend(
 
   // Deploy bases.
   logBack('Deploying Aragon bases (ENS, DAOFactory, and APM)...')
-
-  // ==================== Temporal hack >>>
-  // Copy external artifacts to the local artifacts folder
-  // This is a temporary hack until multiple artifacts paths are allowed
-  for (const externalArtifactPath of externalArtifactPaths)
-    copyExternalArtifacts(externalArtifactPath)
-  // ==================== Temporal hack <<<
-
   const { ensAddress, daoFactoryAddress, apmAddress } = await deployBases(bre)
   logBack(`ENS deployed: ${ensAddress}`)
   logBack(`DAO factory deployed: ${daoFactoryAddress}`)
