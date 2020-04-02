@@ -62,7 +62,7 @@ export async function startBackend(
   // Copy external artifacts to the local artifacts folder
   // This is a temporary hack until multiple artifacts paths are allowed
   for (const externalArtifactPath of externalArtifactPaths)
-    copyExternalArtifacts(externalArtifactPath)
+    copyExternalArtifacts(externalArtifactPath, bre.config.paths.artifacts)
   // ==================== Temporal hack <<<
 
   const { ensAddress, daoFactoryAddress, apmAddress } = await deployBases(bre)
