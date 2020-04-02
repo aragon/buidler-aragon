@@ -7,7 +7,8 @@ export const defaultAragonConfig: AragonConfig = {
   clientServePort: 3000,
   appSrcPath: 'app/',
   appBuildOutputPath: 'dist/',
-  ignoreFilesPath: '.'
+  ignoreFilesPath: '.',
+  ipfsGateway: 'https://ipfs.eth.aragon.network/ipfs/'
 }
 
 export const configExtender: ConfigExtender = (finalConfig, userConfig) => {

@@ -26,7 +26,28 @@ export interface AragonConfig {
    * ```
    */
   appName?: string | { [network: string]: string }
+
+  /**
+   * IPFS gateway, to fetch static files such as the artifact
+   * of your app's latest version
+   * Examples:
+   * - http://localhost:8080
+   * - https://ipfs.io
+   *
+   * Defaults to: 'https://ipfs.eth.aragon.network/ipfs/'
+   */
   ipfsGateway?: string
+
+  /**
+   * IPFS HTTP API endpoint, to add and pin version data
+   * Examples:
+   * - http://localhost:5001
+   * - http://ipfs.infura.io
+   *
+   * Defaults to 'http://localhost:5001'
+   */
+  ipfsApi?: string
+
   hooks?: AragonConfigHooks
 }
 
@@ -57,21 +78,6 @@ export interface AragonConfigHooks {
   >
   getInitParams?: AragonHook<{}, any[]>
   postUpdate?: AragonHook<{ proxy: Truffle.ContractInstance }, void>
-}
-
-export interface IpfsConfig {
-  /**
-   * To query files such as the artifact of your app's latest version
-   * - http://localhost:8080
-   * - https://ipfs.io
-   */
-  ipfsGateway?: string
-  /**
-   * To add and pin version data
-   * - http://localhost:5001
-   * - http://ipfs.infura.io
-   */
-  ipfsApi?: string
 }
 
 /**

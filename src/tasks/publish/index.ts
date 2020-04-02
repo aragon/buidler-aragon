@@ -116,7 +116,7 @@ async function publishTask(
   const ignoreFilesPath = aragonConfig.ignoreFilesPath as string
   const selectedNetwork = bre.network.name
   const ipfsApiUrl =
-    ipfsApiUrlArg || (bre.config.ipfs || {}).ipfsApi || defaultIpfsApiUrl
+    ipfsApiUrlArg || (bre.config.aragon || {}).ipfsApi || defaultIpfsApiUrl
   const verifyContract =
     (bre.config.etherscan && Boolean(bre.config.etherscan.apiKey)) || verify
 
@@ -208,7 +208,8 @@ async function publishTask(
     managerAddress
   })
 
-  const ipfsGateway = (bre.config.ipfs || {}).ipfsGateway || defaultIpfsGateway
+  const ipfsGateway =
+    (bre.config.aragon || {}).ipfsGateway || defaultIpfsGateway
   const activeIpfsGateway = await guessGatewayUrl({
     ipfsApiUrl,
     ipfsGateway,
