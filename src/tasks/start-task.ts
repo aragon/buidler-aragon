@@ -7,6 +7,7 @@ import { TASK_START } from './task-names'
 import { logMain } from '../ui/logger'
 import { startBackend } from './start/start-backend'
 import { startFrontend } from './start/start-frontend'
+import { startClient } from './start/start-client'
 import { AragonConfig } from '~/src/types'
 import { aragenMnemonic, aragenAccounts } from '~/src/params'
 import { getAppName, getAppEnsName } from '~/src/utils/arappUtils'
@@ -43,6 +44,7 @@ export function setupStartTask(): void {
       const appEnsName = await getAppEnsName()
       const appName = await getAppName()
       const appId: string = getAppId(appEnsName)
+
       logMain(`App name: ${appName}
 App ens name: ${appEnsName}
 App id: ${appId}`)
@@ -53,6 +55,7 @@ App id: ${appId}`)
         accountsStr += `Account ${i} private key ${account.privateKey}\n`
         accountsStr += `           public key ${account.publicKey}\n`
       }
+
       logMain(`Accounts mnemonic "${aragenMnemonic}"
 ${accountsStr}`)
 
@@ -86,14 +89,17 @@ ${accountsStr}`)
 
         // #### Here the app closes after 10 seconds
         // The delay is caused by buidler artifact instances that may be doing polling
-        const { close: closeFrontend } = await startFrontend(
-          bre,
-          daoAddress,
-          appAddress,
-          !params.noBrowser
-        )
+        const { close: closeFrontend } = await startFrontend(bre)
         closeHandlers.push(closeFrontend)
       }
+
+      const { close: closeClient } = await startClient(
+        bre,
+        daoAddress,
+        appAddress,
+        !params.noBrowser
+      )
+      closeHandlers.push(closeClient)
 
       function close(): void {
         for (const closeHandler of closeHandlers) closeHandler()

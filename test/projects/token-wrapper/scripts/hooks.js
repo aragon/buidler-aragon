@@ -7,8 +7,8 @@ async function preDao({ log }, bre) {
   log(`preDao hook called`)
 }
 
-async function postDao({ log }, bre) {
-  log(`postDao hook called`, params.dao.address)
+async function postDao({ dao, log }, bre) {
+  log(`postDao hook called`, dao.address)
 }
 
 async function preInit({ _experimentalAppInstaller, log }, bre) {
