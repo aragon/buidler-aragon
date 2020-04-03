@@ -23,9 +23,9 @@ jobs:
         env:
           CI: true
       - name: Upload coverage to Codecov  
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        flags: unittests
-        name: codecov-buidler
-        fail_ci_if_error: true
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
+          name: codecov-buidler
+          fail_ci_if_error: true
