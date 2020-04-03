@@ -80,7 +80,7 @@ export const defaultLocalAragonBases = {
   apmAddress: '0xA53dE0b8e08b798f975D57f48384C177D410d170'
 }
 
-export const defaultIpfsGateway = 'https://ipfs.eth.aragon.network'
+export const defaultIpfsGateway = 'https://ipfs.eth.aragon.network/ipfs/'
 // No default ipfsApiUrl is provided. User must intentionally provide one
 // export const defaultIpfsApiUrl
 
