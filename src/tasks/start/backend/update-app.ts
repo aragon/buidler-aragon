@@ -2,12 +2,20 @@ import Web3 from 'web3'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { RepoInstance, KernelInstance } from '~/typechain'
 import { deployImplementation } from './deploy-implementation'
+import { getAppId } from '~/src/utils/appName'
 
 export async function updateApp(
-  appId: string,
-  dao: KernelInstance,
-  repo: RepoInstance,
-  appServePort: number,
+  {
+    appName,
+    dao,
+    repo,
+    appServePort
+  }: {
+    appName: string
+    dao: KernelInstance
+    repo: RepoInstance
+    appServePort: number
+  },
   bre: BuidlerRuntimeEnvironment
 ): Promise<{
   implementationAddress: string
@@ -25,7 +33,10 @@ export async function updateApp(
   )
 
   // Update the proxy with the new implementation.
-  await _updateProxy(implementation.address, appId, dao, bre.web3)
+  await _updateProxy(
+    { implementationAddress: implementation.address, appName, dao },
+    bre.web3
+  )
 
   return { implementationAddress: implementation.address, version, uri }
 }
@@ -34,12 +45,19 @@ export async function updateApp(
  * Updates the app proxy's implementation in the Kernel.
  */
 async function _updateProxy(
-  implementationAddress: string,
-  appId: string,
-  dao: KernelInstance,
+  {
+    implementationAddress,
+    appName,
+    dao
+  }: {
+    implementationAddress: string
+    appName: string
+    dao: KernelInstance
+  },
   web3: Web3
 ): Promise<void> {
   const rootAccount: string = (await web3.eth.getAccounts())[0]
+  const appId = getAppId(appName)
 
   // Set the new implementation in the Kernel.
   await dao.setApp(

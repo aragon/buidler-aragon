@@ -10,8 +10,8 @@ import {
   startGanache,
   stopGanache
 } from '~/src/tasks/start/backend/start-ganache'
-import { readArapp, getAppEnsName, getAppName } from '~/src/utils/arappUtils'
-import { getAppId } from '~/src/utils/appName'
+import { readArapp, parseAppName } from '~/src/utils/arappUtils'
+import { AragonAppJson } from '~/src/types'
 
 describe('set-permissions.ts', function() {
   // Note: These particular tests use localhost instead of buidlerevm.
@@ -19,19 +19,22 @@ describe('set-permissions.ts', function() {
   // And because we want to restart the chain on certain tests.
   useEnvironment('counter', 'localhost')
 
-  let ensAddress, apmAddress, daoFactoryAddress
-  let appName, appId
+  let arapp: AragonAppJson, appName: string
+  let ensAddress, daoFactoryAddress
   let dao, acl
   let proxy
+
+  before('Read arapp in test folder after useEnviornment chdir', () => {
+    arapp = readArapp()
+    appName = parseAppName(arapp)
+  })
 
   before('start ganache', async function() {
     await startGanache(this.env)
   })
 
   before('deploy bases', async function() {
-    ;({ ensAddress, apmAddress, daoFactoryAddress } = await deployBases(
-      this.env
-    ))
+    ;({ ensAddress, daoFactoryAddress } = await deployBases(this.env))
   })
 
   before('deploy a dao and retrieve acl', async function() {
@@ -41,20 +44,8 @@ describe('set-permissions.ts', function() {
     acl = await ACL.at(await dao.acl())
   })
 
-  before('calculate appName and appId', async function() {
-    appName = getAppName()
-    appId = getAppId(getAppEnsName())
-  })
-
   before('create app', async function() {
-    ;({ proxy } = await createApp(
-      appName,
-      appId,
-      dao,
-      ensAddress,
-      apmAddress,
-      this.env
-    ))
+    ;({ proxy } = await createApp({ appName, dao, ensAddress }, this.env))
 
     await proxy.initialize()
   })

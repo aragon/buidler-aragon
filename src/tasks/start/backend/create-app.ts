@@ -1,3 +1,4 @@
+import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import {
   RepoContract,
@@ -7,16 +8,22 @@ import {
   AppStubInstance,
   KernelInstance
 } from '~/typechain'
+import { getAppId, getAppNameParts } from '~/src/utils/appName'
 import { getMainContractName } from '~/src/utils/arappUtils'
+import { resolveName } from '~/src/utils/ens'
 import { getLog } from '~/src/utils/getLog'
 import { deployImplementation } from './deploy-implementation'
 
 export async function createApp(
-  appName: string,
-  appId: string,
-  dao: KernelInstance,
-  ensAddress: string,
-  apmAddress: string,
+  {
+    appName,
+    dao,
+    ensAddress
+  }: {
+    appName: string
+    dao: KernelInstance
+    ensAddress: string
+  },
   bre: BuidlerRuntimeEnvironment
 ): Promise<{
   implementation: Truffle.ContractInstance
@@ -27,10 +34,13 @@ export async function createApp(
   const implementation = await deployImplementation(bre.artifacts)
 
   // Create an app proxy.
-  const proxy = await _createProxy(implementation.address, appId, dao, bre)
+  const proxy = await _createProxy(
+    { implementationAddress: implementation.address, appName, dao },
+    bre
+  )
 
   // Deploy a repo for the app.
-  const repo = await _createRepo(appName, appId, ensAddress, apmAddress, bre)
+  const repo = await _createRepo({ appName, ensAddress }, bre)
 
   return { implementation, proxy, repo }
 }
@@ -41,12 +51,19 @@ export async function createApp(
  * deployed app contract, wrapped around an upgradeably proxy address.
  */
 async function _createProxy(
-  implementationAddress: string,
-  appId: string,
-  dao: KernelInstance,
+  {
+    implementationAddress,
+    appName,
+    dao
+  }: {
+    implementationAddress: string
+    appName: string
+    dao: KernelInstance
+  },
   bre: BuidlerRuntimeEnvironment
 ): Promise<AppStubInstance> {
   const rootAccount: string = (await bre.web3.eth.getAccounts())[0]
+  const appId = getAppId(appName)
 
   // Create a new app proxy with base implementation.
   const txResponse: Truffle.TransactionResponse = await dao.newAppInstance(
@@ -71,19 +88,23 @@ async function _createProxy(
  * @returns Promise<RepoInstance> An APM repository for the app.
  */
 async function _createRepo(
-  appName: string,
-  appId: string,
-  ensAddress: string,
-  apmAddress: string,
+  { appName, ensAddress }: { appName: string; ensAddress: string },
   bre: BuidlerRuntimeEnvironment
 ): Promise<RepoInstance> {
   const rootAccount: string = (await bre.web3.eth.getAccounts())[0]
+
+  const { shortName, registryName } = getAppNameParts(appName)
+  const apmAddress = await resolveName({ name: registryName, ensAddress }, bre)
+  if (!apmAddress)
+    throw new BuidlerPluginError(
+      `No APM registry configured for ${registryName}`
+    )
 
   // Create a new repo using the APM.
   const APMRegistry: APMRegistryContract = bre.artifacts.require('APMRegistry')
   const apmRegistry: APMRegistryInstance = await APMRegistry.at(apmAddress)
   const txResponse: Truffle.TransactionResponse = await apmRegistry.newRepo(
-    appName,
+    shortName,
     rootAccount
   )
 

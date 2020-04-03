@@ -6,11 +6,10 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { aragenMnemonic, aragenAccounts } from '~/src/params'
 import { AragonConfig } from '~/src/types'
 import { logMain } from '~/src/ui/logger'
-import { getAppId } from '~/src/utils/appName'
-import { getAppName, getAppEnsName } from '~/src/utils/arappUtils'
+import { getAppId, getAppNameParts } from '~/src/utils/appName'
+import { readArapp, parseAppName } from '~/src/utils/arappUtils'
 import { readJson, pathExists } from '~/src/utils/fsUtils'
 import onExit from '~/src/utils/onExit'
-import { validateEnsName } from '~/src/utils/validateEnsName'
 import { startBackend } from './start/start-backend'
 import { startClient } from './start/start-client'
 import { startFrontend } from './start/start-frontend'
@@ -41,12 +40,15 @@ export function setupStartTask(): void {
 
       logMain(`Starting Aragon app development...`)
 
-      const appEnsName = getAppEnsName(bre.network.name)
-      const appName = getAppName(bre.network.name)
-      const appId: string = getAppId(appEnsName)
+      const arapp = readArapp()
+      const appNameProduction = parseAppName(arapp)
+      const { shortName } = getAppNameParts(appNameProduction)
+      // Note: Since only the aragonpm.eth APM registry is deployed in development,
+      // all apps will be hosted there regardless of their name
+      const appName = `${shortName}.aragonpm.eth`
+      const appId: string = getAppId(appName)
 
-      logMain(`App name: ${appName}
-App ens name: ${appEnsName}
+      logMain(`App name: ${shortName}
 App id: ${appId}`)
 
       let accountsStr = ''
@@ -59,17 +61,11 @@ App id: ${appId}`)
       logMain(`Accounts mnemonic "${aragenMnemonic}"
 ${accountsStr}`)
 
-      if (!validateEnsName(appEnsName)) {
-        throw new BuidlerPluginError(
-          `Invalid ENS name "${appEnsName}" found in arapp.json (environments.default.appName). Only ENS names in the form "<name>.aragonpm.eth" are supported in development. Please change the value in environments.default.appName, in your project's arapp.json file. Note: Non-development environments are ignored in development and don't have this restriction.`
-        )
-      }
-
       const {
         daoAddress,
         appAddress,
         close: closeBackend
-      } = await startBackend(bre, appName, appId, params.silent)
+      } = await startBackend({ appName, silent: params.silent }, bre)
 
       const closeHandlers: CallbackClose[] = []
       closeHandlers.push(closeBackend)

@@ -25,10 +25,8 @@ import { startGanache } from './backend/start-ganache'
  * be used with an Aragon client to view the app.
  */
 export async function startBackend(
-  bre: BuidlerRuntimeEnvironment,
-  appName: string,
-  appId: string,
-  silent: boolean
+  { appName, silent }: { appName: string; silent: boolean },
+  bre: BuidlerRuntimeEnvironment
 ): Promise<{
   daoAddress: string
   appAddress: string
@@ -93,14 +91,7 @@ export async function startBackend(
   // Note: This creates the proxy, but doesn't
   // initialize it yet.
   logBack('Creating app...')
-  const { proxy, repo } = await createApp(
-    appName,
-    appId,
-    dao,
-    ensAddress,
-    apmAddress,
-    bre
-  )
+  const { proxy, repo } = await createApp({ appName, dao, ensAddress }, bre)
   logBack(`Proxy address: ${proxy.address}`)
   logBack(`Repo address: ${repo.address}`)
 
@@ -126,11 +117,9 @@ export async function startBackend(
   }
 
   // Update app.
+  const appServePort = config.appServePort as number
   const { implementationAddress, version } = await updateApp(
-    appId,
-    dao,
-    repo,
-    config.appServePort as number,
+    { appName, dao, repo, appServePort },
     bre
   )
   logBack(`Implementation address: ${implementationAddress}`)
@@ -181,10 +170,7 @@ export async function startBackend(
       // Update app.
       logBack('Updating app...')
       const { implementationAddress, version } = await updateApp(
-        appId,
-        dao,
-        repo,
-        config.appServePort as number,
+        { appName, dao, repo, appServePort },
         bre
       )
       logBack(`Implementation address: ${implementationAddress}`)

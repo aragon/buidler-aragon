@@ -17,15 +17,6 @@ export interface AragonConfig {
   appSrcPath?: string
   appBuildOutputPath?: string
   ignoreFilesPath?: string
-  /**
-   * If the appName is different per network use object form
-   * ```ts
-   * appName: {
-   *   rinkeby: "myapp.open.aragonpm.eth"
-   * }
-   * ```
-   */
-  appName?: string | { [network: string]: string }
 
   /**
    * IPFS gateway, to fetch static files such as the artifact
@@ -171,6 +162,17 @@ export interface AragonAppJson {
       params: string // '*'
     }[]
   }[]
+  /**
+   * If the appName is different per network use environments
+   * ```ts
+   * environments: {
+   *   rinkeby: {
+   *     appName: "myapp.open.aragonpm.eth"
+   *   }
+   * }
+   * ```
+   */
+  appName?: string
 }
 
 export interface AragonEnvironments {

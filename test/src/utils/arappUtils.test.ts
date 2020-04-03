@@ -2,8 +2,6 @@ import { assert } from 'chai'
 import {
   getMainContractName,
   getMainContractPath,
-  getAppName,
-  getAppEnsName,
   readArapp
 } from '~/src/utils/arappUtils'
 import { useDefaultEnvironment } from '~/test/test-helpers/useEnvironment'
@@ -14,14 +12,6 @@ describe('arapp.ts', function() {
   it('should read an arapp.json file', async function() {
     const arapp = await readArapp()
     assert(arapp != null)
-  })
-
-  it('should retrieve app name', async function() {
-    assert.equal(await getAppName(), 'counter')
-  })
-
-  it('should retrieve app ens-name', async function() {
-    assert.equal(await getAppEnsName(), 'counter.aragonpm.eth')
   })
 
   it('should retrieve the correct main contract path', function() {
