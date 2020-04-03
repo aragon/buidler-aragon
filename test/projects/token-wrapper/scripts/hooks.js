@@ -29,8 +29,8 @@ async function postDao({ dao, _experimentalAppInstaller, log }, bre) {
   log(`Installed vault: ${vault.address}`)
   log(`Installed finance: ${finance.address}`)
 
-  // Every app have access to the createPermission() and initialize() methods.
-  // To assign permissions and to initialize the proxy app.
+  // Every app has access to the createPermission() and initialize() methods
+  // to easily assign permissions and initialize the app's smart contract.
 
   /* createPermission(roleName, entity):
     - roleName: 'DUMMY_ROLE'
