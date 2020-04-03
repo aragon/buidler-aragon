@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "npm run compile && npm run generate && npm run build-app",
-    "build-app": "cd app && npm install && cd ..",
+    "postinstall": "yarn compile && yarn generate && yarn build-app",
+    "build-app": "cd app && yarn && cd ..",
     "compile": "buidler compile --force",
     "generate": "typechain --target truffle --outDir typechain 'artifacts/*.json'",
     "start": "buidler start"

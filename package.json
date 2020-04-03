@@ -18,11 +18,11 @@
   ],
   "scripts": {
     "generate": "typechain --target truffle --outDir typechain './node_modules/@aragon/abis/os/artifacts/*.json'",
-    "build-projects": "cd test/projects && npm install && npm run build-projects && cd ../..",
-    "dev": "npm run generate && npm run build && npm run build-projects",
+    "build-projects": "cd test/projects && yarn && yarn build-projects && cd ../..",
+    "dev": "yarn generate && yarn build && yarn build-projects",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "prettier": "prettier --write '**/*.{ts,js,css,html}'",
-    "test": "npm run build && mocha --recursive \"test/**/*.ts\" --exit",
+    "test": "yarn build && mocha --recursive \"test/**/*.ts\" --exit",
     "build": "tsc --build .",
     "postbuild": "cp ./tsconfig.json ./dist/tsconfig.json"
   },
