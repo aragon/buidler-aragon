@@ -23,7 +23,7 @@ export async function assertCanPublish(
     const isAllowed = await repo.canPublishVersion(appName, sender, provider)
     if (!isAllowed)
       throw new BuidlerPluginError(
-        `Account ${sender} does not have permissions to publish a new version in ${appName}`
+        `Account ${sender} does not have permissions to publish a new version in repo ${appName}`
       )
   } else {
     // If the repo does not exist yet, create a repo with the first version
@@ -42,7 +42,7 @@ export async function assertCanPublish(
     const isAllowed = await registry.canPerform(sender, CREATE_REPO_ROLE, [])
     if (!isAllowed)
       throw new BuidlerPluginError(
-        `Account ${sender} does not have permissions to create a new repo ${registryName}`
+        `Account ${sender} does not have permissions to create a new repo in registry ${registryName}`
       )
   }
 }
