@@ -5,7 +5,7 @@
  */
 
 import path from 'path'
-import { artifactName, flatCodeName } from '~/src/params'
+import { artifactName, flatCodeName, defaultIpfsGateway } from '~/src/params'
 import {
   getRepoVersion,
   resolveRepoContentUri,
@@ -14,7 +14,7 @@ import {
 import { writeJson, writeFile, ensureDir } from '~/src/utils/fsUtils'
 import { getMainnetProvider } from '~/test/test-helpers/providers'
 
-const ipfsGateway = 'https://ipfs.eth.aragon.network/ipfs/'
+const ipfsGateway = defaultIpfsGateway
 const appsToFetch = ['agent', 'finance', 'token-manager', 'vault', 'voting']
 
 /* eslint-disable no-console */

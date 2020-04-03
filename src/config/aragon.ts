@@ -1,5 +1,6 @@
 import { ConfigExtender } from '@nomiclabs/buidler/types'
 import { AragonConfig } from '~/src/types'
+import { defaultIpfsGateway } from '~/src/params'
 
 export const defaultAragonConfig: AragonConfig = {
   appServePort: 8001,
@@ -7,7 +8,7 @@ export const defaultAragonConfig: AragonConfig = {
   appSrcPath: 'app/',
   appBuildOutputPath: 'dist/',
   ignoreFilesPath: '.',
-  ipfsGateway: 'https://ipfs.eth.aragon.network/ipfs/'
+  ipfsGateway: defaultIpfsGateway
 }
 
 export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
