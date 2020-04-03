@@ -5,3 +5,5 @@ cache/
 .cache/
 .debug/
 dist/
+coverage
+.nyc_output
