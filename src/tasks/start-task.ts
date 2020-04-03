@@ -3,18 +3,18 @@ import tcpPortUsed from 'tcp-port-used'
 import { task } from '@nomiclabs/buidler/config'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { TASK_START } from './task-names'
-import { logMain } from '../ui/logger'
-import { startBackend } from './start/start-backend'
-import { startFrontend } from './start/start-frontend'
-import { startClient } from './start/start-client'
-import { AragonConfig } from '~/src/types'
 import { aragenMnemonic, aragenAccounts } from '~/src/params'
+import { AragonConfig } from '~/src/types'
+import { logMain } from '~/src/ui/logger'
+import { getAppId } from '~/src/utils/appName'
 import { getAppName, getAppEnsName } from '~/src/utils/arappUtils'
+import { readJson, pathExists } from '~/src/utils/fsUtils'
+import onExit from '~/src/utils/onExit'
 import { validateEnsName } from '~/src/utils/validateEnsName'
-import { getAppId } from '../utils/appName'
-import onExit from '../utils/onExit'
-import { readJson, pathExists } from '../utils/fsUtils'
+import { startBackend } from './start/start-backend'
+import { startClient } from './start/start-client'
+import { startFrontend } from './start/start-frontend'
+import { TASK_START } from './task-names'
 
 type CallbackClose = () => void
 
@@ -41,8 +41,8 @@ export function setupStartTask(): void {
 
       logMain(`Starting Aragon app development...`)
 
-      const appEnsName = await getAppEnsName()
-      const appName = await getAppName()
+      const appEnsName = getAppEnsName(bre.network.name)
+      const appName = getAppName(bre.network.name)
       const appId: string = getAppId(appEnsName)
 
       logMain(`App name: ${appName}

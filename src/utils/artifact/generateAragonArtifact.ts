@@ -1,9 +1,9 @@
-import { AragonAppJson, AragonArtifact, AragonEnvironment } from '~/src/types'
-import { keccak256, AbiItem } from 'web3-utils'
-import { getAppId } from '../appName'
-import { parseContractFunctions, AragonContractFunction } from '../ast'
-import { keyBy } from 'lodash'
 import { ethers } from 'ethers'
+import { keyBy } from 'lodash'
+import { keccak256, AbiItem } from 'web3-utils'
+import { AragonAppJson, AragonArtifact } from '~/src/types'
+import { getAppId } from '~/src/utils/appName'
+import { parseContractFunctions, AragonContractFunction } from '~/src/utils/ast'
 
 const abiFallback = {
   payable: true,
@@ -12,17 +12,13 @@ const abiFallback = {
 }
 
 function _generateAragonArtifact(
+  appEnsName: string,
   arapp: AragonAppJson,
   abi: AbiItem[],
   functions: AragonContractFunction[]
 ): AragonArtifact {
   const abiFunctions = abi.filter(abiElem => abiElem.type === 'function')
   const abiBySignature = keyBy(abiFunctions, ethers.utils.formatSignature)
-
-  // Get mainnet env
-  const mainnetEnv: AragonEnvironment | undefined =
-    arapp.environments['mainnet']
-  const appName = (mainnetEnv || {}).appName || ''
 
   return {
     ...arapp,
@@ -50,8 +46,8 @@ function _generateAragonArtifact(
     abi,
     // Additional metadata
     flattenedCode: './code.sol',
-    appName,
-    appId: appName ? getAppId(appName) : ''
+    appName: appEnsName,
+    appId: getAppId(appEnsName)
   }
 }
 
@@ -59,11 +55,13 @@ function _generateAragonArtifact(
 
 /**
  * Returns aragon artifact.json from app data
+ * @param appEnsName "finance.aragonpm.eth"
  * @param arapp
  * @param abi
  * @param functions Parsed contract function info
  */
 export function generateAragonArtifact(
+  appEnsName: string,
   arapp: AragonAppJson,
   abi: AbiItem[],
   functions: AragonContractFunction[]
@@ -71,12 +69,14 @@ export function generateAragonArtifact(
 
 /**
  * Returns aragon artifact.json from app data
+ * @param appEnsName "finance.aragonpm.eth"
  * @param arapp
  * @param abi
  * @param flatCode Flat code of target contract plus all imports
  * @param contractName Target contract name or path: "Finance" | "contracts/Finance.sol"
  */
 export function generateAragonArtifact(
+  appEnsName: string,
   arapp: AragonAppJson,
   abi: AbiItem[],
   flatCode: string,
@@ -84,6 +84,7 @@ export function generateAragonArtifact(
 ): AragonArtifact
 
 export function generateAragonArtifact(
+  appEnsName: string,
   arapp: AragonAppJson,
   abi: AbiItem[],
   functionsOrSourceCode: AragonContractFunction[] | string,
@@ -95,9 +96,14 @@ export function generateAragonArtifact(
       functionsOrSourceCode,
       contractName
     )
-    return _generateAragonArtifact(arapp, abi, functions)
+    return _generateAragonArtifact(appEnsName, arapp, abi, functions)
   } else if (Array.isArray(functionsOrSourceCode)) {
-    return _generateAragonArtifact(arapp, abi, functionsOrSourceCode)
+    return _generateAragonArtifact(
+      appEnsName,
+      arapp,
+      abi,
+      functionsOrSourceCode
+    )
   } else {
     throw Error(
       'Parameter functionsOrSourceCode must be of type AragonContractFunction[] | string'

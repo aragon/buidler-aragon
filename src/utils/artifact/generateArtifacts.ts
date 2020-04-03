@@ -1,11 +1,15 @@
 import path from 'path'
-import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { readJson, writeJson, writeFile, ensureDir } from '../fsUtils'
 import { TASK_FLATTEN_GET_FLATTENED_SOURCE } from '@nomiclabs/buidler/builtin-tasks/task-names'
-import { generateAragonArtifact } from './generateAragonArtifact'
+import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { artifactName, manifestName, flatCodeName } from '~/src/params'
 import { AragonManifest, AbiItem } from '~/src/types'
-import { getMainContractName, readArapp } from '../arappUtils'
+import {
+  getMainContractName,
+  readArapp,
+  getAppEnsName
+} from '~/src/utils/arappUtils'
+import { readJson, writeJson, writeFile, ensureDir } from '~/src/utils/fsUtils'
+import { generateAragonArtifact } from './generateAragonArtifact'
 
 /**
  * Generate and write aragon artifacts to outPath
@@ -22,6 +26,7 @@ export async function generateArtifacts(
   const arapp = readArapp()
   const manifest = readJson<AragonManifest>(manifestName)
   const contractName: string = getMainContractName()
+  const appEnsName = getAppEnsName(bre.network.name)
 
   // buidler will detect and throw for cyclic dependencies
   // any flatten task also compiles
@@ -29,7 +34,13 @@ export async function generateArtifacts(
   // Get ABI from generated artifacts in compilation
   const abi = _readArtifact(contractName, bre).abi
 
-  const artifact = generateAragonArtifact(arapp, abi, flatCode, contractName)
+  const artifact = generateAragonArtifact(
+    appEnsName,
+    arapp,
+    abi,
+    flatCode,
+    contractName
+  )
   ensureDir(outPath)
   writeJson(path.join(outPath, artifactName), artifact)
   writeJson(path.join(outPath, manifestName), manifest)
