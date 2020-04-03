@@ -11,7 +11,11 @@ import {
   NetworkType
 } from '~/src/types'
 import { ANY_ADDRESS } from '~/src/params'
-import { toApmVersionArray, getRepoVersion } from '~/src/utils/apm'
+import {
+  toApmVersionArray,
+  getRepoVersion,
+  joinIpfsLocation
+} from '~/src/utils/apm'
 import { getFullAppName } from '~/src/utils/appName'
 import { getLog } from '~/src/utils/getLog'
 import { namehash } from '~/src/utils/namehash'
@@ -167,7 +171,7 @@ async function _installExternalApp(
     const shortName = name.split('.')[0]
     const initialVersionArray = toApmVersionArray('1.0.0')
     const contentUriHttpFromPublicGateway = utf8ToHex(
-      `http:${ipfsGateway}${getContentHash(contentURI)}`
+      'http:' + joinIpfsLocation(ipfsGateway, getContentHash(contentURI))
     )
     const APMRegistry = bre.artifacts.require('APMRegistry')
     const apmRegistry: APMRegistryInstance = await APMRegistry.at(apmAddress)
