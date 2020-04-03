@@ -1,3 +1,5 @@
+import { ethers } from 'ethers'
+import execa from 'execa'
 import { task, types } from '@nomiclabs/buidler/config'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import {
@@ -5,16 +7,24 @@ import {
   HttpNetworkConfig
 } from '@nomiclabs/buidler/types'
 import {
-  zeroAddress,
+  ZERO_ADDRESS,
   etherscanSupportedChainIds,
   defaultIpfsGateway,
   etherscanChainUrls,
   defaultIpfsApiUrl
-} from '../../params'
-import execa from 'execa'
-import { TASK_COMPILE, TASK_VERIFY_CONTRACT, TASK_PUBLISH } from '../task-names'
-import { logMain } from '../../ui/logger'
+} from '~/src/params'
+import {
+  TASK_COMPILE,
+  TASK_VERIFY_CONTRACT,
+  TASK_PUBLISH
+} from '~/src/tasks/task-names'
 import { AragonConfig } from '~/src/types'
+import { logMain } from '~/src/ui/logger'
+import * as apm from '~/src/utils/apm'
+import { getRootAccount } from '~/src/utils/accounts'
+import { getFullAppName } from '~/src/utils/appName'
+import { getMainContractName } from '~/src/utils/arappUtils'
+import { generateArtifacts, validateArtifacts } from '~/src/utils/artifact'
 import {
   uploadDirToIpfs,
   assertIpfsApiIsAvailable,
@@ -22,14 +32,7 @@ import {
 } from '~/src/utils/ipfs'
 import createIgnorePatternFromFiles from './createIgnorePatternFromFiles'
 import parseAndValidateBumpOrVersion from './parseAndValidateBumpOrVersion'
-import { getMainContractName } from '../../utils/arappUtils'
-import * as apm from '~/src/utils/apm'
-import { generateArtifacts, validateArtifacts } from '~/src/utils/artifact'
-import { getFullAppName } from '~/src/utils/appName'
-import { ethers } from 'ethers'
 import { getPrettyPublishTxPreview, getPublishTxOutput } from './prettyOutput'
-import { encodePublishVersionTxData } from '~/src/utils/apm'
-import { getRootAccount } from '~/src/utils/accounts'
 
 /**
  * Sets up the publish task
@@ -66,7 +69,7 @@ export function setupPublishTask(): void {
       'onlyContent',
       'Prevents contract compilation, deployment and artifact generation.'
     )
-    .addFlag('verify', 'Force Etherscan verification.')
+    .addFlag('verify', 'Automatically verify contract on Etherscan.')
     .addFlag('dryRun', 'Output tx data without broadcasting')
     .setAction(
       async (
@@ -117,8 +120,8 @@ async function publishTask(
   const selectedNetwork = bre.network.name
   const ipfsApiUrl =
     ipfsApiUrlArg || (bre.config.aragon || {}).ipfsApi || defaultIpfsApiUrl
-  const verifyContract =
-    (bre.config.etherscan && Boolean(bre.config.etherscan.apiKey)) || verify
+  const hasEtherscanKey =
+    bre.config.etherscan && Boolean(bre.config.etherscan.apiKey)
 
   // TODO: Warn the user their metadata files (e.g. appName) are not correct.
 
@@ -149,7 +152,11 @@ async function publishTask(
   // So users do not have to wait a long time before seeing the config is not okay
   if (!rootAccount)
     throw new BuidlerPluginError(
-      `No account configured. Provide a mnemonic or private key for ${selectedNetwork} in `
+      `No account configured. Provide a mnemonic or private key for ${selectedNetwork} in the buidler.config.json. For more information check: https://buidler.dev/config/#json-rpc-based-networks`
+    )
+  if (verify && !hasEtherscanKey)
+    throw new BuidlerPluginError(
+      `To verify your contracts using Etherscan you need an API Key configure in buidler.config.json. Get one at: https://etherscan.io/apis`
     )
   await apm.assertCanPublish(appName, rootAccount, provider)
   await assertIpfsApiIsAvailable(ipfsApiUrl)
@@ -158,18 +165,14 @@ async function publishTask(
   // to assign value and log status to console
   let contractAddress: string
   if (onlyContent) {
-    contractAddress = zeroAddress
+    contractAddress = ZERO_ADDRESS
     logMain('No contract used for this version')
   } else if (existingContractAddress) {
     contractAddress = existingContractAddress
     logMain(`Using provided contract address: ${contractAddress}`)
   } else if (!prevVersion || bump === 'major') {
     logMain('Deploying new implementation contract')
-    contractAddress = await _deployMainContract(
-      contractName,
-      verifyContract,
-      bre
-    )
+    contractAddress = await _deployMainContract(contractName, verify, bre)
     logMain(`New implementation contract address: ${contractAddress}`)
   } else {
     contractAddress = prevVersion.contractAddress
@@ -237,7 +240,7 @@ async function publishTask(
       .sendTransaction({
         from: rootAccount,
         to: txData.to,
-        data: encodePublishVersionTxData(txData)
+        data: apm.encodePublishVersionTxData(txData)
       })
       .on('transactionHash', (hash: string) => {
         logMain(getPublishTxOutput.txHash(hash, etherscanTxUrl))
