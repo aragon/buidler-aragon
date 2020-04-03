@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import semver from 'semver'
+import { urlJoin } from '~/src/utils/url'
 import { ApmVersion, ApmVersionReturn } from './types'
 
 /**
@@ -53,6 +54,21 @@ export function stipIpfsPrefix(ipfsDirtyHash: string): string {
 }
 
 /**
+ * Returns a joined IPFS location given an IPFS gateway and an IPFS path
+ * This util makes sure the url is properly joined, and that it contains
+ * the "ipfs" route only once, stripping it from the gateway and the location
+ * @param ipfsGateway "https://ipfs.io"
+ * @param location "Qmzz"
+ * @return "https://ipfs.io/ipfs/Qmzz/artifact.json"
+ */
+export function joinIpfsLocation(
+  ipfsGateway: string,
+  location: string
+): string {
+  return urlJoin(stipIpfsPrefix(ipfsGateway), 'ipfs', stipIpfsPrefix(location))
+}
+
+/**
  * Return a fetchable URL to get the resources of a contentURI
  * @param contentUri "ipfs:QmaT4Eef..."
  * @param options
@@ -71,11 +87,7 @@ export function contentUriToFetchUrl(
     case 'ipfs':
       if (!options || !options.ipfsGateway)
         throw Error(`Must provide an ipfsGateway for protocol 'ipfs'`)
-      return [
-        stipIpfsPrefix(options.ipfsGateway),
-        'ipfs',
-        stipIpfsPrefix(location)
-      ].join('/')
+      return joinIpfsLocation(options.ipfsGateway, location)
     default:
       throw Error(`Protocol '${protocol}' not supported`)
   }
