@@ -23,3 +23,5 @@ jobs:
         env:
           CI: true
       - run: yarn report-coverage
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
