@@ -31,7 +31,7 @@ This plugin provides the "start" task, which allows you to develop an applicatio
 
 **Task options:**
 
-- openBrowser: Wether or not to automatically open a browser tab with the client when running this task.
+- openBrowser: Whether or not to automatically open a browser tab with the client when running this task.
 - Please use buidler.config.js for additional options.
 
 ### Environment extensions
