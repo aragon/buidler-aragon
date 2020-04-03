@@ -13,7 +13,7 @@
   ],
   "files": [
     "typechain",
-    "dist",
+    "dist/src",
     "src"
   ],
   "scripts": {
