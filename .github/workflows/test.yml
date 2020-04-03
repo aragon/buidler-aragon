@@ -19,6 +19,7 @@ jobs:
       - run: yarn --frozen-lockfile
       - run: yarn dev
       - run: yarn lint
-      - run: yarn test
+      - run: yarn test:coverage
         env:
           CI: true
+      - run: yarn report-coverage
