@@ -14,6 +14,11 @@
   "files": [
     "typechain",
     "dist/src",
+    "dist/src",
+    "dist/bootstrap-paths.d.ts",
+    "dist/bootstrap-paths.d.ts.map",
+    "dist/bootstrap-paths.js",
+    "dist/bootstrap-paths.js.map",
     "src"
   ],
   "scripts": {
