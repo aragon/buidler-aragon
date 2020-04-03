@@ -56,7 +56,8 @@ async function preInit({ _experimentalAppInstaller, log }, bre) {
 
   // Mint tokens.
   // NOTE: Tokens are automatically minted to the deploying address in this sample ERC20,
-  // so no need to mint to the first account. All we need to do is transfer from the first account to the second account.
+  // so no need to mint to the first account. All we need to do is transfer from the first
+  // account to the second account.
   await token.transfer(accounts[1], '1000000000000000000000')
 
   // Used for testing only.
