@@ -1,6 +1,6 @@
 import { ConfigExtender } from '@nomiclabs/buidler/types'
-import { AragonConfig } from '../types'
-import { readArappIfExists } from '../utils/arappUtils'
+import { AragonConfig } from '~/src/types'
+import { readArappIfExists } from '~/src/utils/arappUtils'
 
 export const defaultAragonConfig: AragonConfig = {
   appServePort: 8001,

@@ -1,20 +1,20 @@
-import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import chokidar from 'chokidar'
 import { Writable } from 'stream'
-import { AragonConfig, AragonConfigHooks } from '~/src/types'
+import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { KernelInstance } from '~/typechain'
+import { AragonConfig, AragonConfigHooks } from '~/src/types'
 import { logBack, logHook } from '~/src/ui/logger'
+import AppInstaller from '~/src/utils/appInstaller'
 import { readArapp } from '~/src/utils/arappUtils'
+import { generateArtifacts } from '~/src/utils/artifact'
+import onExit from '~/src/utils/onExit'
 import { TASK_COMPILE } from '~/src/tasks/task-names'
 import deployBases from './backend/bases/deploy-bases'
+import { createApp } from './backend/create-app'
 import { createDao } from './backend/create-dao'
+import { updateApp } from './backend/update-app'
 import { setAllPermissionsOpenly } from './backend/set-permissions'
 import { startGanache } from './backend/start-ganache'
-import { createApp } from './backend/create-app'
-import { updateApp } from './backend/update-app'
-import onExit from '~/src/utils/onExit'
-import { generateArtifacts } from '~/src/utils/artifact'
-import AppInstaller from '~/src/utils/appInstaller'
 
 /**
  * Starts the task's backend sub-tasks. Logic is contained in ./tasks/start/utils/backend/.
@@ -115,7 +115,10 @@ export async function startBackend(
   // Call getInitParams hook.
   let proxyInitParams: any[] = []
   if (hooks && hooks.getInitParams) {
-    const params = await hooks.getInitParams({ log: logHook('initP') }, bre)
+    const params = await hooks.getInitParams(
+      { log: logHook('initParams') },
+      bre
+    )
     proxyInitParams = params ? params : proxyInitParams
   }
   if (proxyInitParams && proxyInitParams.length > 0) {

@@ -1,11 +1,11 @@
 import {
   ConfigExtender,
   HttpNetworkConfig,
-  NetworkConfig
+  NetworkConfig,
+  Networks
 } from '@nomiclabs/buidler/types'
-import { Networks } from '@nomiclabs/buidler/types'
-import { readArappIfExists } from '../utils/arappUtils'
-import { defaultLocalAragonBases, aragenMnemonic } from '../params'
+import { defaultLocalAragonBases, aragenMnemonic } from '~/src/params'
+import { readArappIfExists } from '~/src/utils/arappUtils'
 
 const aragonRpc = (network: string): string =>
   `https://${network}.eth.aragon.network`

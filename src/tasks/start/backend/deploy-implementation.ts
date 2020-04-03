@@ -1,5 +1,5 @@
-import { getMainContractName } from '~/src/utils/arappUtils'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
+import { getMainContractName } from '~/src/utils/arappUtils'
 
 /**
  * Deploys the app's current contract.

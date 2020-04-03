@@ -1,9 +1,9 @@
 import { ethers } from 'ethers'
 import semver from 'semver'
+import { getAppNameParts } from '~/src/utils/appName'
+import { appStorageAbi, apmRegistryAbi, repoAbi } from './abis'
 import { ApmVersion, AragonJsIntent, PublishVersionTxData } from './types'
 import { toApmVersionArray } from './utils'
-import { appStorageAbi, apmRegistryAbi, repoAbi } from './abis'
-import { getAppNameParts } from '../appName'
 
 /**
  * Return the kernel address of an aragon app contract

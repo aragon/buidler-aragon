@@ -1,6 +1,5 @@
-import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import Web3 from 'web3'
-import { getLog } from '~/src/utils/getLog'
+import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import {
   KernelContract,
   KernelInstance,
@@ -9,6 +8,7 @@ import {
   DAOFactoryContract,
   DAOFactoryInstance
 } from '~/typechain'
+import { getLog } from '~/src/utils/getLog'
 
 /**
  * Deploys a new DAO with direct/pure interaction with aragonOS.

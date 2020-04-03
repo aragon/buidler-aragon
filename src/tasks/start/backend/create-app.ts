@@ -1,15 +1,15 @@
-import { getMainContractName } from '~/src/utils/arappUtils'
-import { KernelInstance } from '~/typechain'
-import { getLog } from '~/src/utils/getLog'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { deployImplementation } from './deploy-implementation'
 import {
   RepoContract,
   RepoInstance,
   APMRegistryContract,
   APMRegistryInstance,
-  AppStubInstance
+  AppStubInstance,
+  KernelInstance
 } from '~/typechain'
+import { getMainContractName } from '~/src/utils/arappUtils'
+import { getLog } from '~/src/utils/getLog'
+import { deployImplementation } from './deploy-implementation'
 
 export async function createApp(
   appName: string,

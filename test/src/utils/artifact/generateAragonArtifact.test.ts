@@ -1,12 +1,12 @@
 import { assert } from 'chai'
-import path from 'path'
-import { generateAragonArtifact } from '~/src/utils/artifact'
-import { listTestCases } from '~/test/test-helpers/test-cases-apps/listCases'
 import { sortBy, keyBy } from 'lodash'
-import { writeJson, ensureDir } from '~/src/utils/fsUtils'
+import path from 'path'
 import { artifactName } from '~/src/params'
 import { AragonArtifact } from '~/src/types'
+import { generateAragonArtifact } from '~/src/utils/artifact'
+import { writeJson, ensureDir } from '~/src/utils/fsUtils'
 import { debugDir } from '~/test/testParams'
+import { listTestCases } from '~/test/test-helpers/test-cases-apps/listCases'
 
 const writeToDebug = false
 
@@ -16,6 +16,7 @@ describe('ast > generateAragonArtifact', () => {
     if (arapp && flatCode && artifact) {
       it(`Should generate artifact.json - ${appName}`, () => {
         const newArtifact = generateAragonArtifact(
+          'mainnet',
           arapp,
           artifact.abi,
           flatCode,

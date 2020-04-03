@@ -1,8 +1,8 @@
 import { assert } from 'chai'
-import { useEnvironment } from '~/test/test-helpers/useEnvironment'
-import { AragonConfig, AragonConfigHooks } from '~/src/types'
-import { defaultAragonConfig } from '~/src/config/aragon'
 import { pick } from 'lodash'
+import { defaultAragonConfig } from '~/src/config/aragon'
+import { AragonConfig, AragonConfigHooks } from '~/src/types'
+import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 
 describe('index.ts', () => {
   describe('default config', async function() {

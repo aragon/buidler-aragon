@@ -1,10 +1,10 @@
-import path from 'path'
-import os from 'os'
 import execa from 'execa'
-import { logFront } from '~/src/ui/logger'
 import liveServer from 'live-server'
+import os from 'os'
 import open from 'open'
+import path from 'path'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
+import { logFront } from '~/src/ui/logger'
 import { ensureDir, writeJson, pathExists, remove } from '~/src/utils/fsUtils'
 
 const defaultRepo = 'https://github.com/aragon/aragon'

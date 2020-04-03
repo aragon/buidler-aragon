@@ -1,6 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-import { readFileIfExists, readJsonIfExists } from '~/src/utils/fsUtils'
 import {
   arappName,
   artifactName,
@@ -8,6 +7,7 @@ import {
   manifestName
 } from '~/src/params'
 import { AragonAppJson, AragonArtifact, AragonManifest } from '~/src/types'
+import { readFileIfExists, readJsonIfExists } from '~/src/utils/fsUtils'
 
 interface TestCase {
   appName: string

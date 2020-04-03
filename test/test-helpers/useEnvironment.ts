@@ -1,6 +1,6 @@
+import path from 'path'
 import { resetBuidlerContext } from '@nomiclabs/buidler/plugins-testing'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import path from 'path'
 
 declare module 'mocha' {
   interface Context {

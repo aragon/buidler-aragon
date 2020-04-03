@@ -1,5 +1,4 @@
 import { ethers } from 'ethers'
-
 import * as abis from '~/src/utils/apm/abis'
 
 describe('apm > abis', () => {

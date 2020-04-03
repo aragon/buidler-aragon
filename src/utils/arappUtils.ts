@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { AragonAppJson } from '~/src/types'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
+import { AragonAppJson, AragonEnvironment } from '~/src/types'
 import { readJson, readJsonIfExists } from './fsUtils'
 
 const arappPath = 'arapp.json'
@@ -25,28 +25,34 @@ export function readArappIfExists(): AragonAppJson | undefined {
 
 /**
  * Returns app ens name.
+ * @param network "mainnet"
  * @return "voting.open.aragonpm.eth"
  */
-export function getAppEnsName(): string {
+export function getAppEnsName(network = 'default'): string {
   const arapp = readArapp()
 
-  const defaultEnvironment = arapp.environments.default
-  if (!defaultEnvironment) {
-    throw new BuidlerPluginError('Default environemnt not found in arapp.json')
+  const environment: AragonEnvironment | undefined =
+    arapp.environments[network] || arapp.environments['default']
+  if (!environment) {
+    throw new BuidlerPluginError(`Default environemnt not found in arapp.json.`)
   }
 
-  const appName = defaultEnvironment.appName
-  if (!appName) throw Error('No appName found in environment')
+  const appEnsName = (environment || {}).appName
+  if (!appEnsName)
+    throw new BuidlerPluginError(
+      `No appName found. You need to setup one for the environment ${environment} in the arapp.json file.`
+    )
 
-  return appName
+  return appEnsName
 }
 
 /**
  * Returns app name.
+ * @param network "mainnet"
  * @return "voting"
  */
-export function getAppName(): string {
-  const ensName = getAppEnsName()
+export function getAppName(network = 'default'): string {
+  const ensName = getAppEnsName(network)
 
   return (ensName || '').split('.')[0]
 }

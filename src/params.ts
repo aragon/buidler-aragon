@@ -9,8 +9,8 @@ export const flatCodeName = 'code.sol'
 export const arappName = 'arapp.json'
 
 // Special addresses used for permissions
-export const zeroAddress = '0x0000000000000000000000000000000000000000'
-export const anyEntity = '0xffffffffffffffffffffffffffffffffffffffff'
+export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+export const ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
 
 // The Aragon web client expects certain parameters to work locally:
 // - Local testnet node to connect to (testnetPort)

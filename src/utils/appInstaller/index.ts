@@ -1,14 +1,8 @@
+import { ethers } from 'ethers'
 import {
   BuidlerRuntimeEnvironment,
   HttpNetworkConfig
 } from '@nomiclabs/buidler/types'
-import { ethers } from 'ethers'
-import { APMRegistryInstance, KernelInstance } from '~/typechain'
-import { getLog } from '~/src/utils/getLog'
-import { getFullAppName } from '~/src/utils/appName'
-import { toApmVersionArray, getRepoVersion } from '~/src/utils/apm'
-import { namehash } from '~/src/utils/namehash'
-import { anyEntity } from '~/src/params'
 import {
   AppInstallerOptions,
   AppInstaller,
@@ -16,10 +10,16 @@ import {
   AppInstalled,
   NetworkType
 } from '~/src/types'
-import { getContentHash, utf8ToHex } from './utils'
+import { ANY_ADDRESS } from '~/src/params'
+import { toApmVersionArray, getRepoVersion } from '~/src/utils/apm'
+import { getFullAppName } from '~/src/utils/appName'
+import { getLog } from '~/src/utils/getLog'
+import { namehash } from '~/src/utils/namehash'
+import { APMRegistryInstance, KernelInstance } from '~/typechain'
+import assertEnsDomain from './assertEnsDomain'
 import getAbiFromContentUri from './getAbiFromContentUri'
 import getExternalRepoVersion from './getRepoVersion'
-import assertEnsDomain from './assertEnsDomain'
+import { getContentHash, utf8ToHex } from './utils'
 
 /**
  * Get an initialized instance of appInstaller
@@ -203,11 +203,11 @@ async function _installExternalApp(
   /**
    * Assign a permission of this app to an entity
    * @param roleName 'TRANSFER_ROLE'
-   * @param entity "0x615..." if unspecified defaults to anyEntity
+   * @param entity "0x615..." if unspecified defaults to ANY_ADDRESS
    */
   async function createPermission(
     roleName: string,
-    entity = anyEntity
+    entity = ANY_ADDRESS
   ): Promise<void> {
     const _proxy = await _getProxyInstance()
     const _acl = await _getAclInstance()

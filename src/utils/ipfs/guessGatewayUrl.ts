@@ -1,6 +1,6 @@
-import fetch from 'node-fetch'
 import { uniq } from 'lodash'
-import { urlJoin, parseUrlSafe } from '../url'
+import fetch from 'node-fetch'
+import { urlJoin, parseUrlSafe } from '~/src/utils/url'
 
 /**
  * Returns a URL that may have a given content hash already available

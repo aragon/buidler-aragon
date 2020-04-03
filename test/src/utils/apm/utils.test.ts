@@ -1,4 +1,5 @@
 import { assert } from 'chai'
+import { ZERO_ADDRESS } from '~/src/params'
 import {
   parseApmVersionReturn,
   toApmVersionArray,
@@ -9,7 +10,6 @@ import {
   utf8ToHex,
   ApmVersion
 } from '~/src/utils/apm'
-import { zeroAddress } from '~/src/params'
 
 describe('apm > utils', () => {
   const hash = 'QmWWNkXdGDnTaxAxw6vtCM21SDJeWLyaoUzDb3skYXynmo'
@@ -103,7 +103,7 @@ describe('apm > utils', () => {
   describe('isAddress', () => {
     const testCases: [string, boolean][] = [
       [contractAddress, true],
-      [zeroAddress, true],
+      [ZERO_ADDRESS, true],
       [hash, false],
       ['0x', false]
     ]

@@ -1,9 +1,9 @@
-import { KernelInstance } from '~/typechain'
-import { AragonAppJson } from '~/src/types'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
+import { KernelInstance } from '~/typechain'
+import { ANY_ADDRESS } from '~/src/params'
+import { AragonAppJson } from '~/src/types'
 
-export const ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
 export const DUMMY_BYTES =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 

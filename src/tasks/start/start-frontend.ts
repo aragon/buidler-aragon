@@ -1,12 +1,12 @@
 import chokidar from 'chokidar'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { logFront } from '~/src/ui/logger'
 import { AragonConfig } from '~/src/types'
-import { serveAppAndResolveWhenBuilt } from './frontend/serve-app'
-import { copyAppUiAssets } from './frontend/copy-assets'
-import { startAppWatcher } from './frontend/watch-app'
+import { logFront } from '~/src/ui/logger'
 import { generateArtifacts } from '~/src/utils/artifact'
 import { refreshClient } from './client/aragon-client'
+import { copyAppUiAssets } from './frontend/copy-assets'
+import { serveAppAndResolveWhenBuilt } from './frontend/serve-app'
+import { startAppWatcher } from './frontend/watch-app'
 
 /**
  * Starts the task's frontend sub-tasks. Logic is contained in ./tasks/start/utils/frontend/.

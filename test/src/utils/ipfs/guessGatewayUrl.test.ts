@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-
 import { guessGatewayUrl, getPossibleGatewayUrls } from '~/src/utils/ipfs'
 import { infuraIpfsApiUrl } from '~/test/testParams'
 
