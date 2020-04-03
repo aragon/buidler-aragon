@@ -75,7 +75,7 @@ async function getInitParams({ log }, bre) {
   return [tokenAddress, 'Wrapped token', 'wORG']
 }
 
-async function postInit({ proxy, log }, bre) {
+async function postInit({ proxy, _experimentalAppInstaller, log }, bre) {
   log(`postInit hook called`)
 
   const vault2 = await _experimentalAppInstaller("vault");
