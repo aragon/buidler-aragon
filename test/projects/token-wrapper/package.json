@@ -12,8 +12,8 @@
     "/test"
   ],
   "scripts": {
-    "postinstall": "npm run compile && npm run build-app",
-    "build-app": "cd app && npm install && cd ..",
+    "postinstall": "yarn compile && yarn build-app",
+    "build-app": "cd app && yarn && cd ..",
     "compile": "buidler compile --force",
     "start": "buidler start"
   },
