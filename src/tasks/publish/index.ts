@@ -10,8 +10,7 @@ import {
   ZERO_ADDRESS,
   etherscanSupportedChainIds,
   defaultIpfsGateway,
-  etherscanChainUrls,
-  defaultIpfsApiUrl
+  etherscanChainUrls
 } from '~/src/params'
 import {
   TASK_COMPILE,
@@ -122,8 +121,7 @@ async function publishTask(
   const distPath = aragonConfig.appBuildOutputPath as string
   const ignoreFilesPath = aragonConfig.ignoreFilesPath as string
   const selectedNetwork = bre.network.name
-  const ipfsApiUrl =
-    ipfsApiUrlArg || (bre.config.aragon || {}).ipfsApi || defaultIpfsApiUrl
+  const ipfsApiUrl = ipfsApiUrlArg || (bre.config.aragon || {}).ipfsApi
   const hasEtherscanKey =
     bre.config.etherscan && Boolean(bre.config.etherscan.apiKey)
 
@@ -164,6 +162,24 @@ async function publishTask(
       `To verify your contracts using Etherscan you need an API Key configure in buidler.config.json. Get one at: https://etherscan.io/apis`
     )
   await apm.assertCanPublish(appName, rootAccount, provider)
+  if (!ipfsApiUrl)
+    throw new BuidlerPluginError(
+      `No IPFS API url configured. Add 'aragon.ipfsApiUrl' to your buidler.config with
+a valid IPFS API url that you have permissions to upload and persist content to.
+Example values:
+
+    http://your-remote-node.io:5001
+    https://ipfs.infura.io
+
+Note: if you are releasing this app in production, you are responsible for pinning
+the app's content and making sure it's available to users.
+
+If you want to quickly test an app release and you are not concerned about persistance,
+you may use a public IPFS API such as
+
+    https://ipfs.infura.io
+`
+    )
   await assertIpfsApiIsAvailable(ipfsApiUrl)
 
   // Using let + if {} block instead of a ternary operator

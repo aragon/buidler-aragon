@@ -19,23 +19,32 @@ export interface AragonConfig {
   ignoreFilesPath?: string
 
   /**
-   * IPFS gateway, to fetch static files such as the artifact
-   * of your app's latest version
-   * Examples:
-   * - http://localhost:8080
-   * - https://ipfs.io
+   * IPFS gateway to pull published data; static files from existing
+   * APM versions. Used in publish to get your app's latests version
+   * or to pull external app data with the _experimentalAppInstaller
    *
-   * Defaults to: 'https://ipfs.eth.aragon.network/ipfs/'
+   * Examples:
+   * - http://your-remote-node.io:8080
+   * - https://ipfs.io
+   * - https://ipfs.eth.aragon.network
+   *
+   * Defaults to: 'https://ipfs.eth.aragon.network'
    */
   ipfsGateway?: string
 
   /**
-   * IPFS HTTP API endpoint, to add and pin version data
-   * Examples:
-   * - http://localhost:5001
-   * - http://ipfs.infura.io
+   * IPFS HTTP API endpoint to push new data. Used in publish
+   * to upload the assets of your new app's version
    *
-   * Defaults to 'http://localhost:5001'
+   * This API must have the following routes available
+   * - /api/v0/version
+   * - /api/v0/add
+   *
+   * Examples:
+   * - http://your-remote-node.io:5001
+   * - https://ipfs.infura.io
+   *
+   * You must provide a valid value to publish a new version
    */
   ipfsApi?: string
 
