@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { TASK_PUBLISH } from '~/src/tasks/task-names'
-import { AragonConfig } from '~/src/types'
 import { startGanache } from '~/src/tasks/start/backend/start-ganache'
 import deployBases from '~/src/tasks/start/backend/bases/deploy-bases'
 import {
@@ -23,6 +22,7 @@ import {
   HttpNetworkConfig
 } from '@nomiclabs/buidler/types'
 import { getRootAccount } from '~/src/utils/accounts'
+import { readArapp, parseAppName } from '~/src/utils/arappUtils'
 
 interface RepoState {
   repoAddress: string
@@ -222,12 +222,8 @@ describe('Publish task', function() {
     })
 
     before('Retrieve config', async function() {
-      const config = this.env.config.aragon as AragonConfig
-      assert.equal(
-        (config.appName || {})[mainnetNetwork] || config.appName,
-        appName,
-        'Wrong app name'
-      )
+      const arapp = readArapp()
+      assert.equal(parseAppName(arapp), appName, 'Wrong app name')
     })
 
     before('Make sure mainnet provider works', async function() {

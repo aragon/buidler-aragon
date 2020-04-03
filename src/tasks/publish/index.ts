@@ -23,7 +23,11 @@ import { logMain } from '~/src/ui/logger'
 import * as apm from '~/src/utils/apm'
 import { getRootAccount } from '~/src/utils/accounts'
 import { getFullAppName } from '~/src/utils/appName'
-import { getMainContractName } from '~/src/utils/arappUtils'
+import {
+  getMainContractName,
+  readArapp,
+  parseAppName
+} from '~/src/utils/arappUtils'
 import { generateArtifacts, validateArtifacts } from '~/src/utils/artifact'
 import {
   uploadDirToIpfs,
@@ -125,7 +129,8 @@ async function publishTask(
 
   // TODO: Warn the user their metadata files (e.g. appName) are not correct.
 
-  const appName = _parseAppNameFromConfig(aragonConfig.appName, selectedNetwork)
+  const arapp = readArapp()
+  const appName = parseAppName(arapp, selectedNetwork)
   const contractName = getMainContractName()
   const rootAccount = await getRootAccount(bre)
 
@@ -317,36 +322,4 @@ async function _getChainId(bre: BuidlerRuntimeEnvironment): Promise<number> {
   const provider = new ethers.providers.Web3Provider(bre.web3.currentProvider)
   const net = await provider.getNetwork()
   return net.chainId
-}
-
-/**
- * Utility to parse appName from the aragon config
- * @param appNameOrObj
- * @param network
- */
-function _parseAppNameFromConfig(
-  appNameOrObj: string | { [network: string]: string } | undefined,
-  network: string
-): string {
-  switch (typeof appNameOrObj) {
-    case 'string':
-      if (!appNameOrObj)
-        throw new BuidlerPluginError(
-          `appName must not be empty in buidler.config`
-        )
-      return appNameOrObj
-
-    case 'object':
-      if (!appNameOrObj[network])
-        throw new BuidlerPluginError(
-          `No appName defined for network '${network}' in buidler.config`
-        )
-      else return appNameOrObj[network]
-
-    default:
-      throw new BuidlerPluginError(
-        `appName is buidler.config is of type ${typeof appNameOrObj}
-It must a string or an object { [network]: appName}`
-      )
-  }
 }

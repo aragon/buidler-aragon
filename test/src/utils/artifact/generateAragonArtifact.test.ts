@@ -16,7 +16,6 @@ describe('ast > generateAragonArtifact', () => {
     if (arapp && flatCode && artifact) {
       it(`Should generate artifact.json - ${appName}`, () => {
         const newArtifact = generateAragonArtifact(
-          'mainnet',
           arapp,
           artifact.abi,
           flatCode,
