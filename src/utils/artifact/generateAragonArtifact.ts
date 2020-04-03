@@ -71,13 +71,13 @@ export function generateAragonArtifact(
  * Returns aragon artifact.json from app data
  * @param arapp
  * @param abi
- * @param flatCode Flat code of target contract plus all imports
+ * @param sourceCode Flat code of target contract plus all imports
  * @param contractName Target contract name or path: "Finance" | "contracts/Finance.sol"
  */
 export function generateAragonArtifact(
   arapp: AragonAppJson,
   abi: AbiItem[],
-  flatCode: string,
+  sourceCode: string,
   contractName: string
 ): AragonArtifact
 
