@@ -1,6 +1,4 @@
-## buidler-aragon
-
-_WIP - Experimental!_
+# Aragon Buidler plugin
 
 Buidler plugin for developing Aragon apps with full front end and back end hot reloading.
 
@@ -10,6 +8,7 @@ This plugin currently requires:
 
 - [**buidler-truffle5**](https://github.com/nomiclabs/buidler/tree/master/packages/buidler-truffle5)
 - [**buidler-web3**](https://github.com/nomiclabs/buidler/tree/master/packages/buidler-web3)
+- [**buidler-etherscan**](https://github.com/nomiclabs/buidler/tree/master/packages/buidler-etherscan)
 
 ### Installation
 
