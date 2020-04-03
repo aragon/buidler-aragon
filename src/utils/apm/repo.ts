@@ -1,8 +1,8 @@
 import { ethers } from 'ethers'
+import { getFullAppName } from '~/src/utils/appName'
 import { repoAbi } from './abis'
-import { parseApmVersionReturn, toApmVersionArray, isAddress } from './utils'
 import { ApmVersion, ApmVersionReturn, ApmRepoInstance } from './types'
-import { getFullAppName } from '../appName'
+import { parseApmVersionReturn, toApmVersionArray, isAddress } from './utils'
 
 /**
  * Internal logic shared with single and all version fetchers

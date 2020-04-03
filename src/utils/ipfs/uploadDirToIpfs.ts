@@ -1,5 +1,6 @@
 import IpfsHttpClient from 'ipfs-http-client'
 import path from 'path'
+
 const { globSource } = IpfsHttpClient
 
 interface Cid {

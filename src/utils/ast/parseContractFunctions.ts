@@ -1,9 +1,9 @@
-import * as parser from 'solidity-parser-antlr'
+import { keyBy } from 'lodash'
 import path from 'path'
+import * as parser from 'solidity-parser-antlr'
+import { parseFunctionsNotices } from './parseFunctionNotices'
 import { AragonContractFunction } from './types'
 import { coerceFunctionSignature } from './utils'
-import { parseFunctionsNotices } from './parseFunctionNotices'
-import { keyBy } from 'lodash'
 
 /**
  * Helper to parse the role name from a modifier node

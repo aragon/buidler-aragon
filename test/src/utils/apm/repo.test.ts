@@ -1,7 +1,7 @@
 import { assert } from 'chai'
+import { ZERO_ADDRESS } from '~/src/params'
 import { getRepoVersion, canPublishVersion, ApmVersion } from '~/src/utils/apm'
 import { getMainnetProvider } from '~/test/test-helpers/providers'
-import { zeroAddress } from '~/src/params'
 
 describe('apm > repo', () => {
   const provider = getMainnetProvider()
@@ -25,7 +25,7 @@ describe('apm > repo', () => {
 
   describe('Publish version permissions', () => {
     const allowedSender = '0xE04cAbcB24e11620Dd62bB99c396E76cEB578914'
-    const notAllowedSender = zeroAddress
+    const notAllowedSender = ZERO_ADDRESS
 
     it('Allowed address should be able to publish', async () => {
       const canPerform = await canPublishVersion(

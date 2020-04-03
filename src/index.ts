@@ -1,6 +1,6 @@
 import { extendConfig, usePlugin } from '@nomiclabs/buidler/config'
-import { configExtender } from './config'
 import '../bootstrap-paths'
+import { configExtender } from './config'
 
 // TODO: Don't use any type below, try to use something like these...
 // import { ResolvedBuidlerConfig, BuidlerConfig } from '@nomiclabs/buidler/types'

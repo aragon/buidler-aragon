@@ -5,14 +5,14 @@
  */
 
 import path from 'path'
+import { artifactName, flatCodeName } from '~/src/params'
 import {
   getRepoVersion,
   resolveRepoContentUri,
   resolveRepoContentUriFile
 } from '~/src/utils/apm'
-import { getMainnetProvider } from '~/test/test-helpers/providers'
 import { writeJson, writeFile, ensureDir } from '~/src/utils/fsUtils'
-import { artifactName, flatCodeName } from '~/src/params'
+import { getMainnetProvider } from '~/test/test-helpers/providers'
 
 const ipfsGateway = 'https://ipfs.eth.aragon.network/ipfs/'
 const appsToFetch = ['agent', 'finance', 'token-manager', 'vault', 'voting']

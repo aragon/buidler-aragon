@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
-import { contentUriToFetchUrl, toUtf8IfHex } from './utils'
 import { AragonManifest, AragonArtifact } from '~/src/types'
+import { contentUriToFetchUrl, toUtf8IfHex } from './utils'
 
 /**
  * Resolve an Aragon app contentUri and return its manifest and artifact

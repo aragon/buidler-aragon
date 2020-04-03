@@ -1,8 +1,8 @@
 import { assert } from 'chai'
+import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
+import { ZERO_ADDRESS } from '~/src/params'
 import { assertCanPublish } from '~/src/utils/apm'
 import { getMainnetProvider } from '~/test/test-helpers/providers'
-import { zeroAddress } from '~/src/params'
-import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 
 describe('apm > assertCanPublish', () => {
   const provider = getMainnetProvider()
@@ -14,15 +14,15 @@ describe('apm > assertCanPublish', () => {
   } = {
     'finance.aragonpm.eth': {
       [financeManager]: true,
-      [zeroAddress]: false
+      [ZERO_ADDRESS]: false
     },
     'newapp.aragonpm.eth': {
       [financeManager]: true,
-      [zeroAddress]: false
+      [ZERO_ADDRESS]: false
     },
     'newapp.open.aragonpm.eth': {
       [financeManager]: true,
-      [zeroAddress]: true
+      [ZERO_ADDRESS]: true
     }
   }
 

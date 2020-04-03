@@ -1,15 +1,9 @@
+import { isHexString } from 'ethers/utils'
 import { homedir } from 'os'
 import path from 'path'
 import { ConfigExtender, HttpNetworkConfig } from '@nomiclabs/buidler/types'
-import { aragenMnemonic } from '../params'
-import { readJsonIfExists } from '../utils/fsUtils'
-import { isHexString } from 'ethers/utils'
-
-// Standard Aragon test paths
-const aragonConfig = '.aragon'
-const genericName = 'mnemonic.json'
-const byNetworkName = (network: string): string => `${network}_key.json`
-const defaultMnemonic = aragenMnemonic
+import { aragenMnemonic } from '~/src/params'
+import { readJsonIfExists } from '~/src/utils/fsUtils'
 
 interface GenericMnemonic {
   mnemonic: string
@@ -18,6 +12,19 @@ interface ByNetworkMnemonic {
   rpc?: string
   keys?: string[] // privateKeys = [ "3f841bf589fdf83a521e55d51afddc34fa65351161eead24f064855fc29c9580" ];
 }
+
+// Standard Aragon test paths
+const aragonConfig = '.aragon'
+const genericName = 'mnemonic.json'
+const byNetworkName = (network: string): string => `${network}_key.json`
+const defaultMnemonic = aragenMnemonic
+
+/**
+ * Utility to ensure and array of strings has hex encoding
+ * @param keys ['34b...456', '0x456...3e2']
+ */
+const ensureHexEncoding = (keys: string[]): string[] =>
+  keys.map(key => (isHexString(key) ? key : `0x${key}`))
 
 export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
   const genericMnemonic = readAragonConfig<GenericMnemonic>(genericName)
@@ -66,11 +73,3 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
 function readAragonConfig<T>(filename: string): T | undefined {
   return readJsonIfExists(path.join(homedir(), aragonConfig, filename))
 }
-
-/**
- * Utility to read JSON files from aragonConfig dirs
- * Returns undefined if the file does not exist
- * @param filename 'mnemonic.json'
- */
-const ensureHexEncoding = (keys: string[]): string[] =>
-  keys.map(key => (isHexString(key) ? key : `0x${key}`))

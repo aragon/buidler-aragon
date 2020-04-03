@@ -4,10 +4,8 @@ import { createDao } from '~/src/tasks/start/backend/create-dao'
 import { createApp } from '~/src/tasks/start/backend/create-app'
 import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 import { ACLContract } from '~/typechain'
-import {
-  setAllPermissionsOpenly,
-  ANY_ADDRESS
-} from '~/src/tasks/start/backend/set-permissions'
+import { ANY_ADDRESS } from '~/src/params'
+import { setAllPermissionsOpenly } from '~/src/tasks/start/backend/set-permissions'
 import {
   startGanache,
   stopGanache

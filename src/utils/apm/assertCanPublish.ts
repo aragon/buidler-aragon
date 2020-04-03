@@ -1,8 +1,8 @@
 import { ethers } from 'ethers'
-import * as repo from './repo'
-import { apmRegistryAbi } from './abis'
-import { getAppNameParts } from '../appName'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
+import { getAppNameParts } from '~/src/utils/appName'
+import { apmRegistryAbi } from './abis'
+import * as repo from './repo'
 
 /**
  * Asserts that a sender has permissions to publish a new version / repo

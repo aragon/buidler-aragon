@@ -1,5 +1,5 @@
 import { AbiItem, AragonArtifact } from '~/src/types'
-import { resolveRepoContentUriFile } from '../apm'
+import { resolveRepoContentUriFile } from '~/src/utils/apm'
 
 /**
  * Gets the ABI from an Aragon App release directory

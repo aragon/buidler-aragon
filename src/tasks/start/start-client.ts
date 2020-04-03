@@ -1,6 +1,6 @@
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { logFront } from '~/src/ui/logger'
 import { AragonConfig } from '~/src/types'
+import { logFront } from '~/src/ui/logger'
 import {
   installAragonClientIfNeeded,
   startAragonClient

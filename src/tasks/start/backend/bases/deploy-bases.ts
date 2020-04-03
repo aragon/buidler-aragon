@@ -1,10 +1,10 @@
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { deployEns } from './deploy-ens'
-import { deployApm } from './deploy-apm'
-import { deployDaoFactory } from './deploy-dao-factory'
 import { defaultLocalAragonBases, externalArtifactPaths } from '~/src/params'
 import { copyExternalArtifacts } from '~/src/utils/copyExternalArtifacts'
+import { deployApm } from './deploy-apm'
+import { deployDaoFactory } from './deploy-dao-factory'
+import { deployEns } from './deploy-ens'
 
 interface AragonBases {
   ensAddress: string

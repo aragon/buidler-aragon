@@ -1,5 +1,5 @@
 import path from 'path'
-import { readFileIfExists } from '../../utils/fsUtils'
+import { readFileIfExists } from '~/src/utils/fsUtils'
 
 /**
  * Reads ignore files from disk and aggregates their glob patterns

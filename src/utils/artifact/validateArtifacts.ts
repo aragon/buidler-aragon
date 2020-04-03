@@ -5,12 +5,12 @@ import {
   manifestName,
   flatCodeName,
   arappName
-} from '../../params'
-import { readFile, readJson } from '../../utils/fsUtils'
+} from '~/src/params'
 import { AragonArtifact, AragonManifest } from '~/src/types'
-import { matchContractRoles } from './matchContractRoles'
-import { findMissingManifestFiles } from './findMissingManifestFiles'
 import { parseContractFunctions } from '~/src/utils/ast'
+import { readFile, readJson } from '~/src/utils/fsUtils'
+import { findMissingManifestFiles } from './findMissingManifestFiles'
+import { matchContractRoles } from './matchContractRoles'
 
 /**
  * Validates a release directory. Throws if there are issues

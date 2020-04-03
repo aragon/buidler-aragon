@@ -1,10 +1,10 @@
-import path from 'path'
-import fs from 'fs'
 import { assert } from 'chai'
+import fs from 'fs'
+import { removeSync } from 'fs-extra'
+import path from 'path'
+import { ensureDir } from '~/src/utils/fsUtils'
 import { uploadDirToIpfs } from '~/src/utils/ipfs'
 import { debugDir, infuraIpfsApiUrl } from '~/test/testParams'
-import { ensureDir } from '~/src/utils/fsUtils'
-import { removeSync } from 'fs-extra'
 
 describe('uploadDirToIpfs', function() {
   const testDir = path.join(debugDir, 'test-ipfs-dir-to-upload')
