@@ -6,16 +6,6 @@ Feel welcome and read the following sections in order to know how to ask questio
 
 All members of our community are expected to follow our [Code of Conduct](https://wiki.aragon.org/documentation/Code_of_Conduct/). Please make sure you are welcoming and friendly in all of our spaces.
 
-## Get Rewarded
-
-We are starting to experiment with bounties using the very same tools we are building in Aragon. In particular the [Projects app](https://www.autark.xyz/projects-app) of The Planning Suite made by Autark team.
-
-Look for the [💰funded](https://github.com/aragon/buidler-aragon/issues?q=is%3Aissue+is%3Aopen+label%3A%22💰+funded%22) label on issues and ask the mantainers to guide you through the bounty workflow.
-
-You will apply to the boutnies on our own DAO, [follow the link to explore it.](https://rinkeby.aragon.org/#/meshteam/0x2b2290c2370cbc59e7c77bd36072f801d5e996c8)
-
-We will create a guide shortly with a walkthrough the whole process. Stay tuned 🙌
-
 ## Get Involved
 
 There are many ways to contribute to Aragon, and many of them do not involve writing any code. Here's a few ideas to get started:
@@ -76,7 +66,7 @@ Unsure where to begin contributing? You can start by looking through these `good
 
 ## Getting help
 
-If you need help, please reach out to Aragon core contributors and community members in the [#dev-help channel](https://aragon.chat/channel/dev-help) on the Aragon Chat. We'd love to hear from you and know what you're working on!
+If you need help, please reach out to Aragon core contributors and community members in the [#dev-help channel](https://spectrum.chat/aragon) on the Aragon Chat. We'd love to hear from you and know what you're working on!
 
 ## Style Guide
 

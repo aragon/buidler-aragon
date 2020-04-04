@@ -48,7 +48,7 @@ labels: bug
 
 (Which network you are using the app with.)
 
-#### Aragon App project?
+#### Aragon app project?
 
 (Enter the Github URL of your project if it's public)
 

@@ -11,4 +11,4 @@ Please contact us instead. We have a few channels:
 
 - [Aragon Hack](https://hack.aragon.org/docs)
 - [Aragon Forum](https://forum.aragon.org)
-- [Aragon Chat](https://aragon.chat)
+- [Aragon Chat](https://spectrum.chat/aragon)
