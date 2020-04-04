@@ -19,6 +19,7 @@
     "dist/bootstrap-paths.d.ts.map",
     "dist/bootstrap-paths.js",
     "dist/bootstrap-paths.js.map",
+    "dist/tsconfig.json",
     "src"
   ],
   "scripts": {
