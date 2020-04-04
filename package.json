@@ -1,6 +1,6 @@
 {
   "name": "@aragon/buidler-aragon",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Aragon Buidler plugin",
   "main": "dist/src/index.js",
   "author": "Aragon Association <legal@aragon.org>",
@@ -19,6 +19,7 @@
     "dist/bootstrap-paths.d.ts.map",
     "dist/bootstrap-paths.js",
     "dist/bootstrap-paths.js.map",
+    "dist/tsconfig.json",
     "src"
   ],
   "scripts": {
