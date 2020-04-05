@@ -1,9 +1,10 @@
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { deployEns } from './deploy-ens'
+import { defaultLocalAragonBases, externalArtifactPaths } from '~/src/params'
+import { copyExternalArtifacts } from '~/src/utils/copyExternalArtifacts'
 import { deployApm } from './deploy-apm'
 import { deployDaoFactory } from './deploy-dao-factory'
-import { defaultLocalAragonBases } from '~/src/params'
+import { deployEns } from './deploy-ens'
 
 interface AragonBases {
   ensAddress: string
@@ -19,6 +20,13 @@ interface AragonBases {
 export default async function deployBases(
   bre: BuidlerRuntimeEnvironment
 ): Promise<AragonBases> {
+  // ==================== Temporal hack >>>
+  // Copy external artifacts to the local artifacts folder
+  // This is a temporary hack until multiple artifacts paths are allowed
+  for (const externalArtifactPath of externalArtifactPaths)
+    copyExternalArtifacts(externalArtifactPath)
+  // ==================== Temporal hack <<<
+
   // First, aggregate which bases are deployed and which not
   // by checking if code can be found at the expected addresses.
   const isBaseDeployed: { [baseName: string]: boolean } = {}

@@ -11,12 +11,9 @@ import {
   startGanache,
   stopGanache
 } from '~/src/tasks/start/backend/start-ganache'
-import {
-  readArapp,
-  getAppEnsName,
-  getAppId,
-  getAppName
-} from '~/src/utils/arappUtils'
+import { readArapp, parseAppName } from '~/src/utils/arappUtils'
+import { getAppId } from '~/src/utils/appName'
+import { AragonAppJson } from '~/src/types'
 
 describe('create-app.ts', function() {
   // Note: These particular tests use localhost instead of buidlerevm.
@@ -24,27 +21,25 @@ describe('create-app.ts', function() {
   // And because we want to restart the chain on certain tests.
   useEnvironment('counter', 'localhost')
 
-  let ensAddress, apmAddress, daoFactoryAddress
-  let appName, appId
+  let arapp: AragonAppJson, appName: string
+  let ensAddress, daoFactoryAddress
   let dao
+
+  before('Read arapp in test folder after useEnviornment chdir', () => {
+    arapp = readArapp()
+    appName = parseAppName(arapp)
+  })
 
   before('start ganache', async function() {
     await startGanache(this.env)
   })
 
   before('deploy bases', async function() {
-    ;({ ensAddress, apmAddress, daoFactoryAddress } = await deployBases(
-      this.env
-    ))
+    ;({ ensAddress, daoFactoryAddress } = await deployBases(this.env))
   })
 
   before('deploy a dao', async function() {
     dao = await createDao(this.env.web3, this.env.artifacts, daoFactoryAddress)
-  })
-
-  before('calculate appName and appId', async function() {
-    appName = getAppName()
-    appId = getAppId(getAppEnsName())
   })
 
   after('stop ganache', async function() {
@@ -56,11 +51,7 @@ describe('create-app.ts', function() {
 
     before('create app', async function() {
       ;({ proxy, repo, implementation } = await createApp(
-        appName,
-        appId,
-        dao,
-        ensAddress,
-        apmAddress,
+        { appName, dao, ensAddress },
         this.env
       ))
 
@@ -80,6 +71,7 @@ describe('create-app.ts', function() {
     })
 
     it('dao references the correct implementation for it', async function() {
+      const appId = getAppId(appName)
       assert.equal(
         implementation.address,
         await dao.getApp(await dao.APP_BASES_NAMESPACE(), appId),
@@ -93,7 +85,7 @@ describe('create-app.ts', function() {
 
     it('reverts when attempting to create the app again', async function() {
       await assertRevert(
-        createApp(appName, appId, dao, ensAddress, apmAddress, this.env),
+        createApp({ appName, dao, ensAddress }, this.env),
         'KERNEL_INVALID_APP_CHANGE'
       )
     })

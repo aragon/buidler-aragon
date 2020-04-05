@@ -1,4 +1,16 @@
-import { AragonConfig } from './types'
+// Copy external artifacts to the local artifacts folder
+// This is a temporary hack until multiple artifacts paths are allowed
+export const externalArtifactPaths = ['node_modules/@aragon/abis/os/artifacts']
+
+// Standard expected Aragon file paths
+export const artifactName = 'artifact.json'
+export const manifestName = 'manifest.json'
+export const flatCodeName = 'code.sol'
+export const arappName = 'arapp.json'
+
+// Special addresses used for permissions
+export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+export const ANY_ADDRESS = '0xffffffffffffffffffffffffffffffffffffffff'
 
 // The Aragon web client expects certain parameters to work locally:
 // - Local testnet node to connect to (testnetPort)
@@ -68,9 +80,34 @@ export const defaultLocalAragonBases = {
   apmAddress: '0xA53dE0b8e08b798f975D57f48384C177D410d170'
 }
 
-export const defaultAragonConfig: AragonConfig = {
-  appServePort: 8001,
-  clientServePort: 3000,
-  appSrcPath: 'app/',
-  appBuildOutputPath: 'dist/'
+export const defaultIpfsGateway = 'https://ipfs.eth.aragon.network'
+// No default ipfsApiUrl is provided. User must intentionally provide one
+// export const defaultIpfsApiUrl
+
+/**
+ * Chain ids of networks that support Etherscan contract verification
+ */
+export const etherscanSupportedChainIds = new Set([
+  // Mainnet
+  1,
+  // Ropsten
+  3,
+  // Rinkeby
+  4,
+  // Goerli
+  5,
+  // Kovan
+  42
+])
+
+/**
+ * Root etherscan URLs per chainId
+ * Note: All URLs are expected to have the same sub paths, /tx, etc
+ */
+export const etherscanChainUrls = {
+  1: 'https://etherscan.io/',
+  3: 'https://ropsten.etherscan.io/',
+  4: 'https://rinkeby.etherscan.io/',
+  5: 'https://goerli.etherscan.io/',
+  42: 'https://kovan.etherscan.io/'
 }

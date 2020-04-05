@@ -1,55 +1,39 @@
 import chokidar from 'chokidar'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { logFront } from '~/src/ui/logger'
 import { AragonConfig } from '~/src/types'
-import { emitEvent, FRONTEND_STARTED_SERVING } from '~/src/ui/events'
-import { serveAppAndResolveWhenBuilt } from './frontend/serve-app'
-import { generateAppArtifacts } from './frontend/generate-artifacts'
+import { logFront } from '~/src/ui/logger'
+import { generateArtifacts } from '~/src/utils/artifact'
+import { refreshClient } from './client/aragon-client'
 import { copyAppUiAssets } from './frontend/copy-assets'
+import { serveAppAndResolveWhenBuilt } from './frontend/serve-app'
 import { startAppWatcher } from './frontend/watch-app'
-import onExit from '~/src/utils/onExit'
-import {
-  installAragonClientIfNeeded,
-  startAragonClient,
-  refreshClient
-} from './frontend/aragon-client'
 
 /**
  * Starts the task's frontend sub-tasks. Logic is contained in ./tasks/start/utils/frontend/.
- * Retrieves the Aragon client using git, builds it, builds the app's frontend and serves the build.
- * Starts the Aragon client pointed at a Dao and an app, and watches for changes on the app's sources.
  * If changes are detected, the app's frontend is rebuilt.
  */
 export async function startFrontend(
-  bre: BuidlerRuntimeEnvironment,
-  daoAddress: string,
-  appAddress: string,
-  openBrowser: boolean
-): Promise<void> {
+  bre: BuidlerRuntimeEnvironment
+): Promise<{
+  /**
+   * Closes open file watchers and file servers
+   */
+  close: () => void
+}> {
   const config: AragonConfig = bre.config.aragon as AragonConfig
 
-  logFront('Checking Aragon client...')
-  await installAragonClientIfNeeded()
-
+  logFront('Generating app artifacts...')
   const appBuildOutputPath = config.appBuildOutputPath as string
-  await generateAppArtifacts(appBuildOutputPath, bre.artifacts)
+  await generateArtifacts(appBuildOutputPath, bre)
 
   logFront('Building front end (takes a minute)...')
   const appSrcPath = config.appSrcPath as string
   const appServePort = config.appServePort as number
   await copyAppUiAssets(appSrcPath)
-  await serveAppAndResolveWhenBuilt(appSrcPath, appServePort)
-
-  // Start Aragon client at the deployed address.
-  const appURL = `http://localhost:${appServePort}`
-  const clientURL: string = await startAragonClient(
-    config.clientServePort as number,
-    `${daoAddress}/${appAddress}`,
-    openBrowser
+  const { close: closeServerApp } = await serveAppAndResolveWhenBuilt(
+    appSrcPath,
+    appServePort
   )
-  logFront(`You can now view the Aragon client in the browser.
-App content: ${appURL}
-Client:  ${clientURL}`)
 
   // Watch changes to app/src/script.js.
   const srcWatcher = chokidar
@@ -73,13 +57,15 @@ Client:  ${clientURL}`)
       )
     })
 
-  onExit(() => {
-    srcWatcher.close()
-    artifactWatcher.close()
-  })
-
-  emitEvent(FRONTEND_STARTED_SERVING, 1000)
-
   logFront('Watching changes on front end...')
-  await startAppWatcher(appSrcPath)
+  const { close: closeWatchScript } = await startAppWatcher(appSrcPath)
+
+  return {
+    close: (): void => {
+      srcWatcher.close()
+      artifactWatcher.close()
+      closeServerApp()
+      closeWatchScript()
+    }
+  }
 }

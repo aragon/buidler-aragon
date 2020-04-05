@@ -1,7 +1,5 @@
-import { hash as namehash } from 'eth-ens-namehash'
 import Web3 from 'web3'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
-import { getLog } from '~/src/utils/getLog'
 import {
   DAOFactoryInstance,
   APMRegistryInstance,
@@ -14,8 +12,9 @@ import {
   ENSSubdomainRegistrarInstance,
   APMRegistryFactoryInstance
 } from '~/typechain'
-
-const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
+import { ZERO_ADDRESS } from '~/src/params'
+import { getLog } from '~/src/utils/getLog'
+import { namehash } from '~/src/utils/namehash'
 
 /**
  * Deploys a new DAOFactory with direct/pure interaction with aragonOS.
@@ -51,7 +50,7 @@ export async function deployApm(
     apmRepoBase.address,
     ensSubdomainRegistrarBase.address,
     ens.address,
-    ZERO_ADDR
+    ZERO_ADDRESS
   )
 
   // Creating aragonpm.eth subdomain and assigning it to APMRegistryFactory.

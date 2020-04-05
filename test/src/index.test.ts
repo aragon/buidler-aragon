@@ -1,7 +1,8 @@
 import { assert } from 'chai'
-import { useEnvironment } from '~/test/test-helpers/useEnvironment'
+import { pick } from 'lodash'
+import { defaultAragonConfig } from '~/src/config/aragon'
 import { AragonConfig, AragonConfigHooks } from '~/src/types'
-import { defaultAragonConfig } from '~/src/params'
+import { useEnvironment } from '~/test/test-helpers/useEnvironment'
 
 describe('index.ts', () => {
   describe('default config', async function() {
@@ -17,7 +18,11 @@ describe('index.ts', () => {
       })
 
       it('resulting config contains default values', function() {
-        assert.deepEqual(config, defaultConfig, 'config is different')
+        assert.deepEqual(
+          pick(config, Object.keys(defaultConfig)),
+          defaultConfig,
+          'config is different'
+        )
       })
     })
 

@@ -1,8 +1,8 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import namehash from 'eth-ens-namehash'
-import { AragonAppJson } from '~/src/types'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
+import { AragonAppJson } from '~/src/types'
+import { pathExists, readJson, readJsonIfExists } from './fsUtils'
 
 const arappPath = 'arapp.json'
 const contractsPath = './contracts'
@@ -12,36 +12,19 @@ const contractsPath = './contracts'
  * @return AragonAppJson
  */
 export function readArapp(): AragonAppJson {
-  return JSON.parse(fs.readFileSync(arappPath, 'utf-8'))
+  if (!pathExists(arappPath))
+    throw new BuidlerPluginError(
+      `No ${arappPath} found in current working directory\n ${process.cwd()}`
+    )
+  return readJson(arappPath)
 }
 
 /**
- * Returns app ens name.
- * @return "voting.open.aragonpm.eth"
+ * Reads and parses an arapp.json file only if exists
+ * otherwise returns undefined
  */
-export function getAppEnsName(): string {
-  const arapp = readArapp()
-
-  const defaultEnvironment = arapp.environments.default
-  if (!defaultEnvironment) {
-    throw new BuidlerPluginError('Default environemnt not found in arapp.json')
-  }
-
-  return defaultEnvironment.appName
-}
-
-export function getAppId(ensName: string): string {
-  return namehash.hash(ensName)
-}
-
-/**
- * Returns app name.
- * @return "voting"
- */
-export function getAppName(): string {
-  const ensName = getAppEnsName()
-
-  return ensName.split('.')[0]
+export function readArappIfExists(): AragonAppJson | undefined {
+  return readJsonIfExists(arappPath)
 }
 
 /**
@@ -50,11 +33,8 @@ export function getAppName(): string {
  */
 export function getMainContractPath(): string {
   // Read the path from arapp.json.
-  if (fs.existsSync(arappPath)) {
-    const arapp = readArapp()
-
-    return arapp.path
-  }
+  const arapp = readArappIfExists()
+  if (arapp) return arapp.path
 
   // Try to guess contract path.
   if (fs.existsSync(contractsPath)) {
@@ -79,4 +59,49 @@ export function getMainContractPath(): string {
 export function getMainContractName(): string {
   const mainContractPath: string = getMainContractPath()
   return path.parse(mainContractPath).name
+}
+
+/**
+ * Parse the appName from arapp.json in a flexible manner
+ * @param arapp
+ * @param network
+ */
+export function parseAppName(arapp: AragonAppJson, network?: string): string {
+  if (!arapp.appName && !arapp.environments)
+    throw new BuidlerPluginError(
+      `No appName configured. 
+Add an 'appName' property in your arapp.json with your app's ENS name`
+    )
+
+  // Aggreate app names from environments
+  const appNameByNetwork: { [network: string]: string } = {}
+  for (const [_network, env] of Object.entries(arapp.environments)) {
+    if (env.appName) appNameByNetwork[_network] = env.appName
+  }
+
+  // If there an appName for that network return it
+  if (network && appNameByNetwork[network]) return appNameByNetwork[network]
+
+  // If there's a default appName return it
+  if (arapp.appName) {
+    return arapp.appName
+  } else {
+    // Otherwise, try to guess the appName
+
+    // Pre-compute booleans to make logic below readable
+    const appNamesArr = Object.values(appNameByNetwork)
+    const thereAreNames = appNamesArr.length > 0
+    const allNamesAreEqual = appNamesArr.every(name => name === appNamesArr[0])
+
+    if (thereAreNames && allNamesAreEqual) return appNamesArr[0]
+
+    // If no guess was possible ask the user to provide it
+    const networkId = network || 'development' // Don't print "undefined" for development
+    throw new BuidlerPluginError(
+      `No appName configured for network ${networkId}. 
+Add an 'appName' property in the environment of ${networkId} with your app's 
+ENS name in your arapp.json. If your app's name is the name accross networks,
+Add an 'appName' property in your arapp.json with your app's ENS name`
+    )
+  }
 }

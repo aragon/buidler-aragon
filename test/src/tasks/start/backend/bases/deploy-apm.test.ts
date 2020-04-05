@@ -1,5 +1,7 @@
 import { assert } from 'chai'
 import { APMRegistryInstance } from '~/typechain'
+import { externalArtifactPaths } from '~/src/params'
+import { copyExternalArtifacts } from '~/src/utils/copyExternalArtifacts'
 import { deployEns } from '~/src/tasks/start/backend/bases/deploy-ens'
 import { deployDaoFactory } from '~/src/tasks/start/backend/bases/deploy-dao-factory'
 import { deployApm } from '~/src/tasks/start/backend/bases/deploy-apm'
@@ -13,6 +15,13 @@ describe('deploy-apm.ts', function() {
     let apm: APMRegistryInstance
 
     before('create an apm instance', async function() {
+      // ==================== Temporal hack >>>
+      // Copy external artifacts to the local artifacts folder
+      // This is a temporary hack until multiple artifacts paths are allowed
+      for (const externalArtifactPath of externalArtifactPaths)
+        copyExternalArtifacts(externalArtifactPath)
+      // ==================== Temporal hack <<<
+
       const ens = await deployEns(this.env.web3, this.env.artifacts)
 
       const daoFactory = await deployDaoFactory(this.env.artifacts)

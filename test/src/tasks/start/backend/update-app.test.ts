@@ -11,12 +11,9 @@ import {
   startGanache,
   stopGanache
 } from '~/src/tasks/start/backend/start-ganache'
-import {
-  getAppEnsName,
-  getAppId,
-  getAppName,
-  readArapp
-} from '~/src/utils/arappUtils'
+import { readArapp, parseAppName } from '~/src/utils/arappUtils'
+import { getAppId } from '~/src/utils/appName'
+import { AragonAppJson } from '~/src/types'
 
 describe('update-app.ts', function() {
   // Note: These particular tests use localhost instead of buidlerevm.
@@ -24,27 +21,25 @@ describe('update-app.ts', function() {
   // And because we want to restart the chain on certain tests.
   useEnvironment('counter', 'localhost')
 
-  let ensAddress, apmAddress, daoFactoryAddress
-  let appName, appId
+  let arapp: AragonAppJson, appName: string
+  let ensAddress, daoFactoryAddress
   let dao
+
+  before('Read arapp in test folder after useEnviornment chdir', () => {
+    arapp = readArapp()
+    appName = parseAppName(arapp)
+  })
 
   before('start ganache', async function() {
     await startGanache(this.env)
   })
 
   before('deploy bases', async function() {
-    ;({ ensAddress, apmAddress, daoFactoryAddress } = await deployBases(
-      this.env
-    ))
+    ;({ ensAddress, daoFactoryAddress } = await deployBases(this.env))
   })
 
   before('deploy a dao', async function() {
     dao = await createDao(this.env.web3, this.env.artifacts, daoFactoryAddress)
-  })
-
-  before('calculate appName and appId', async function() {
-    appName = getAppName()
-    appId = getAppId(getAppEnsName())
   })
 
   after('stop ganache', async function() {
@@ -56,11 +51,7 @@ describe('update-app.ts', function() {
 
     before('create app', async function() {
       ;({ proxy, repo, implementation } = await createApp(
-        appName,
-        appId,
-        dao,
-        ensAddress,
-        apmAddress,
+        { appName, dao, ensAddress },
         this.env
       ))
 
@@ -89,10 +80,7 @@ describe('update-app.ts', function() {
         // Appears to be a caching issue with truffle/ganache.
         await this.env.run(TASK_COMPILE)
         ;({ implementationAddress, version, uri } = await updateApp(
-          appId,
-          dao,
-          repo,
-          port,
+          { appName, dao, repo, appServePort: port },
           this.env
         ))
       })
@@ -102,6 +90,7 @@ describe('update-app.ts', function() {
       })
 
       it('the dao references the correct implementation for it', async function() {
+        const appId = getAppId(appName)
         assert.equal(
           implementationAddress,
           await dao.getApp(await dao.APP_BASES_NAMESPACE(), appId),

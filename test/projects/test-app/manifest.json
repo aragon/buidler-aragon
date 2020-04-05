@@ -1,0 +1,11 @@
+{
+  "name": "Test app",
+  "author": "testing",
+  "description": "Test app",
+  "details_url": "",
+  "source_url": "",
+  "icons": [],
+  "screenshots": [],
+  "start_url": "/index.html",
+  "script": "/script.js"
+}

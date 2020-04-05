@@ -1,6 +1,9 @@
 import tcpPortUsed from 'tcp-port-used'
 import { promisify } from 'util'
-import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
+import {
+  BuidlerRuntimeEnvironment,
+  HttpNetworkConfig
+} from '@nomiclabs/buidler/types'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { aragenGasLimit, aragenMnemonic, testnetPort } from '~/src/params'
 
@@ -14,7 +17,7 @@ let server
 
 export async function startGanache(
   bre: BuidlerRuntimeEnvironment
-): Promise<number> {
+): Promise<{ networkId: number; close?: () => void }> {
   if (bre.network.name === 'buidlerevm') {
     throw new BuidlerPluginError(
       'Cannot use buidlerevm network for this task until a JSON RPC is exposed'
@@ -27,10 +30,13 @@ export async function startGanache(
     )
   }
 
+  const nodeUrl = (bre.network.config as HttpNetworkConfig).url
+  const port = nodeUrl ? parsePort(nodeUrl) || testnetPort : testnetPort
+
   // If port is in use, assume that a local chain is already running.
-  const portInUse = await tcpPortUsed.check(testnetPort)
+  const portInUse = await tcpPortUsed.check(port)
   if (portInUse) {
-    return 0
+    return { networkId: 0 }
   }
 
   // Start a new ganache server.
@@ -40,9 +46,14 @@ export async function startGanache(
     /* eslint-disable @typescript-eslint/camelcase */
     default_balance_ether: 100
   })
-  const blockchain = await promisify(server.listen)(testnetPort)
+  const blockchain = await promisify(server.listen)(port)
 
-  return blockchain.options.network_id
+  return {
+    networkId: blockchain.options.network_id,
+    close: (): void => {
+      server.close()
+    }
+  }
 }
 
 export function stopGanache(): void {
@@ -53,4 +64,10 @@ export function stopGanache(): void {
   }
 
   server.close()
+}
+
+function parsePort(urlString: string): number | null {
+  const url = new URL(urlString)
+  if (!url || !url.port) return null
+  return parseInt(url.port)
 }

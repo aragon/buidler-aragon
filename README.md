@@ -1,19 +1,19 @@
-## buidler-aragon
-
-_WIP - Experimental!_
+# Aragon Buidler plugin
 
 Buidler plugin for developing Aragon apps with full front end and back end hot reloading.
 
 ### Required plugins
 
 This plugin currently requires:
-* [**buidler-truffle5**](https://github.com/nomiclabs/buidler/tree/master/packages/buidler-truffle5)
-* [**buidler-web3**](https://github.com/nomiclabs/buidler/tree/master/packages/buidler-web3)
+
+- [**buidler-truffle5**](https://github.com/nomiclabs/buidler/tree/master/packages/buidler-truffle5)
+- [**buidler-web3**](https://github.com/nomiclabs/buidler/tree/master/packages/buidler-web3)
+- [**buidler-etherscan**](https://github.com/nomiclabs/buidler/tree/master/packages/buidler-etherscan)
 
 ### Installation
 
 ```
-npm install --save-dev @aragon/buidler-aragon @nomiclabs/buidler-truffle5 @nomiclabs/buidler-web3 web3
+yarn add --dev @aragon/buidler-aragon @nomiclabs/buidler-truffle5 @nomiclabs/buidler-web3 web3
 ```
 
 And add the following statement to your buidler.config.js:
@@ -29,8 +29,9 @@ usePlugin('@aragon/buidler-aragon')
 This plugin provides the "start" task, which allows you to develop an application while visualizing it in the browser.
 
 **Task options:**
-* openBrowser: Wether or not to automatically open a browser tab with the client when running this task.
-* Please use buidler.config.js for additional options.
+
+- openBrowser: Whether or not to automatically open a browser tab with the client when running this task.
+- Please use buidler.config.js for additional options.
 
 ### Environment extensions
 
