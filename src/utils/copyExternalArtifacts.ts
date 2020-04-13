@@ -12,10 +12,7 @@ export function copyExternalArtifacts(
 ): void {
   const fromDir = path.resolve(externalArtifactsPath)
   const toDir = path.resolve(localArtifactsPath)
-  if (!fs.existsSync(fromDir))
-    throw Error(
-      `Can not copy external artifacts from ${fromDir}, does not exist`
-    )
+  if (!fs.existsSync(fromDir)) return //fail silently
 
   for (const file of fs.readdirSync(fromDir)) {
     const from = path.join(fromDir, file)
