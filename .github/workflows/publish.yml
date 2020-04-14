@@ -16,7 +16,8 @@ jobs:
       - run: yarn --frozen-lockfile
       - run: yarn generate
       - run: yarn build
-      - run: yarn git:clean
+      - run: git --no-pager diff 
+      - run: git stash
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
