@@ -18,7 +18,7 @@ yarn add --dev @aragon/buidler-aragon @nomiclabs/buidler-truffle5 @nomiclabs/bui
 
 And add the following statement to your buidler.config.js:
 
-```
+```js
 usePlugin('@aragon/buidler-aragon')
 ```
 
@@ -47,7 +47,7 @@ If you don't want to use a create-aragon-app or a boilerplate, you can follow th
 
 This plugin extends BuidlerConfig by adding the following fields:
 
-```
+```js
 export interface AragonConfig {
   appServePort?: number
   clientServePort?: number
@@ -61,7 +61,7 @@ export interface AragonConfig {
 
 If you need to perform some tasks before deploying your application's proxy, i.e. deploying a token and passing that token in your proxy's initialize function, you can use the hooks object within the BuidlerConfig object. This object simply contains functions, which, if named correctly, will be called at the appropriate moments in the development pipeline:
 
-```
+```js
 export interface AragonConfigHooks {
   preDao?: (bre: BuidlerRuntimeEnvironment) => Promise<void> | void
   postDao?: (
