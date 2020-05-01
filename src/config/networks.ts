@@ -12,6 +12,7 @@ const aragonRpc = (network: string): string =>
 const localRpc = 'http://localhost:8545'
 const coverageRpc = 'http://localhost:8555'
 const frameRpc = 'ws://localhost:1248'
+const frameOrigin = 'BuidlerAragon'
 
 const aragenNetwork: NetworkConfig = {
   url: localRpc,
@@ -52,7 +53,8 @@ const defaultNetworks: Networks = {
     gasPrice: 0x01
   },
   frame: {
-    url: frameRpc
+    url: frameRpc,
+    httpHeaders: { origin: frameOrigin }
   }
 }
 
