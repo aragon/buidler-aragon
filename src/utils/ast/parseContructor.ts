@@ -1,4 +1,4 @@
-import * as parser from 'solidity-parser-antlr'
+import * as parser from '@solidity-parser/parser'
 
 /**
  * Returns true if a contract has a constructor, otherwise false.

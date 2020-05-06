@@ -1,4 +1,4 @@
-import * as parser from 'solidity-parser-antlr'
+import * as parser from '@solidity-parser/parser'
 
 /**
  * Finds global storage variable declarations with initialized values, e.g 'int a = 1'.

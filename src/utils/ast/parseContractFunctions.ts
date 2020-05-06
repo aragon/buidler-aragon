@@ -1,6 +1,6 @@
 import { keyBy } from 'lodash'
 import path from 'path'
-import * as parser from 'solidity-parser-antlr'
+import * as parser from '@solidity-parser/parser'
 import { parseFunctionsNotices } from './parseFunctionNotices'
 import { AragonContractFunction } from './types'
 import { coerceFunctionSignature } from './utils'
@@ -209,7 +209,7 @@ export function parseContractFunctions(
       contracts[contracts.length - 1]
   )
 
-  // # Pending: Curent solidity-parser-antlr version does not parse notices
+  // # Pending: Curent @solidity-parser/parser version does not parse notices
   // which are parsed here separately using regex against the source string
   // Functions are mapped with each other on a best effort using their
   // guessed signature, which may be wrong if complex syntax is used

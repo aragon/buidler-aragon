@@ -34,6 +34,7 @@
     "report-coverage": "codecov"
   },
   "dependencies": {
+    "@solidity-parser/parser": "^0.6.0",
     "chalk": "^3.0.0",
     "chokidar": "^3.3.1",
     "ethers": "^4.0.46",
@@ -46,7 +47,6 @@
     "live-server": "^1.2.1",
     "node-fetch": "^2.6.0",
     "open": "^7.0.0",
-    "solidity-parser-antlr": "^0.4.11",
     "source-map-support": "^0.5.16",
     "tcp-port-used": "^1.0.1",
     "tsconfig-paths": "^3.9.0"
