@@ -1,11 +1,7 @@
 import { ethers } from 'ethers'
 import { keyBy } from 'lodash'
 import { keccak256, AbiItem } from 'web3-utils'
-import {
-  AragonAppJson,
-  AragonArtifact,
-  AragonArtifactFunction
-} from '~/src/types'
+import { AragonAppJson, AragonArtifact } from '~/src/types'
 import { getAppId } from '~/src/utils/appName'
 import { parseAppName } from '~/src/utils/arappUtils'
 import { parseContractFunctions, AragonContractFunction } from '~/src/utils/ast'
@@ -30,19 +26,16 @@ function _generateAragonArtifact(
     ...arapp,
 
     // Artifact appears to require the abi of each function
-    functions: functions.map(
-      parsedFn =>
-        ({
-          roles: parsedFn.roles.map(role => role.id),
-          notice: parsedFn.notice,
-          abi:
-            abiBySignature[parsedFn.sig] ||
-            (parsedFn.sig === 'fallback' ? abiFallback : null),
-          // #### Todo: Is the signature actually necessary?
-          // > Will keep them for know just in case, they are found in current release
-          sig: parsedFn.sig
-        } as AragonArtifactFunction)
-    ),
+    functions: functions.map(parsedFn => ({
+      roles: parsedFn.roles.map(role => role.id),
+      notice: parsedFn.notice,
+      abi:
+        abiBySignature[parsedFn.sig] ||
+        (parsedFn.sig === 'fallback' ? abiFallback : null),
+      // #### Todo: Is the signature actually necessary?
+      // > Will keep them for know just in case, they are found in current release
+      sig: parsedFn.sig
+    })),
 
     deprecatedFunctions: {},
 
