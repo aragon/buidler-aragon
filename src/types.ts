@@ -112,7 +112,7 @@ export interface AragonManifest {
 }
 /* eslint-enable camelcase */
 
-interface AragonArtifactFunction {
+export interface AragonArtifactFunction {
   roles: string[]
   sig: string
   /**
