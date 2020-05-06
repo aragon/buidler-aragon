@@ -38,7 +38,7 @@ describe('set-permissions.ts', function() {
   })
 
   before('deploy a dao and retrieve acl', async function() {
-    dao = await createDao(this.env.web3, this.env.artifacts, daoFactoryAddress)
+    dao = await createDao(this.env, this.env.artifacts, daoFactoryAddress)
 
     const ACL: ACLContract = this.env.artifacts.require('ACL')
     acl = await ACL.at(await dao.acl())
@@ -61,7 +61,7 @@ describe('set-permissions.ts', function() {
         dao,
         proxy,
         arapp,
-        this.env.web3,
+        this.env,
         this.env.artifacts
       )
     })

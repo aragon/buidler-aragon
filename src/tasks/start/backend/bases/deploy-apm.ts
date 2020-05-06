@@ -1,4 +1,4 @@
-import Web3 from 'web3'
+import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import {
   DAOFactoryInstance,
@@ -13,6 +13,7 @@ import {
   APMRegistryFactoryInstance
 } from '~/typechain'
 import { ZERO_ADDRESS } from '~/src/params'
+import { getRootAccount } from '~/src/utils/accounts'
 import { getLog } from '~/src/utils/getLog'
 import { namehash } from '~/src/utils/namehash'
 
@@ -21,12 +22,12 @@ import { namehash } from '~/src/utils/namehash'
  * @returns DAOFactory's instance.
  */
 export async function deployApm(
-  web3: Web3,
+  bre: BuidlerRuntimeEnvironment,
   artifacts: TruffleEnvironmentArtifacts,
   ens: ENSInstance,
   daoFactory: DAOFactoryInstance
 ): Promise<APMRegistryInstance> {
-  const rootAccount: string = (await web3.eth.getAccounts())[0]
+  const rootAccount: string = await getRootAccount(bre)
 
   // Retrieve contract artifacts.
   const APMRegistry: APMRegistryContract = artifacts.require('APMRegistry')
@@ -55,7 +56,7 @@ export async function deployApm(
 
   // Creating aragonpm.eth subdomain and assigning it to APMRegistryFactory.
   const tldHash = namehash('eth')
-  const labelHash = web3.utils.keccak256('aragonpm')
+  const labelHash = bre.web3.utils.keccak256('aragonpm')
   await ens.setSubnodeOwner(tldHash, labelHash, apmFactory.address)
 
   // Deploy APMRegistry.

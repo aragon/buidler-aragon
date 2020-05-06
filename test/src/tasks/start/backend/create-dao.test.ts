@@ -19,11 +19,7 @@ describe('create-dao.ts', function() {
       let dao: KernelInstance
 
       before('create a dao', async function() {
-        dao = await createDao(
-          this.env.web3,
-          this.env.artifacts,
-          daoFactory.address
-        )
+        dao = await createDao(this.env, this.env.artifacts, daoFactory.address)
       })
 
       it('deploys a dao with a valid address', function() {

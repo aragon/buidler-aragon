@@ -45,9 +45,9 @@ export default async function deployBases(
   //    *no*   bases are deployed => deploy them,
   //    *some* bases are deployed => throw an error.
   if (noBasesAreDeployed) {
-    const ens = await deployEns(bre.web3, bre.artifacts)
+    const ens = await deployEns(bre, bre.artifacts)
     const daoFactory = await deployDaoFactory(bre.artifacts)
-    const apm = await deployApm(bre.web3, bre.artifacts, ens, daoFactory)
+    const apm = await deployApm(bre, bre.artifacts, ens, daoFactory)
 
     if (ens.address !== defaultLocalAragonBases.ensAddress)
       throw new BuidlerPluginError(

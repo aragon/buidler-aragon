@@ -69,7 +69,7 @@ export async function startBackend(
   // Create a DAO.
   logBack('Deploying DAO and app repository...')
   const dao: KernelInstance = await createDao(
-    bre.web3,
+    bre,
     bre.artifacts,
     daoFactoryAddress
   )
@@ -140,7 +140,7 @@ export async function startBackend(
 
   // TODO: What if user wants to set custom permissions?
   // Use a hook? A way to disable all open permissions?
-  await setAllPermissionsOpenly(dao, proxy, arapp, bre.web3, bre.artifacts)
+  await setAllPermissionsOpenly(dao, proxy, arapp, bre, bre.artifacts)
   logBack('All permissions set openly.')
 
   // Watch back-end files.

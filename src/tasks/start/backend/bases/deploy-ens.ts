@@ -1,6 +1,7 @@
-import Web3 from 'web3'
+import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import { ENSContract, ENSFactoryContract, ENSInstance } from '~/typechain'
+import { getRootAccount } from '~/src/utils/accounts'
 import { getLog } from '~/src/utils/getLog'
 
 /**
@@ -8,10 +9,10 @@ import { getLog } from '~/src/utils/getLog'
  * @returns ENS's instance.
  */
 export async function deployEns(
-  web3: Web3,
+  bre: BuidlerRuntimeEnvironment,
   artifacts: TruffleEnvironmentArtifacts
 ): Promise<ENSInstance> {
-  const rootAccount: string = (await web3.eth.getAccounts())[0]
+  const rootAccount: string = await getRootAccount(bre)
 
   // Retrieve contract artifacts.
   const ENS: ENSContract = artifacts.require('ENS')
