@@ -8,6 +8,7 @@ import {
   AppStubInstance,
   KernelInstance
 } from '~/typechain'
+import { getRootAccount } from '~/src/utils/accounts'
 import { getAppId, getAppNameParts } from '~/src/utils/appName'
 import { getMainContractName } from '~/src/utils/arappUtils'
 import { resolveName } from '~/src/utils/ens'
@@ -62,7 +63,7 @@ async function _createProxy(
   },
   bre: BuidlerRuntimeEnvironment
 ): Promise<AppStubInstance> {
-  const rootAccount: string = (await bre.web3.eth.getAccounts())[0]
+  const rootAccount: string = await getRootAccount(bre)
   const appId = getAppId(appName)
 
   // Create a new app proxy with base implementation.

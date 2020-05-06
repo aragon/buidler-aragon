@@ -1,8 +1,9 @@
-import Web3 from 'web3'
+import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import { KernelInstance } from '~/typechain'
 import { ANY_ADDRESS } from '~/src/params'
 import { AragonAppJson } from '~/src/types'
+import { getRootAccount } from '~/src/utils/accounts'
 
 export const DUMMY_BYTES =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
@@ -14,10 +15,10 @@ export async function setAllPermissionsOpenly(
   dao: KernelInstance,
   app: any, // TODO: needs type
   arapp: AragonAppJson,
-  web3: Web3,
+  bre: BuidlerRuntimeEnvironment,
   artifacts: TruffleEnvironmentArtifacts
 ): Promise<void> {
-  const rootAccount: string = (await web3.eth.getAccounts())[0]
+  const rootAccount: string = await getRootAccount(bre)
 
   // Retrieve ACL.
   const aclAddress = await dao.acl()

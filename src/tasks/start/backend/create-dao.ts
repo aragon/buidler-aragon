@@ -1,4 +1,4 @@
-import Web3 from 'web3'
+import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { TruffleEnvironmentArtifacts } from '@nomiclabs/buidler-truffle5/src/artifacts'
 import {
   KernelContract,
@@ -8,6 +8,7 @@ import {
   DAOFactoryContract,
   DAOFactoryInstance
 } from '~/typechain'
+import { getRootAccount } from '~/src/utils/accounts'
 import { getLog } from '~/src/utils/getLog'
 
 /**
@@ -15,11 +16,11 @@ import { getLog } from '~/src/utils/getLog'
  * @returns DAO's Kernel TruffleContract.
  */
 export async function createDao(
-  web3: Web3,
+  bre: BuidlerRuntimeEnvironment,
   artifacts: TruffleEnvironmentArtifacts,
   daoFactoryAddress: string
 ): Promise<KernelInstance> {
-  const rootAccount: string = (await web3.eth.getAccounts())[0]
+  const rootAccount: string = await getRootAccount(bre)
 
   // Create a DAO instance using the factory.
   const DAOFactory: DAOFactoryContract = artifacts.require('DAOFactory')

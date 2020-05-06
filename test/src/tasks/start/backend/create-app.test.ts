@@ -39,7 +39,7 @@ describe('create-app.ts', function() {
   })
 
   before('deploy a dao', async function() {
-    dao = await createDao(this.env.web3, this.env.artifacts, daoFactoryAddress)
+    dao = await createDao(this.env, this.env.artifacts, daoFactoryAddress)
   })
 
   after('stop ganache', async function() {
@@ -62,7 +62,7 @@ describe('create-app.ts', function() {
         dao,
         proxy,
         arapp,
-        this.env.web3,
+        this.env,
         this.env.artifacts
       )
 

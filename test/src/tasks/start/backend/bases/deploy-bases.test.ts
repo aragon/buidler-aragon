@@ -116,7 +116,7 @@ describe('deploy-bases.ts', function() {
     })
 
     before('deploy an ENS instance', async function() {
-      const ens = await deployEns(this.env.web3, this.env.artifacts)
+      const ens = await deployEns(this.env, this.env.artifacts)
 
       assert.equal(
         ens.address,

@@ -11,7 +11,7 @@ describe('deploy-ens.ts', function() {
     let ens: ENSInstance
 
     before('deploy ens instance', async function() {
-      ens = await deployEns(this.env.web3, this.env.artifacts)
+      ens = await deployEns(this.env, this.env.artifacts)
     })
 
     it('deploys an ens instance with a valid address', function() {

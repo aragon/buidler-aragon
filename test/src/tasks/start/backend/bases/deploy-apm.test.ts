@@ -22,11 +22,11 @@ describe('deploy-apm.ts', function() {
         copyExternalArtifacts(externalArtifactPath)
       // ==================== Temporal hack <<<
 
-      const ens = await deployEns(this.env.web3, this.env.artifacts)
+      const ens = await deployEns(this.env, this.env.artifacts)
 
       const daoFactory = await deployDaoFactory(this.env.artifacts)
 
-      apm = await deployApm(this.env.web3, this.env.artifacts, ens, daoFactory)
+      apm = await deployApm(this.env, this.env.artifacts, ens, daoFactory)
     })
 
     it('deploys an apm instance with a valid address', function() {
