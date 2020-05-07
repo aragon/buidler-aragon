@@ -22,25 +22,27 @@ export function findMissingManifestFiles(
   const missingFiles: MissingFile[] = []
 
   function assertFile(filepath: string, id: string, required: boolean): void {
-    // filepath maybe a remote URL, ignore those cases
-    if (filepath.includes('://')) return
-    const fullPath = path.join(distPath, filepath)
-    if (!fs.existsSync(fullPath))
-      missingFiles.push({ path: fullPath, id, required })
+    if (filepath) {
+      // filepath maybe a remote URL, ignore those cases
+      if (filepath.includes('://')) return
+      const fullPath = path.join(distPath, filepath)
+      if (!fs.existsSync(fullPath))
+        missingFiles.push({ path: fullPath, id, required })
+    }
   }
 
   // Assert optional metadata
-  if (manifest.details_url) assertFile(manifest.details_url, 'details', false)
-  manifest.icons.forEach((icon, i) => {
-    assertFile(icon.src, `icon ${i}`, false)
-  })
-  manifest.screenshots.forEach((screenshot, i) => {
-    assertFile(screenshot.src, `screenshot ${i}`, false)
-  })
-
-  // Assert mandatory files
-  assertFile(manifest.start_url, 'start page', true)
-  assertFile(manifest.script, 'script', true)
+  assertFile(manifest.details_url, 'details', false)
+  manifest.icons &&
+    manifest.icons.forEach((icon, i) => {
+      assertFile(icon.src, `icon ${i}`, false)
+    })
+  manifest.screenshots &&
+    manifest.screenshots.forEach((screenshot, i) => {
+      assertFile(screenshot.src, `screenshot ${i}`, false)
+    })
+  assertFile(manifest.start_url, 'start page', false)
+  assertFile(manifest.script, 'script', false)
 
   return missingFiles
 }

@@ -33,7 +33,9 @@ Some files declared in manifest.json are not found in dist dir: ${distPath}
 ${missingFiles.map(file => ` - ${file.id}: ${file.path}`).join('\n')}
       
 Make sure your app build process includes them in the dist directory on
-every run of the designated NPM build script
+every run of the designated NPM build script.
+
+If you are sure you want to publish anyway, use the flag "--force".
 `
     )
 
@@ -44,6 +46,8 @@ every run of the designated NPM build script
       `
 Some contract roles do not match declared roles in ${arappName}:
 ${roleMatchErrors.map(err => ` - ${err.id}: ${err.message}`).join('\n')}
+
+If you are sure you want to publish anyway, use the flag "--force".
 `
     )
 }
