@@ -73,6 +73,7 @@ export function setupPublishTask(): void {
       'Prevents contract compilation, deployment and artifact generation.'
     )
     .addFlag('verify', 'Automatically verify contract on Etherscan.')
+    .addFlag('force', 'Force publish without artifacts validation.')
     .addFlag('dryRun', 'Output tx data without broadcasting')
     .setAction(
       async (
@@ -88,6 +89,7 @@ export function setupPublishTask(): void {
             ipfsApiUrl: params.ipfsApiUrl,
             onlyContent: params.onlyContent,
             verify: params.verify,
+            force: params.force,
             dryRun: params.dryRun
           },
           bre
@@ -104,6 +106,7 @@ async function publishTask(
     ipfsApiUrl: ipfsApiUrlArg,
     onlyContent,
     verify,
+    force,
     dryRun
   }: {
     bumpOrVersion: string
@@ -112,6 +115,7 @@ async function publishTask(
     ipfsApiUrl: string
     onlyContent: boolean
     verify: boolean
+    force: boolean
     dryRun: boolean
   },
   bre: BuidlerRuntimeEnvironment
@@ -200,15 +204,16 @@ you may use a public IPFS API such as
     logMain(`Reusing previous version contract address: ${contractAddress}`)
   }
 
-  // Prepare release directory
-  // npm run build must create: index.html, src.js, script.js
-  logMain(`Building app front-end at ${appSrcPath}`)
-  await execa('npm', ['run', 'build'], { cwd: appSrcPath })
+  if (appSrcPath) {
+    logMain(`Running app build script`)
+    await execa('npm', ['run', 'build'], { cwd: appSrcPath })
+  }
 
   // Generate and validate Aragon artifacts, release files
   logMain(`Generating Aragon app artifacts`)
   await generateArtifacts(distPath, bre)
-  validateArtifacts(distPath)
+  const hasFrontend = appSrcPath ? true : false
+  if (!force) validateArtifacts(distPath, hasFrontend)
 
   // Upload release directory to IPFS
   logMain('Uploading release assets to IPFS...')

@@ -17,7 +17,10 @@ import { matchContractRoles } from './matchContractRoles'
  * - Make sure contract roles match arapp.json roles
  * - Make sure filepaths in the manifest exist
  */
-export function validateArtifacts(distPath: string): void {
+export function validateArtifacts(
+  distPath: string,
+  hasFrontend: boolean
+): void {
   // Load files straight from the dist directory
   const artifact = readJson<AragonArtifact>(path.join(distPath, artifactName))
   const manifest = readJson<AragonManifest>(path.join(distPath, manifestName))
@@ -25,7 +28,7 @@ export function validateArtifacts(distPath: string): void {
   const functions = parseContractFunctions(flatCode, artifact.path)
 
   // Make sure all declared files in the manifest are there
-  const missingFiles = findMissingManifestFiles(manifest, distPath)
+  const missingFiles = findMissingManifestFiles(manifest, distPath, hasFrontend)
   if (missingFiles.length)
     throw new BuidlerPluginError(
       `
@@ -33,7 +36,9 @@ Some files declared in manifest.json are not found in dist dir: ${distPath}
 ${missingFiles.map(file => ` - ${file.id}: ${file.path}`).join('\n')}
       
 Make sure your app build process includes them in the dist directory on
-every run of the designated NPM build script
+every run of the designated NPM build script.
+
+If you are sure you want to publish anyway, use the flag "--force".
 `
     )
 
@@ -44,6 +49,8 @@ every run of the designated NPM build script
       `
 Some contract roles do not match declared roles in ${arappName}:
 ${roleMatchErrors.map(err => ` - ${err.id}: ${err.message}`).join('\n')}
+
+If you are sure you want to publish anyway, use the flag "--force".
 `
     )
 }

@@ -11,7 +11,7 @@ const aragonRpc = (network: string): string =>
   `https://${network}.eth.aragon.network`
 const localRpc = 'http://localhost:8545'
 const coverageRpc = 'http://localhost:8555'
-const frameRpc = 'ws://localhost:1248'
+const frameRpc = 'http://localhost:1248'
 const frameOrigin = 'BuidlerAragon'
 
 const aragenNetwork: NetworkConfig = {
