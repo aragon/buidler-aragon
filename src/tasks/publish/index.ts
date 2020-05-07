@@ -212,7 +212,8 @@ you may use a public IPFS API such as
   // Generate and validate Aragon artifacts, release files
   logMain(`Generating Aragon app artifacts`)
   await generateArtifacts(distPath, bre)
-  if (!force) validateArtifacts(distPath)
+  const hasFrontend = appSrcPath ? true : false
+  if (!force) validateArtifacts(distPath, hasFrontend)
 
   // Upload release directory to IPFS
   logMain('Uploading release assets to IPFS...')

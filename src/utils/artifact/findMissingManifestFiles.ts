@@ -17,14 +17,14 @@ interface MissingFile {
  */
 export function findMissingManifestFiles(
   manifest: AragonManifest,
-  distPath: string
+  distPath: string,
+  hasFrontend: boolean
 ): MissingFile[] {
   const missingFiles: MissingFile[] = []
 
   function assertFile(filepath: string, id: string, required: boolean): void {
-    if (filepath) {
+    if (filepath && filepath.includes('://')) {
       // filepath maybe a remote URL, ignore those cases
-      if (filepath.includes('://')) return
       const fullPath = path.join(distPath, filepath)
       if (!fs.existsSync(fullPath))
         missingFiles.push({ path: fullPath, id, required })
@@ -41,8 +41,8 @@ export function findMissingManifestFiles(
     manifest.screenshots.forEach((screenshot, i) => {
       assertFile(screenshot.src, `screenshot ${i}`, false)
     })
-  assertFile(manifest.start_url, 'start page', false)
-  assertFile(manifest.script, 'script', false)
+  assertFile(manifest.start_url, 'start page', hasFrontend)
+  assertFile(manifest.script, 'script', hasFrontend)
 
   return missingFiles
 }
