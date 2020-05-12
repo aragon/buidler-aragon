@@ -33,11 +33,11 @@ export function findMissingManifestFiles(
 
   // Assert optional metadata
   assertFile(manifest.details_url, 'details', false)
-  manifest.icons &&
+  if (manifest.icons)
     manifest.icons.forEach((icon, i) => {
       assertFile(icon.src, `icon ${i}`, false)
     })
-  manifest.screenshots &&
+  if (manifest.screenshots)
     manifest.screenshots.forEach((screenshot, i) => {
       assertFile(screenshot.src, `screenshot ${i}`, false)
     })
