@@ -5,6 +5,7 @@ import {
   Networks
 } from '@nomiclabs/buidler/types'
 import { defaultLocalAragonBases, aragenMnemonic } from '~/src/params'
+import { AragonEnvironment } from '~/src/types'
 import { readArappIfExists } from '~/src/utils/arappUtils'
 
 const aragonRpc = (network: string): string =>
@@ -69,32 +70,40 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
     } as HttpNetworkConfig
   }
 
+  const mutateNetwork = (
+    aragonEnvironment: AragonEnvironment,
+    buidlerNetwork: HttpNetworkConfig
+  ): HttpNetworkConfig => {
+    const mutatedNetwork = Object.assign(
+      {},
+      buidlerNetwork
+    ) as HttpNetworkConfig
+
+    // Append registry address
+    if (aragonEnvironment.registry) {
+      mutatedNetwork.ensAddress = aragonEnvironment.registry
+    }
+
+    return mutatedNetwork
+  }
+
   // Apply networks from arapp.json
   const arapp = readArappIfExists()
   if (arapp && typeof arapp.environments === 'object') {
-    for (const [networkName, network] of Object.entries(arapp.environments)) {
-      if (network.network && finalConfig.networks[networkName]) {
-        const finalNetwork = finalConfig.networks[
-          networkName
-        ] as HttpNetworkConfig
-
-        // Append registry address
-        if (network.registry) {
-          finalNetwork.ensAddress = network.registry
+    for (const [envName, environment] of Object.entries(arapp.environments)) {
+      if (environment.network) {
+        if (finalConfig.networks[envName]) {
+          finalConfig.networks[envName] = mutateNetwork(
+            environment,
+            finalConfig.networks[envName] as HttpNetworkConfig
+          )
+        } else if (finalConfig.networks[environment.network]) {
+          // Add missing network from arapp.json
+          finalConfig.networks[envName] = mutateNetwork(
+            environment,
+            finalConfig.networks[environment.network] as HttpNetworkConfig
+          )
         }
-      } else if (network.network && finalConfig.networks[network.network]) {
-        // Add missing network from arapp.json
-        const finalNetwork = Object.assign(
-          {},
-          finalConfig.networks[network.network]
-        ) as HttpNetworkConfig
-
-        // Append registry address
-        if (network.registry) {
-          finalNetwork.ensAddress = network.registry
-        }
-
-        finalConfig.networks[networkName] = finalNetwork
       }
     }
   }
