@@ -59,7 +59,7 @@ export interface AragonConfig {
 
 ### Hooks
 
-If you need to perform some tasks before deploying your application's proxy, i.e. deploying a token and passing that token in your proxy's initialize function, you can use the hooks object within the BuidlerConfig object. This object simply contains functions, which, if named correctly, will be called at the appropriate moments in the development pipeline:
+If you need to perform some tasks before deploying your application's proxy, e.g. deploying a token and passing that token in your proxy's initialize function, you can use the hooks object within the BuidlerConfig object. This object simply contains functions, which, if named correctly, will be called at the appropriate moments in the development pipeline:
 
 ```js
 export interface AragonConfigHooks {
