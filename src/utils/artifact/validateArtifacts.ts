@@ -38,7 +38,7 @@ ${missingFiles.map(file => ` - ${file.id}: ${file.path}`).join('\n')}
 Make sure your app build process includes them in the dist directory on
 every run of the designated NPM build script.
 
-If you are sure you want to publish anyway, use the flag "--force".
+If you are sure you want to publish anyway, use the flag "--skip-validation".
 `
     )
 
@@ -50,7 +50,7 @@ If you are sure you want to publish anyway, use the flag "--force".
 Some contract roles do not match declared roles in ${arappName}:
 ${roleMatchErrors.map(err => ` - ${err.id}: ${err.message}`).join('\n')}
 
-If you are sure you want to publish anyway, use the flag "--force".
+If you are sure you want to publish anyway, use the flag "--skip-validation".
 `
     )
 }

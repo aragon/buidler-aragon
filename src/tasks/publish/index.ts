@@ -73,7 +73,7 @@ export function setupPublishTask(): void {
       'Prevents contract compilation, deployment and artifact generation.'
     )
     .addFlag('verify', 'Automatically verify contract on Etherscan.')
-    .addFlag('force', 'Force publish without artifacts validation.')
+    .addFlag('skipValidation', 'Skip validation of artifacts files.')
     .addFlag('dryRun', 'Output tx data without broadcasting')
     .setAction(
       async (
@@ -89,7 +89,7 @@ export function setupPublishTask(): void {
             ipfsApiUrl: params.ipfsApiUrl,
             onlyContent: params.onlyContent,
             verify: params.verify,
-            force: params.force,
+            skipValidation: params.skipValidation,
             dryRun: params.dryRun
           },
           bre
@@ -106,7 +106,7 @@ async function publishTask(
     ipfsApiUrl: ipfsApiUrlArg,
     onlyContent,
     verify,
-    force,
+    skipValidation,
     dryRun
   }: {
     bumpOrVersion: string
@@ -115,7 +115,7 @@ async function publishTask(
     ipfsApiUrl: string
     onlyContent: boolean
     verify: boolean
-    force: boolean
+    skipValidation: boolean
     dryRun: boolean
   },
   bre: BuidlerRuntimeEnvironment
@@ -213,7 +213,7 @@ you may use a public IPFS API such as
   logMain(`Generating Aragon app artifacts`)
   await generateArtifacts(distPath, bre)
   const hasFrontend = appSrcPath ? true : false
-  if (!force) validateArtifacts(distPath, hasFrontend)
+  if (!skipValidation) validateArtifacts(distPath, hasFrontend)
 
   // Upload release directory to IPFS
   logMain('Uploading release assets to IPFS...')
