@@ -83,10 +83,11 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
         if (network.registry) {
           finalNetwork.ensAddress = network.registry
         }
-
-        // Create an alias of the declared network to an existing network
-        if (network.network !== networkName)
-          finalConfig.networks[networkName] = finalNetwork
+      } else if (network.network && finalConfig.networks[network.network]) {
+        finalConfig.networks[networkName] = {
+          ...finalConfig.networks[network.network],
+          ...(network.registry ? { ensAddress: network.registry } : {})
+        } as HttpNetworkConfig
       }
     }
   }
