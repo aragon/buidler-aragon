@@ -11,12 +11,19 @@ export interface BuidlerAragonConfig extends BuidlerConfig {
   aragon?: AragonConfig
 }
 
+export interface DeployedAddresses {
+  ens: string
+  apm: string
+  daoFactory: string
+}
+
 export interface AragonConfig {
   appServePort?: number
   clientServePort?: number
   appSrcPath?: string
   appBuildOutputPath?: string
   ignoreFilesPath?: string
+  deployedAddresses?: DeployedAddresses
 
   /**
    * IPFS gateway to pull published data; static files from existing
