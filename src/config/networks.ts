@@ -71,11 +71,12 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
 
   // Apply networks from arapp.json
   const arapp = readArappIfExists()
+
   if (arapp && typeof arapp.environments === 'object') {
     for (const [networkName, network] of Object.entries(arapp.environments)) {
-      if (network.network && finalConfig.networks[network.network]) {
+      if (finalConfig.networks[networkName]) {
         const finalNetwork = finalConfig.networks[
-          network.network
+          networkName
         ] as HttpNetworkConfig
 
         // Append registry address
