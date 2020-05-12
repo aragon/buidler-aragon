@@ -1,7 +1,7 @@
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { externalArtifactPaths } from '~/src/params'
-import { AragonConfig } from '~/src/types'
+import { DeployedAddresses } from '~/src/types'
 import { copyExternalArtifacts } from '~/src/utils/copyExternalArtifacts'
 import { deployApm } from './deploy-apm'
 import { deployDaoFactory } from './deploy-dao-factory'
@@ -28,17 +28,12 @@ export default async function deployBases(
     copyExternalArtifacts(externalArtifactPath)
   // ==================== Temporal hack <<<
 
-  const aragonConfig = bre.config.aragon as AragonConfig
-  const localAragonBases = {
-    ensAddress: aragonConfig.ensAddress as string,
-    apmAddress: aragonConfig.apmAddress as string,
-    daoFactoryAddress: aragonConfig.daoFactoryAddress as string
-  }
-
+  const deployedAddresses = bre.config.aragon
+    ?.deployedAddresses as DeployedAddresses
   // First, aggregate which bases are deployed and which not
   // by checking if code can be found at the expected addresses.
   const isBaseDeployed: { [baseName: string]: boolean } = {}
-  for (const [name, address] of Object.entries(localAragonBases)) {
+  for (const [name, address] of Object.entries(deployedAddresses)) {
     const baseContractCode = await bre.web3.eth.getCode(address)
     // parseInt("0x") = NaN (falsy), parseInt("0x0") = 0 (falsy)
     isBaseDeployed[name] = Boolean(parseInt(baseContractCode))
@@ -68,5 +63,9 @@ export default async function deployBases(
     )
   }
 
-  return localAragonBases
+  return {
+    ensAddress: deployedAddresses.ens,
+    daoFactoryAddress: deployedAddresses.daoFactory,
+    apmAddress: deployedAddresses.apm
+  }
 }

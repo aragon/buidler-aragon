@@ -8,9 +8,11 @@ export const defaultAragonConfig: AragonConfig = {
   appBuildOutputPath: 'dist/',
   ignoreFilesPath: '.',
   ipfsGateway: defaultIpfsGateway,
-  ensAddress: defaultLocalAragonBases.ensAddress,
-  apmAddress: defaultLocalAragonBases.apmAddress,
-  daoFactoryAddress: defaultLocalAragonBases.daoFactoryAddress
+  deployedAddresses: {
+    ens: defaultLocalAragonBases.ensAddress,
+    apm: defaultLocalAragonBases.apmAddress,
+    daoFactory: defaultLocalAragonBases.daoFactoryAddress
+  }
 }
 
 export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
