@@ -87,7 +87,7 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
         finalConfig.networks[networkName] = {
           ...finalConfig.networks[network.network],
           ...(network.registry ? { ensAddress: network.registry } : {})
-        } as HttpNetworkConfig
+        }
       }
     }
   }
