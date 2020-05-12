@@ -1,6 +1,7 @@
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
-import { defaultLocalAragonBases, externalArtifactPaths } from '~/src/params'
+import { externalArtifactPaths } from '~/src/params'
+import { AragonConfig } from '~/src/types'
 import { copyExternalArtifacts } from '~/src/utils/copyExternalArtifacts'
 import { deployApm } from './deploy-apm'
 import { deployDaoFactory } from './deploy-dao-factory'
@@ -27,10 +28,17 @@ export default async function deployBases(
     copyExternalArtifacts(externalArtifactPath)
   // ==================== Temporal hack <<<
 
+  const aragonConfig = bre.config.aragon as AragonConfig
+  const localAragonBases = {
+    ensAddress: aragonConfig.ensAddress as string,
+    apmAddress: aragonConfig.apmAddress as string,
+    daoFactoryAddress: aragonConfig.daoFactoryAddress as string
+  }
+
   // First, aggregate which bases are deployed and which not
   // by checking if code can be found at the expected addresses.
   const isBaseDeployed: { [baseName: string]: boolean } = {}
-  for (const [name, address] of Object.entries(defaultLocalAragonBases)) {
+  for (const [name, address] of Object.entries(localAragonBases)) {
     const baseContractCode = await bre.web3.eth.getCode(address)
     // parseInt("0x") = NaN (falsy), parseInt("0x0") = 0 (falsy)
     isBaseDeployed[name] = Boolean(parseInt(baseContractCode))
@@ -49,11 +57,6 @@ export default async function deployBases(
     const daoFactory = await deployDaoFactory(bre.artifacts)
     const apm = await deployApm(bre, bre.artifacts, ens, daoFactory)
 
-    if (ens.address !== defaultLocalAragonBases.ensAddress)
-      throw new BuidlerPluginError(
-        `ENS was deployed at ${ens.address} instead of the expected local address ${defaultLocalAragonBases.ensAddress}`
-      )
-
     return {
       ensAddress: ens.address,
       daoFactoryAddress: daoFactory.address,
@@ -65,5 +68,5 @@ export default async function deployBases(
     )
   }
 
-  return defaultLocalAragonBases
+  return localAragonBases
 }

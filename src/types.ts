@@ -17,6 +17,9 @@ export interface AragonConfig {
   appSrcPath?: string
   appBuildOutputPath?: string
   ignoreFilesPath?: string
+  ensAddress?: string
+  apmAddress?: string
+  daoFactoryAddress?: string
 
   /**
    * IPFS gateway to pull published data; static files from existing
