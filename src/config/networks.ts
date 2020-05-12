@@ -73,19 +73,28 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
   const arapp = readArappIfExists()
   if (arapp && typeof arapp.environments === 'object') {
     for (const [networkName, network] of Object.entries(arapp.environments)) {
-      if (network.network && finalConfig.networks[network.network]) {
+      if (network.network && finalConfig.networks[networkName]) {
         const finalNetwork = finalConfig.networks[
-          network.network
+          networkName
         ] as HttpNetworkConfig
 
         // Append registry address
         if (network.registry) {
           finalNetwork.ensAddress = network.registry
         }
+      } else if (network.network && finalConfig.networks[network.network]) {
+        // Add missing network from arapp.json
+        const finalNetwork = Object.assign(
+          {},
+          finalConfig.networks[network.network]
+        ) as HttpNetworkConfig
 
-        // Create an alias of the declared network to an existing network
-        if (network.network !== networkName)
-          finalConfig.networks[networkName] = finalNetwork
+        // Append registry address
+        if (network.registry) {
+          finalNetwork.ensAddress = network.registry
+        }
+
+        finalConfig.networks[networkName] = finalNetwork
       }
     }
   }
