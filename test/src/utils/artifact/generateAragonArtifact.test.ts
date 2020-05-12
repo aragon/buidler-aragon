@@ -17,6 +17,7 @@ describe('ast > generateAragonArtifact', () => {
       it(`Should generate artifact.json - ${appName}`, () => {
         const newArtifact = generateAragonArtifact(
           arapp,
+          appName,
           artifact.abi,
           flatCode,
           arapp.path

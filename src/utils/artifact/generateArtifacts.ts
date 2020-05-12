@@ -3,7 +3,11 @@ import { TASK_FLATTEN_GET_FLATTENED_SOURCE } from '@nomiclabs/buidler/builtin-ta
 import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 import { artifactName, manifestName, flatCodeName } from '~/src/params'
 import { AragonManifest, AbiItem } from '~/src/types'
-import { getMainContractName, readArapp } from '~/src/utils/arappUtils'
+import {
+  getMainContractName,
+  readArapp,
+  parseAppName
+} from '~/src/utils/arappUtils'
 import { readJson, writeJson, writeFile, ensureDir } from '~/src/utils/fsUtils'
 import { generateAragonArtifact } from './generateAragonArtifact'
 
@@ -20,6 +24,7 @@ export async function generateArtifacts(
   bre: BuidlerRuntimeEnvironment
 ): Promise<void> {
   const arapp = readArapp()
+  const appName = parseAppName(arapp, bre.network.name)
   const manifest = readJson<AragonManifest>(manifestName)
   const contractName: string = getMainContractName()
 
@@ -29,7 +34,13 @@ export async function generateArtifacts(
   // Get ABI from generated artifacts in compilation
   const abi = _readArtifact(contractName, bre).abi
 
-  const artifact = generateAragonArtifact(arapp, abi, flatCode, contractName)
+  const artifact = generateAragonArtifact(
+    arapp,
+    appName,
+    abi,
+    flatCode,
+    contractName
+  )
   ensureDir(outPath)
   writeJson(path.join(outPath, artifactName), artifact)
   writeJson(path.join(outPath, manifestName), manifest)
