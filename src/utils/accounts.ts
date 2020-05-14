@@ -7,8 +7,7 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types'
 export async function getRootAccount(
   bre: BuidlerRuntimeEnvironment
 ): Promise<string> {
-  const accounts =
-    bre.config.networks[bre.network.name].from ||
-    (await bre.web3.eth.getAccounts())
-  return accounts[0]
+  const from = bre.config.networks[bre.network.name].from
+
+  return from || (await bre.web3.eth.getAccounts())[0]
 }
