@@ -11,6 +11,9 @@ loadPluginFile(__dirname + '/../../../dist/src/index')
 module.exports = {
   defaultNetwork: 'localhost',
   networks: {
+    buidlerevm: {
+      from: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7'
+    },
     localhost: {
       url: 'http://localhost:8545',
       accounts: [
