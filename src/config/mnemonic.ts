@@ -1,7 +1,6 @@
 import { isHexString } from 'ethers/utils'
 import { homedir } from 'os'
 import path from 'path'
-import { isArray } from 'lodash'
 import { ConfigExtender, HttpNetworkConfig } from '@nomiclabs/buidler/types'
 import { aragenMnemonic } from '~/src/params'
 import { readJsonIfExists } from '~/src/utils/fsUtils'
@@ -47,7 +46,7 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
       const { rpc, keys } = byNetworkMnemonic
       if (!finalNetwork.url && rpc) finalNetwork.url = rpc
       if (!finalNetwork.accounts && keys)
-        finalNetwork.accounts = isArray(keys)
+        finalNetwork.accounts = Array.isArray(keys)
           ? ensureHexEncoding(keys)
           : ensureHexEncoding([keys])
     }
