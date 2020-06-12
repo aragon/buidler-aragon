@@ -111,7 +111,7 @@ ${accountsStr}`)
 async function _checkPorts(config: AragonConfig): Promise<void> {
   if (await tcpPortUsed.check(config.clientServePort)) {
     throw new BuidlerPluginError(
-      `Cannot start client. Port ${config.clientServePort} is in use.`
+      `Cannot start client. Port ${config.clientServePort} is in use. If you have an instance of the client already running use the command with the flag --no-browser.`
     )
   }
 

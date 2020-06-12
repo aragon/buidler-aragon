@@ -7,8 +7,8 @@ import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 import { logFront } from '~/src/ui/logger'
 import { ensureDir, writeJson, pathExists, remove } from '~/src/utils/fsUtils'
 
-const defaultRepo = 'https://github.com/aragon/aragon'
-const defaultVersion = '775edd606333a111eb2693df53900039722a95dc'
+const defaultRepo = 'https://github.com/0xGabi/aragon'
+const defaultVersion = '456815dbc991a6d08904e8ff462bdb1f4d42dc6c'
 const aragonBaseDir: string = path.join(os.homedir(), '.aragon')
 
 export async function installAragonClientIfNeeded(
