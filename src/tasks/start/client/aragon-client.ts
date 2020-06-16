@@ -8,7 +8,7 @@ import { logFront } from '~/src/ui/logger'
 import { ensureDir, writeJson, pathExists, remove } from '~/src/utils/fsUtils'
 
 const defaultRepo = 'https://github.com/0xGabi/aragon'
-const defaultVersion = '456815dbc991a6d08904e8ff462bdb1f4d42dc6c'
+const defaultVersion = '8241ccdfd69de528500af4d8cc6ad59e00c5d41a'
 const aragonBaseDir: string = path.join(os.homedir(), '.aragon')
 
 export async function installAragonClientIfNeeded(
