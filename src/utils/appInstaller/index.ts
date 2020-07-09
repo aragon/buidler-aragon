@@ -54,7 +54,7 @@ async function _installExternalApp(
   {
     name,
     version,
-    network = 'homestead',
+    network = 'mainnet',
     initializeArgs,
     skipInitialize,
     apmAddress,
@@ -90,7 +90,7 @@ async function _installExternalApp(
   // If no repo for the app we publish first version otherwise we fetch previous version
   const { contractAddress, contentUri } = repoAddress
     ? await getRepoVersion(fullName, 'latest', ethersWeb3Provider)
-    : await _publishApp(network, fullName, rootAccount, version)
+    : await _publishApp(network, fullName, rootAccount, bre, version)
 
   // Install app instance and retrieve proxy address
   const proxyAddress = await dao
@@ -135,16 +135,25 @@ async function _installExternalApp(
     network: string,
     fullName: string,
     rootAccount: string,
+    bre: BuidlerRuntimeEnvironment,
     version?: string
   ): Promise<{ contractAddress: string; contentUri: string }> {
-    const infuraProvider = new ethers.providers.InfuraProvider(network)
+    const networkConfig: any = bre.config.networks[network]
+    const jsonRpcProvider = new ethers.providers.JsonRpcProvider(
+      networkConfig.url,
+      {
+        name: network,
+        chainId: networkConfig.chainId || 8545,
+        ensAddress: networkConfig.ensAddress
+      }
+    )
     const etherscanProvider = new ethers.providers.EtherscanProvider(network)
 
     // Fetch version from external network
     const versionData = await getExternalRepoVersion(
       fullName,
       version,
-      infuraProvider
+      jsonRpcProvider
     )
     const { contractAddress, contentURI } = versionData
 
@@ -162,7 +171,7 @@ async function _installExternalApp(
     // Todo: construct valid deploy TX from the source code
     // Make sure the contract code is correct before continuing
     const codeNew = await bre.web3.eth.getCode(newContractAddress)
-    const codeReal = await infuraProvider.getCode(contractAddress)
+    const codeReal = await jsonRpcProvider.getCode(contractAddress)
     if (codeNew !== codeReal)
       throw Error('Error re-deploying contract code, it is not equal')
 
