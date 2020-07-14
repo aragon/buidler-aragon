@@ -240,12 +240,7 @@ export interface AclPermission {
  * App Installer types
  */
 
-export type NetworkType =
-  | 'homestead'
-  | 'rinkeby'
-  | 'ropsten'
-  | 'kovan'
-  | 'goerli'
+export type NetworkType = 'mainnet' | 'rinkeby' | 'ropsten' | 'kovan' | 'goerli'
 
 export interface AppOptions {
   version?: string
