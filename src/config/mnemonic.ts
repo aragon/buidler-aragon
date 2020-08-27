@@ -46,7 +46,9 @@ export const configExtender: ConfigExtender = (finalConfig, userConfig) => {
       const { rpc, keys } = byNetworkMnemonic
       if (!finalNetwork.url && rpc) finalNetwork.url = rpc
       if (!finalNetwork.accounts && keys)
-        finalNetwork.accounts = ensureHexEncoding(keys)
+        finalNetwork.accounts = Array.isArray(keys)
+          ? ensureHexEncoding(keys)
+          : ensureHexEncoding([keys])
     }
     // Generic mnemonic
     if (genericMnemonic && !finalNetwork.accounts) {
