@@ -35,6 +35,7 @@ describe('update-app.ts', function() {
   })
 
   before('deploy bases', async function() {
+    this.timeout(500000)
     ;({ ensAddress, daoFactoryAddress } = await deployBases(this.env))
   })
 
