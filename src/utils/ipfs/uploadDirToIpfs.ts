@@ -1,6 +1,4 @@
 import { create, globSource } from 'ipfs-http-client'
-import path from 'path'
-
 
 interface Cid {
   version: number
@@ -25,8 +23,7 @@ interface IpfsAddResult {
 export async function uploadDirToIpfs({
   dirPath,
   ipfsApiUrl,
-  ignore,
-  progress
+  ignore
 }: {
   dirPath: string
   ipfsApiUrl: string
