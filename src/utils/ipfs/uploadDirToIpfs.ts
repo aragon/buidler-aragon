@@ -37,5 +37,4 @@ export async function uploadDirToIpfs({
   const root = await ipfs.add(globSource(dirPath, { recursive: true, ignore }))
 
   return root.cid.toString()
-
 }
