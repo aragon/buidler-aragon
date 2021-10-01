@@ -24,6 +24,7 @@ function _generateAragonArtifact(
     ...arapp,
 
     // Artifact appears to require the abi of each function
+    // @ts-ignore
     functions: functions.map(parsedFn => ({
       roles: parsedFn.roles.map(role => role.id),
       notice: parsedFn.notice,

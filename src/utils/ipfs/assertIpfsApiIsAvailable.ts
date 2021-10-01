@@ -1,4 +1,4 @@
-import IpfsHttpClient from 'ipfs-http-client'
+import { create } from 'ipfs-http-client'
 import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 
 /**
@@ -8,7 +8,8 @@ import { BuidlerPluginError } from '@nomiclabs/buidler/plugins'
 export async function assertIpfsApiIsAvailable(
   ipfsApiUrl: string
 ): Promise<void> {
-  const ipfs = IpfsHttpClient(ipfsApiUrl)
+  // @ts-ignore
+  const ipfs = create(ipfsApiUrl)
   try {
     await ipfs.version()
   } catch (e) {
