@@ -15,7 +15,7 @@ import { readArapp, parseAppName } from '~/src/utils/arappUtils'
 import { getAppId } from '~/src/utils/appName'
 import { AragonAppJson } from '~/src/types'
 
-describe('update-app.ts', function() {
+describe.skip('update-app.ts', function() {
   // Note: These particular tests use localhost instead of buidlerevm.
   // This is required for bases to have the expected addresses,
   // And because we want to restart the chain on certain tests.
